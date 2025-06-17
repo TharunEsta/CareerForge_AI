@@ -23,6 +23,7 @@ pydantic_core==2.33.2
 Pygments==2.19.1
 PyMuPDF==1.26.0
 pypdf==4.0.1
+sentence-transformers==2.5.1
 spacy==3.8.7
 pytest==8.4.0
 python-dotenv==1.1.0
