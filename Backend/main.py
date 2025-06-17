@@ -380,44 +380,12 @@ async def upload_resume(
     current_user: dict = Depends(get_current_user)
 ):
     try:
-        email = current_user["email"]
-        if not file or not file.filename:
-            raise HTTPException(status_code=400, detail="No file uploaded")
-        allowed_types = [".pdf", ".docx", ".doc"]
-        file_ext = os.path.splitext(file.filename)[1].lower()
-        if file_ext not in allowed_types:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Invalid file type. Allowed types: {', '.join(allowed_types)}"
-            )
-        upload_dir = Path("uploads") / email
-        upload_dir.mkdir(parents=True, exist_ok=True)
-        for old_file in upload_dir.glob("*.*"):
-            try:
-                old_file.unlink()
-            except Exception as e:
-                print(f"Error deleting old file {old_file}: {e}")
-        file_path = upload_dir / file.filename
-        content = await file.read()
-        if not content:
-            raise HTTPException(status_code=400, detail="Empty file uploaded")
-        with open(file_path, "wb") as buffer:
-            buffer.write(content)
-        with open(file_path, "rb") as f:
-            class DummyUploadFile:
-                def __init__(self, file, filename):
-                    self.file = file
-                    self.filename = filename
-            dummy_file = DummyUploadFile(f, file.filename)
-            text = extract_text(dummy_file)
-        parsed_data = parse_resume(text)
-        return {
-            "message": "Resume uploaded successfully",
-            "parsed_data": parsed_data
-        }
-    except HTTPException as e:
-        raise e
+        if not allowed_file(file.filename):
+            raise HTTPException(status_code=400, detail="File type not allowed")
+        text = extract_text(file)
+        return {"message": "Resume uploaded successfully", "text": text}
     except Exception as e:
+        logger.error(f"Error uploading resume: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/resume/parsed")
@@ -547,89 +515,14 @@ def job_match(
     top_n: int = 3
 ):
     try:
-        # Log the request
-        print(f"Job match request from user: {current_user['email']}")
-        print(f"File details - Name: {file.filename}, Content-Type: {file.content_type}")
-        # Validate file extension
-        ext = file.filename.rsplit('.', 1)[-1].lower()
-        if ext not in utils.ALLOWED_EXTENSIONS:
-            raise HTTPException(
-                status_code=400, 
-                detail=f"Unsupported file type. Allowed types: {', '.join(utils.ALLOWED_EXTENSIONS)}"
-            )
-        # Read jobs from jobs.json
-        try:
-            with open("Backend/jobs.json", "r", encoding="utf-8") as f:
-                jobs = json.load(f)
-            print(f"Successfully loaded {len(jobs)} jobs from jobs.json")
-        except Exception as e:
-            print(f"Error loading jobs.json: {str(e)}")
-            raise HTTPException(status_code=500, detail="Error loading job data")
-        # Parse resume
-        try:
-            with tempfile.NamedTemporaryFile(delete=False, suffix=f'.{ext}') as tmp:
-                content = file.file.read()
-                if not content:
-                    raise ValueError("Empty file content")
-                tmp.write(content)
-                tmp.flush()
-                tmp_path = tmp.name
-            try:
-                class DummyFileStorage:
-                    def __init__(self, filepath):
-                        self.filename = filepath
-                        self.stream = open(filepath, 'rb')
-                        self.content_type = file.content_type
-                resume_data = utils.parse_resume(DummyFileStorage(tmp_path))
-                print(f"Successfully parsed resume: {resume_data}")
-            finally:
-                os.unlink(tmp_path)
-                print("Cleaned up temporary file")
-        except Exception as e:
-            print(f"Error parsing resume: {str(e)}")
-            raise HTTPException(status_code=500, detail=f"Error parsing resume: {str(e)}")
-        resume_skills = resume_data.get("skills", [])
-        print(f"Extracted skills from resume: {resume_skills}")
-        # Match to jobs
-        try:
-            job_matches = []
-            for job in jobs:
-                job_skills = [s.lower() for s in job.get("skills_required", [])]
-                matched = [s for s in resume_skills if s.lower() in job_skills]
-                missing = [s for s in job_skills if s.lower() not in resume_skills]
-                score = int(100 * len(matched) / max(1, len(job_skills)))
-                job_matches.append({
-                    "title": job["title"],
-                    "company": job["company"],
-                    "description": job["description"],
-                    "skills_required": job["skills_required"],
-                    "matched_skills": matched,
-                    "missing_skills": missing,
-                    "match_score": score
-                })
-            print(f"Successfully matched {len(job_matches)} jobs")
-        except Exception as e:
-            print(f"Error matching jobs: {str(e)}")
-            raise HTTPException(status_code=500, detail="Error matching jobs")
-        job_matches.sort(key=lambda x: x["match_score"], reverse=True)
-        top_matches = job_matches[:top_n]
-        print(f"Selected top {len(top_matches)} matches")
-        overall_score = sum(match["match_score"] for match in top_matches) / len(top_matches) if top_matches else 0
-        all_missing_skills = list(set(skill for match in top_matches for skill in match["missing_skills"]))
-        print(f"Successfully completed job matching for user: {current_user['email']}")
-        return {
-            "match_score": overall_score,
-            "missing_skills": all_missing_skills,
-            "learning_plan": f"To improve your job matches, consider learning: {', '.join(all_missing_skills)}" if all_missing_skills else "Your skills match well with the available jobs!",
-            "top_matches": top_matches,
-            "credits_left": users_db[current_user["email"]]["credits"]
-        }
-    except HTTPException as he:
-        print(f"HTTP Exception for user {current_user['email']}: {str(he)}")
-        raise he
+        if not allowed_file(file.filename):
+            raise HTTPException(status_code=400, detail="File type not allowed")
+        text = extract_text(file)
+        resume_data = parse_resume(text)
+        return resume_data
     except Exception as e:
-        print(f"Unexpected error processing job match for user {current_user['email']}: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+        logger.error(f"Error matching job: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/test")
 async def test_endpoint():
@@ -642,29 +535,13 @@ async def analyze_resume(
     current_user: dict = Depends(get_current_user)
 ):
     try:
-        if not file or not file.filename:
-            raise HTTPException(status_code=400, detail="No file uploaded")
         if not allowed_file(file.filename):
-            raise HTTPException(status_code=400, detail="Invalid file type")
-        content = await file.read()
-        if not content:
-            raise HTTPException(status_code=400, detail="Empty file uploaded")
-        file.file.seek(0)
-        resume_data = parse_resume(file)
-        if job_description:
-            job_skills = extract_skills_from_job_description(job_description)
-            matched, missing = match_skills(job_skills, resume_data['skills'])
-            learning_plan = generate_learning_plan(missing)
-            resume_data.update({
-                'job_skills': job_skills,
-                'matched_skills': matched,
-                'missing_skills': missing,
-                'learning_plan': learning_plan
-            })
+            raise HTTPException(status_code=400, detail="File type not allowed")
+        text = extract_text(file)
+        resume_data = parse_resume_with_job_matching(file, job_description) if job_description else parse_resume(text)
         return resume_data
-    except HTTPException as e:
-        raise e
     except Exception as e:
+        logger.error(f"Error analyzing resume: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/health")
@@ -678,25 +555,13 @@ async def match_resume(
     current_user: dict = Depends(get_current_user)
 ):
     try:
-        if not file or not file.filename:
-            raise HTTPException(status_code=400, detail="No file uploaded")
-        if not job_description:
-            raise HTTPException(status_code=400, detail="No job description provided")
         if not allowed_file(file.filename):
-            raise HTTPException(status_code=400, detail="Invalid file type")
-        resume_data = parse_resume(file)
-        job_skills = extract_skills_from_job_description(job_description)
-        matched, missing = match_skills(job_skills, resume_data['skills'])
-        learning_plan = generate_learning_plan(missing)
-        return {
-            'job_skills': job_skills,
-            'matched_skills': matched,
-            'missing_skills': missing,
-            'learning_plan': learning_plan
-        }
-    except HTTPException as e:
-        raise e
+            raise HTTPException(status_code=400, detail="File type not allowed")
+        text = extract_text(file)
+        resume_data = parse_resume_with_job_matching(file, job_description)
+        return resume_data
     except Exception as e:
+        logger.error(f"Error matching resume: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/chat_with_resume")
