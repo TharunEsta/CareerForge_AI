@@ -10,7 +10,7 @@ import os
 import re
 import tempfile
 import docx2txt
-import PyPDF2
+import pypdf
 import uvicorn
 import spacy
 import openai
@@ -183,7 +183,7 @@ def extract_text(file):
         tmp_path = tmp.name
     try:
         if suffix == ".pdf":
-            text = "".join([p.extract_text() or '' for p in PyPDF2.PdfReader(tmp_path).pages])
+            text = "".join([p.extract_text() or '' for p in pypdf.PdfReader(tmp_path).pages])
         elif suffix in [".docx", ".doc"]:
             text = docx2txt.process(tmp_path)
         else:
