@@ -5,7 +5,6 @@ from pydantic import BaseModel, EmailStr
 from typing import List, Optional, Dict
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
-import stripe 
 import fitz  # <--- PyMuPDF
 import os
 import re
@@ -27,23 +26,15 @@ import json
 from utils import parse_resume, parse_resume_with_job_matching, extract_skills_from_job_description, match_skills, generate_learning_plan, allowed_file, rewrite_resume, optimize_for_linkedin
 from fastapi import Query
 from typing import List
+import logging
 
-# ─── Load OpenAI API Key ───────────────────────────────────────
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
-STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
-
-# ─── Validate API Key ───────────────────────────────────────────
+# ─── Load Environment Variables ───────────────────────────────────────
 load_dotenv("key.env")
-api_key = os.getenv("OPENAI_API_KEY")
-if not api_key:
-    raise RuntimeError("OPENAI_API_KEY not found in key.env file.")
-
-# ─── Initialize OpenAI Client ──────────────────────────────────
-
-openai.api_key = os.getenv("OPENAI_API_KEY")
-# response = openai.ChatCompletion.create(...)  # Removed: missing model parameter and not needed here
+load_dotenv(".env")
 
 # ─── App Setup ─────────────────────────────────────────────────
 app = FastAPI(title="CareerForge API")
@@ -90,13 +81,7 @@ users_db = {
         "full_name": "Test User",
         "disabled": False,
         "hashed_password": hash_password("mysecret123"),
-        "credits": 10,
-        "plan": "free"
     }
-}
-
-credits_db = {
-    "user1@example.com": 5
 }
 
 # ─── Models ─────────────────────────────────────────────────────
@@ -114,8 +99,6 @@ class User(BaseModel):
     email: Optional[str] = None
     full_name: Optional[str] = None
     disabled: Optional[bool] = None
-    credits: int = 0
-    plan: str = "free"
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -171,12 +154,6 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         )
     access_token = create_access_token(data={"sub": user["username"]})
     return {"access_token": access_token, "token_type": "bearer"}
-
-# ✅ Stripe Product/Price Mapping
-PLAN_PRICE_MAP = {
-    "basic": os.getenv("STRIPE_BASIC_PRICE_ID"),
-    "premium": os.getenv("STRIPE_PREMIUM_PRICE_ID")
-}
 
 # ─── NLP Models ─────────────────────────────────────────────────
 nlp = spacy.load("en_core_web_sm")
@@ -502,68 +479,6 @@ def search_subscriptions(query: str = Query(...)):
             })
     return results
 
-# ✅ Create Stripe Checkout Session
-@app.post("/create_checkout")
-def create_checkout(plan: str = Form(...), email: str = Depends(get_current_user)):
-    if plan not in PLAN_PRICE_MAP:
-        raise HTTPException(status_code=400, detail="Invalid plan")
-
-    try:
-        checkout_session = stripe.checkout.Session.create(
-            payment_method_types=["card"],
-            customer_email=email,
-            line_items=[{
-                "price": PLAN_PRICE_MAP[plan],
-                "quantity": 1,
-            }],
-            mode="payment",
-            success_url=f"{FRONTEND_URL}/success?plan={plan}",
-            cancel_url=f"{FRONTEND_URL}/cancel",
-            metadata={"email": email, "plan": plan}
-        )
-        return {"checkout_url": checkout_session.url}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-# ✅ Stripe Webhook
-@app.post("/webhook")
-async def stripe_webhook(request: Request):
-    payload = await request.body()
-    sig_header = request.headers.get("stripe-signature")
-
-    try:
-        event = stripe.Webhook.construct_event(payload, sig_header, STRIPE_WEBHOOK_SECRET)
-    except stripe.error.SignatureVerificationError:
-        raise HTTPException(status_code=400, detail="Invalid webhook signature")
-
-    # Handle successful payment
-    if event["type"] == "checkout.session.completed":
-        session = event["data"]["object"]
-        email = session["metadata"]["email"]
-        plan = session["metadata"]["plan"]
-
-        if email in users_db:
-            users_db[email]["plan"] = plan
-            users_db[email]["credits"] = 100 if plan == "premium" else 20
-
-    return JSONResponse(status_code=200, content={"status": "success"})
-
-# 💳 Subscription Plans
-PLAN_FEATURES = {
-    "free": ["resume_upload", "ats_score"],
-    "basic": ["resume_upload", "ats_score", "match_jobs", "rewrite_resume", "chat_resume", "cover_letter"],
-    "premium": ["all"]
-}
-
-# ✅ Check if feature is accessible based on plan
-def check_feature_access(email: str, feature: str):
-    user_plan = users_db[email]["plan"]
-    if "all" in PLAN_FEATURES.get(user_plan, []):
-        return
-    if feature not in PLAN_FEATURES.get(user_plan, []):
-        raise HTTPException(status_code=403, detail=f"{feature} not allowed in your current plan. Please upgrade.")
-
-# 📥 Signup
 @app.post("/signup", response_model=User)
 async def signup(
     email: str = Form(...),
@@ -579,102 +494,16 @@ async def signup(
         "full_name": full_name,
         "disabled": False,
         "hashed_password": hash_password(password),
-        "credits": 5,
-        "plan": "free"
     }
-    credits_db[email] = 5
     
-    return User(username=email, email=email, full_name=full_name, credits=5)
+    return User(username=email, email=email, full_name=full_name)
 
-# 💳 Upgrade plan
-@app.post("/upgrade_plan")
-def upgrade_plan(plan: str = Form(...), email: str = Depends(get_current_user)):
-    if plan not in PLAN_FEATURES:
-        raise HTTPException(status_code=400, detail="Invalid plan")
-    users_db[email]["plan"] = plan
-    return {"message": f"Plan upgraded to {plan}", "plan": plan}
-
-# 👤 Get user info
 @app.get("/get_user_info")
 def get_user_info(email: str = Depends(get_current_user)):
     user = users_db[email]
-    return {"email": email, "full_name": user["full_name"], "plan": user["plan"], "credits": user["credits"]}
-
-# 📄 Match resume + auto rewrite if match_score < 80
-@app.post("/match_resume")
-async def match_resume(
-    file: UploadFile = File(...),
-    job_description: str = Form(...),
-    current_user: User = Depends(get_current_user)
-):
-    try:
-        if not file:
-            raise HTTPException(status_code=400, detail="No file uploaded")
-        
-        if not allowed_file(file.filename):
-            raise HTTPException(status_code=400, detail="Invalid file type")
-        
-        # Process the resume
-        resume_data = parse_resume(file)
-        
-        if job_description:
-            # Check feature access and credits for resume rewriting and LinkedIn optimization
-            check_feature_access(current_user.email, "resume_rewrite")
-            if users_db[current_user.email]["credits"] <= 0:
-                raise HTTPException(status_code=402, detail="Insufficient credits")
-            users_db[current_user.email]["credits"] -= 1
-            
-            # Rewrite resume for better ATS score
-            rewritten_resume = rewrite_resume(resume_data, job_description)
-            
-            # Optimize for LinkedIn
-            linkedin_profile = optimize_for_linkedin(resume_data)
-            
-            # Match resume with job description
-            job_skills = extract_skills_from_job_description(job_description)
-            matched, missing = match_skills(job_skills, resume_data['skills'])
-            learning_plan = generate_learning_plan(missing)
-            
-            # Combine all results
-            result = {
-                'original_resume': resume_data,
-                'rewritten_resume': rewritten_resume,
-                'linkedin_profile': linkedin_profile,
-                'job_skills': job_skills,
-                'matched_skills': matched,
-                'missing_skills': missing,
-                'learning_plan': learning_plan,
-                'ats_score': rewritten_resume['ats_score'],
-                'linkedin_completeness': linkedin_profile['completeness_score'],
-                'credits_left': users_db[current_user.email]["credits"]
-            }
-            
-            return result
-        else:
-            # If no job description, return only the ATS score (free)
-            return {
-                'original_resume': resume_data,
-                'ats_score': calculate_ats_score(resume_data, "")
-            }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-# 💬 Resume Chat
-@app.post("/chat_with_resume")
-def chat_with_resume(
-    prompt: str = Form(...),
-    resume_text: str = Form(...),
-    email: str = Depends(get_current_user)
-):
-    check_feature_access(email, "chat_resume")
-    if users_db[email]["credits"] <= 0:
-        raise HTTPException(status_code=402, detail="No credits left")
-    users_db[email]["credits"] -= 1
-
-    # GPT logic placeholder
     return {
-        "response": f"(GPT chat reply) Based on your resume: {resume_text[:100]}... and your prompt: {prompt}",
-        "credits_left": users_db[email]["credits"]
+        "email": email,
+        "full_name": user["full_name"],
     }
 
 @app.post("/forgot-password")
@@ -730,12 +559,6 @@ def job_match(
         print(f"Job match request from user: {current_user.email}")
         print(f"File details - Name: {file.filename}, Content-Type: {file.content_type}")
         
-        # Check feature access and credits
-        check_feature_access(current_user.email, "match_jobs")
-        if users_db[current_user.email]["credits"] <= 0:
-            raise HTTPException(status_code=402, detail="Insufficient credits")
-        users_db[current_user.email]["credits"] -= 1
-
         # Validate file extension
         ext = file.filename.rsplit('.', 1)[-1].lower()
         if ext not in utils.ALLOWED_EXTENSIONS:
