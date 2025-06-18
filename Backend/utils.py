@@ -151,11 +151,8 @@ def generate_learning_plan(missing_skills):
 
 # --- Main Parser + Matcher ---
 
-def parse_resume(file_storage):
-    ext = file_storage.filename.rsplit('.', 1)[1].lower()
-    text = extract_text(file_storage, ext)
+def parse_resume(text: str):
     doc = nlp(text)
-
     return {
         'name': extract_name(doc),
         'email': extract_email(text),
@@ -164,12 +161,11 @@ def parse_resume(file_storage):
         'total_experience': extract_total_experience(text)
     }
 
-def parse_resume_with_job_matching(file_storage, job_description_text):
-    resume_data = parse_resume(file_storage)
+def parse_resume_with_job_matching(text: str, job_description_text: str):
+    resume_data = parse_resume(text)
     job_skills = extract_skills_from_job_description(job_description_text)
     matched, missing = match_skills(job_skills, resume_data['skills'])
     learning_plan = generate_learning_plan(missing)
-
     resume_data.update({
         'job_skills': job_skills,
         'matched_skills': matched,
