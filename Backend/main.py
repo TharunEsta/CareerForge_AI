@@ -380,8 +380,14 @@ async def upload_resume(
     current_user: dict = Depends(get_current_user)
 ):
     try:
+        if not file or not file.filename:
+            raise HTTPException(status_code=400, detail="No file uploaded")
         if not allowed_file(file.filename):
             raise HTTPException(status_code=400, detail="File type not allowed")
+        content = await file.read()
+        if not content:
+            raise HTTPException(status_code=400, detail="Empty file uploaded")
+        file.file.seek(0)
         text = extract_text(file)
         return {"message": "Resume uploaded successfully", "text": text}
     except Exception as e:
@@ -515,8 +521,14 @@ def job_match(
     top_n: int = 3
 ):
     try:
+        if not file or not file.filename:
+            raise HTTPException(status_code=400, detail="No file uploaded")
         if not allowed_file(file.filename):
             raise HTTPException(status_code=400, detail="File type not allowed")
+        content = await file.read()
+        if not content:
+            raise HTTPException(status_code=400, detail="Empty file uploaded")
+        file.file.seek(0)
         text = extract_text(file)
         resume_data = parse_resume(text)
         return resume_data
@@ -535,8 +547,14 @@ async def analyze_resume(
     current_user: dict = Depends(get_current_user)
 ):
     try:
+        if not file or not file.filename:
+            raise HTTPException(status_code=400, detail="No file uploaded")
         if not allowed_file(file.filename):
             raise HTTPException(status_code=400, detail="File type not allowed")
+        content = await file.read()
+        if not content:
+            raise HTTPException(status_code=400, detail="Empty file uploaded")
+        file.file.seek(0)
         text = extract_text(file)
         resume_data = parse_resume_with_job_matching(file, job_description) if job_description else parse_resume(text)
         return resume_data
@@ -555,8 +573,14 @@ async def match_resume(
     current_user: dict = Depends(get_current_user)
 ):
     try:
+        if not file or not file.filename:
+            raise HTTPException(status_code=400, detail="No file uploaded")
         if not allowed_file(file.filename):
             raise HTTPException(status_code=400, detail="File type not allowed")
+        content = await file.read()
+        if not content:
+            raise HTTPException(status_code=400, detail="Empty file uploaded")
+        file.file.seek(0)
         text = extract_text(file)
         resume_data = parse_resume_with_job_matching(file, job_description)
         return resume_data
