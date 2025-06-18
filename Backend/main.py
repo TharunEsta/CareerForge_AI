@@ -390,6 +390,8 @@ async def upload_resume(
         resume_data = parse_resume(text)
         return resume_data
             
+    except HTTPException as e:
+        raise e
     except Exception as e:
         logger.error(f"Error uploading resume: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -535,6 +537,8 @@ async def job_match(
         resume_data = parse_resume(text)
         return resume_data
             
+    except HTTPException as e:
+        raise e
     except Exception as e:
         logger.error(f"Error matching job: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -567,6 +571,8 @@ async def analyze_resume(
             resume_data = parse_resume(text)
         return resume_data
             
+    except HTTPException as e:
+        raise e
     except Exception as e:
         logger.error(f"Error analyzing resume: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -599,6 +605,8 @@ async def match_resume(
         resume_data = parse_resume_with_job_matching(text, job_description)
         return resume_data
             
+    except HTTPException as e:
+        raise e
     except Exception as e:
         logger.error(f"Error matching resume: {e}")
         raise HTTPException(status_code=500, detail=str(e))
