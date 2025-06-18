@@ -9,6 +9,13 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
+      - name: Check for required secrets
+        run: |
+          if [ -z "${{ secrets.DOCKER_USERNAME }}" ] || [ -z "${{ secrets.DOCKER_PASSWORD }}" ]; then
+            echo "::error::DOCKER_USERNAME and/or DOCKER_PASSWORD secrets are not set."
+            exit 1
+          fi
+
       - name: Checkout code
         uses: actions/checkout@v3
 
