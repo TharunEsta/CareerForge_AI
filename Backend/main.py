@@ -515,7 +515,7 @@ async def reset_password(
     return {"message": "Password has been reset successfully"}
 
 @app.post("/job_match")
-def job_match(
+async def job_match(
     file: UploadFile = File(...),
     current_user: dict = Depends(get_current_user),
     top_n: int = 3
