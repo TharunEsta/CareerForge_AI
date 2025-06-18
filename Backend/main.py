@@ -183,7 +183,10 @@ def extract_text(file):
         tmp_path = tmp.name
     try:
         if suffix == ".pdf":
-            text = "".join([p.extract_text() or '' for p in pypdf.PdfReader(tmp_path).pages])
+            with fitz.open(fileobj=file.file, filetype="pdf") as doc:
+                text = ""
+                for page in doc:
+                    text += page.get_text()
         elif suffix in [".docx", ".doc"]:
             text = docx2txt.process(tmp_path)
         else:
@@ -389,7 +392,8 @@ async def upload_resume(
             raise HTTPException(status_code=400, detail="Empty file uploaded")
         file.file.seek(0)
         text = extract_text(file)
-        return {"message": "Resume uploaded successfully", "text": text}
+        resume_data = parse_resume(text)
+        return resume_data
     except Exception as e:
         logger.error(f"Error uploading resume: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -556,7 +560,10 @@ async def analyze_resume(
             raise HTTPException(status_code=400, detail="Empty file uploaded")
         file.file.seek(0)
         text = extract_text(file)
-        resume_data = parse_resume_with_job_matching(file, job_description) if job_description else parse_resume(text)
+        if job_description:
+            resume_data = parse_resume_with_job_matching(text, job_description)
+        else:
+            resume_data = parse_resume(text)
         return resume_data
     except Exception as e:
         logger.error(f"Error analyzing resume: {e}")
@@ -582,7 +589,7 @@ async def match_resume(
             raise HTTPException(status_code=400, detail="Empty file uploaded")
         file.file.seek(0)
         text = extract_text(file)
-        resume_data = parse_resume_with_job_matching(file, job_description)
+        resume_data = parse_resume_with_job_matching(text, job_description)
         return resume_data
     except Exception as e:
         logger.error(f"Error matching resume: {e}")
