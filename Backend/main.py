@@ -167,33 +167,26 @@ async def openai_chat(messages: List[Dict]):
     )
     return res.choices[0].message.content.strip()
 
-def extract_text(file):
-    # If file is a Path object, open it and wrap in a dummy object with .filename
-    if isinstance(file, Path):
-        with open(file, "rb") as f:
-            class DummyUploadFile:
-                def __init__(self, file, filename):
-                    self.file = file
-                    self.filename = filename
-            file = DummyUploadFile(f, file.name)
-    suffix = os.path.splitext(file.filename)[1].lower()
+def extract_text_from_content(content: bytes, filename: str) -> str:
+    suffix = os.path.splitext(filename)[1].lower()
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-        tmp.write(file.file.read())
+        tmp.write(content)
         tmp.flush()
         tmp_path = tmp.name
+    
     try:
         if suffix == ".pdf":
-            with fitz.open(fileobj=file.file, filetype="pdf") as doc:
+            with fitz.open(stream=content, filetype="pdf") as doc:
                 text = ""
                 for page in doc:
                     text += page.get_text()
         elif suffix in [".docx", ".doc"]:
             text = docx2txt.process(tmp_path)
         else:
-            text = open(tmp_path, encoding="utf-8", errors="ignore").read()
+            text = content.decode('utf-8', errors='ignore')
+        return text
     finally:
         os.unlink(tmp_path)
-    return text
 
 def parse_resume(text: str) -> ParsedResume:
     doc = nlp(text)
@@ -383,24 +376,19 @@ async def upload_resume(
     current_user: dict = Depends(get_current_user)
 ):
     try:
-        contents = await file.read()
-        if not contents:
-            raise HTTPException(status_code=400, detail="Empty file uploaded")
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="No file uploaded")
         
         if not allowed_file(file.filename):
             raise HTTPException(status_code=400, detail="File type not allowed")
         
-        # Create a temporary file to store the contents
-        with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1].lower()) as tmp:
-            tmp.write(contents)
-            tmp_path = tmp.name
+        content = await file.read()
+        if not content:
+            raise HTTPException(status_code=400, detail="Empty file uploaded")
         
-        try:
-            text = extract_text(Path(tmp_path))
-            resume_data = parse_resume(text)
-            return resume_data
-        finally:
-            os.unlink(tmp_path)
+        text = extract_text_from_content(content, file.filename)
+        resume_data = parse_resume(text)
+        return resume_data
             
     except Exception as e:
         logger.error(f"Error uploading resume: {e}")
@@ -430,7 +418,7 @@ async def get_parsed_resume(current_user: User = Depends(get_current_user)):
                     self.file = file
                     self.filename = filename
             dummy_file = DummyUploadFile(f, latest_file.name)
-            text = extract_text(dummy_file)
+            text = extract_text_from_content(f.read(), latest_file.name)
             parsed_data = parse_resume(text)
         
         return parsed_data
@@ -533,24 +521,19 @@ async def job_match(
     top_n: int = 3
 ):
     try:
-        contents = await file.read()
-        if not contents:
-            raise HTTPException(status_code=400, detail="Empty file uploaded")
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="No file uploaded")
         
         if not allowed_file(file.filename):
             raise HTTPException(status_code=400, detail="File type not allowed")
         
-        # Create a temporary file to store the contents
-        with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1].lower()) as tmp:
-            tmp.write(contents)
-            tmp_path = tmp.name
+        content = await file.read()
+        if not content:
+            raise HTTPException(status_code=400, detail="Empty file uploaded")
         
-        try:
-            text = extract_text(Path(tmp_path))
-            resume_data = parse_resume(text)
-            return resume_data
-        finally:
-            os.unlink(tmp_path)
+        text = extract_text_from_content(content, file.filename)
+        resume_data = parse_resume(text)
+        return resume_data
             
     except Exception as e:
         logger.error(f"Error matching job: {e}")
@@ -567,27 +550,22 @@ async def analyze_resume(
     current_user: dict = Depends(get_current_user)
 ):
     try:
-        contents = await file.read()
-        if not contents:
-            raise HTTPException(status_code=400, detail="Empty file uploaded")
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="No file uploaded")
         
         if not allowed_file(file.filename):
             raise HTTPException(status_code=400, detail="File type not allowed")
         
-        # Create a temporary file to store the contents
-        with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1].lower()) as tmp:
-            tmp.write(contents)
-            tmp_path = tmp.name
+        content = await file.read()
+        if not content:
+            raise HTTPException(status_code=400, detail="Empty file uploaded")
         
-        try:
-            text = extract_text(Path(tmp_path))
-            if job_description:
-                resume_data = parse_resume_with_job_matching(text, job_description)
-            else:
-                resume_data = parse_resume(text)
-            return resume_data
-        finally:
-            os.unlink(tmp_path)
+        text = extract_text_from_content(content, file.filename)
+        if job_description:
+            resume_data = parse_resume_with_job_matching(text, job_description)
+        else:
+            resume_data = parse_resume(text)
+        return resume_data
             
     except Exception as e:
         logger.error(f"Error analyzing resume: {e}")
@@ -604,9 +582,8 @@ async def match_resume(
     current_user: dict = Depends(get_current_user)
 ):
     try:
-        contents = await file.read()
-        if not contents:
-            raise HTTPException(status_code=400, detail="Empty file uploaded")
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="No file uploaded")
         
         if not allowed_file(file.filename):
             raise HTTPException(status_code=400, detail="File type not allowed")
@@ -614,17 +591,13 @@ async def match_resume(
         if not job_description:
             raise HTTPException(status_code=400, detail="Job description is required")
         
-        # Create a temporary file to store the contents
-        with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1].lower()) as tmp:
-            tmp.write(contents)
-            tmp_path = tmp.name
+        content = await file.read()
+        if not content:
+            raise HTTPException(status_code=400, detail="Empty file uploaded")
         
-        try:
-            text = extract_text(Path(tmp_path))
-            resume_data = parse_resume_with_job_matching(text, job_description)
-            return resume_data
-        finally:
-            os.unlink(tmp_path)
+        text = extract_text_from_content(content, file.filename)
+        resume_data = parse_resume_with_job_matching(text, job_description)
+        return resume_data
             
     except Exception as e:
         logger.error(f"Error matching resume: {e}")
