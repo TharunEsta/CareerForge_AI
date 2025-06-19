@@ -25,6 +25,7 @@ PyMuPDF==1.26.0
 pypdf==4.0.1
 sentence-transformers==2.5.1
 spacy==3.7.2
+blis==0.7.9
 pytest==8.4.0
 python-dotenv==1.1.0
 python-jose[cryptography]==3.3.0
