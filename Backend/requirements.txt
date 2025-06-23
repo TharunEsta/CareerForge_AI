@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+python-multipart
+pydantic
+spacy
+blis
+thinc
+sentence-transformers
+scikit-learn
+numpy
+pandas
+joblib
+httpx
+requests
+Cython
+setuptools
+wheel 
