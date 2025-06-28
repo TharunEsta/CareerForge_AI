@@ -23,7 +23,7 @@ import hashlib
 import secrets
 from pathlib import Path
 import json
-from Backend.utils import parse_resume, parse_resume_with_job_matching, extract_skills_from_job_description, match_skills, generate_learning_plan, allowed_file, rewrite_resume, optimize_for_linkedin
+from .utils import parse_resume, parse_resume_with_job_matching, extract_skills_from_job_description, match_skills, generate_learning_plan, allowed_file, rewrite_resume, optimize_for_linkedin
 from fastapi import Query
 from typing import List
 import logging
