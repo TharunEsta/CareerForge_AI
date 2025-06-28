@@ -17,4 +17,8 @@ setuptools
 wheel
 python-jose[cryptography]
 passlib[bcrypt]
-python-dotenv 
+python-dotenv
+PyMuPDF
+docx2txt
+pypdf
+openai 
