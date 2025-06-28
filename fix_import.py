@@ -21,13 +21,13 @@ def fix_import_in_main():
         content = f.read()
     
     # Check if the import is already fixed
-    if "from .utils import" in content:
+    if "from Backend.utils import" in content:
         print("✅ Import is already fixed!")
         return True
     
     # Replace the old import with the new one
     old_import = "from utils import parse_resume, parse_resume_with_job_matching, extract_skills_from_job_description, match_skills, generate_learning_plan, allowed_file, rewrite_resume, optimize_for_linkedin"
-    new_import = "from .utils import parse_resume, parse_resume_with_job_matching, allowed_file"
+    new_import = "from Backend.utils import parse_resume, parse_resume_with_job_matching, allowed_file"
     
     if old_import in content:
         content = content.replace(old_import, new_import)

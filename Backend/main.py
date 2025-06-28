@@ -23,7 +23,7 @@ import hashlib
 import secrets
 from pathlib import Path
 import json
-from .utils import parse_resume, parse_resume_with_job_matching, allowed_file
+from Backend.utils import parse_resume, parse_resume_with_job_matching, allowed_file
 from fastapi import Query
 from typing import List
 import logging
