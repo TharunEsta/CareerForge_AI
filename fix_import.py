@@ -5,7 +5,6 @@ Run this on your server to update the import statement
 """
 
 import os
-import re
 
 def fix_import_in_main():
     """Fix the import statement in Backend/main.py"""
