@@ -14,4 +14,7 @@ httpx
 requests
 Cython
 setuptools
-wheel 
+wheel
+python-jose[cryptography]
+passlib[bcrypt]
+python-dotenv 
