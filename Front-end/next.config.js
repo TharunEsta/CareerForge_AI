@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
+  output: 'export',
+  reactStrictMode: true,
   // Allow external access for development
   devIndicators: {
     autoPrerender: false,
