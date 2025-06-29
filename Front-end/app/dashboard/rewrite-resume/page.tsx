@@ -161,7 +161,7 @@ export default function RewriteResumePage() {
           <div className="flex items-center gap-2 mb-8">
             <img src="/placeholder-logo.svg" alt="SkillSync AI Logo" className="h-8 w-8" />
             <span className="font-bold text-lg text-blue-700">SkillSync AI</span>
-          </div>
+            </div>
           <nav className="flex-1 space-y-2">
             <a href="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">🏠 Dashboard</a>
             <a href="/dashboard/resume" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">📄 Resume Analysis</a>
@@ -202,29 +202,29 @@ export default function RewriteResumePage() {
       <main className="flex-1 p-8 flex flex-col items-center justify-center">
         <div className="max-w-xl w-full bg-white/90 p-8 rounded-2xl shadow-xl border border-blue-100 animate-fade-in">
           <h1 className="text-3xl font-bold mb-8 text-blue-700 text-center">Resume Rewriter & LinkedIn Optimizer</h1>
-          <div className="bg-white rounded-lg shadow p-6 mb-8">
-            <h2 className="text-xl font-semibold mb-4">Upload Resume and Job Description</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
+      <div className="bg-white rounded-lg shadow p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4">Upload Resume and Job Description</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Select Resume (PDF or DOCX, max 5MB)</label>
-                <input
-                  type="file"
-                  accept=".pdf,.docx"
-                  onChange={handleFileChange}
+            <input
+              type="file"
+              accept=".pdf,.docx"
+              onChange={handleFileChange}
                   className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                  disabled={isLoading}
-                />
-              </div>
-              <div>
+              disabled={isLoading}
+            />
+          </div>
+          <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Job Description</label>
-                <textarea
-                  value={jobDescription}
+            <textarea
+              value={jobDescription}
                   onChange={e => setJobDescription(e.target.value)}
-                  placeholder="Paste the job description here..."
+              placeholder="Paste the job description here..."
                   className="w-full p-2 border rounded-md min-h-[120px]"
-                  disabled={isLoading}
-                />
-              </div>
+              disabled={isLoading}
+            />
+          </div>
               {error && <div className="text-red-500 text-sm">{error}</div>}
               {success && <div className="text-green-500 text-sm">{success}</div>}
               <button

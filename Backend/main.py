@@ -27,6 +27,7 @@ from Backend.utils import parse_resume, parse_resume_with_job_matching, allowed_
 from fastapi import Query
 from typing import List
 import logging
+from voice_assistant import router as voice_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -47,6 +48,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include voice assistant router
+app.include_router(voice_router, prefix="/api/voice", tags=["voice-assistant"])
 
 # ─── Security & Config ─────────────────────────────────────────
 SECRET_KEY = "tkfs9uMwZuPsW6OGj-jVu8WfKc7YqsAfLg7rqHeUuRU"  

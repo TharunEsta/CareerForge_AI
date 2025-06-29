@@ -22,6 +22,9 @@ import {
   Crown,
   Zap,
   Star,
+  Mic,
+  Brain,
+  Globe,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -52,6 +55,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Image from 'next/image'
 import { Loader2, Send } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import Link from 'next/link'
 
 // Types
 type Message = {
@@ -755,6 +759,51 @@ ACHIEVEMENTS
                 </Button>
               </form>
             </div>
+          </div>
+
+          {/* Voice Assistant Section */}
+          <div className="mb-8">
+            <Card className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-0">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full">
+                      <Mic className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-purple-900 dark:text-purple-100">
+                        AI Voice Assistant
+                      </h3>
+                      <p className="text-purple-700 dark:text-purple-300">
+                        Speak naturally in multiple languages with our intelligent voice assistant
+                      </p>
+                    </div>
+                  </div>
+                  <Link href="/voice-assistant">
+                    <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white">
+                      <Mic className="w-4 h-4 mr-2" />
+                      Try Voice Assistant
+                    </Button>
+                  </Link>
+                </div>
+                
+                {/* Features */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                  <div className="flex items-center space-x-2">
+                    <Globe className="w-4 h-4 text-green-600" />
+                    <span className="text-sm">9+ Languages</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Brain className="w-4 h-4 text-purple-600" />
+                    <span className="text-sm">Smart Responses</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Zap className="w-4 h-4 text-orange-600" />
+                    <span className="text-sm">Real-time</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
