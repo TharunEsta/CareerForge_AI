@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/components/AuthContext";
 import { useRouter } from "next/navigation";
 
@@ -69,6 +69,20 @@ export default function RewriteResumePage() {
   const [linkedinProfile, setLinkedinProfile] = useState<LinkedInProfile | null>(null);
   const [matchScore, setMatchScore] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'resume' | 'linkedin'>('resume');
+  const [userPlan, setUserPlan] = useState("free");
+
+  useEffect(() => {
+    if (!token) {
+      router.push("/login");
+    } else {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/plan`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then(res => res.json())
+        .then(data => setUserPlan(data.plan || "free"))
+        .catch(() => setUserPlan("free"));
+    }
+  }, [token, router]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -140,249 +154,100 @@ export default function RewriteResumePage() {
     }
   };
 
-  if (!token) {
+  if (userPlan === "free") {
     return (
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <p className="text-sm text-yellow-700">
-                Please log in to access this feature.
-              </p>
-            </div>
+      <div className="min-h-screen flex bg-gray-50">
+        <aside className="hidden md:block w-64 bg-white border-r shadow-sm flex flex-col py-8 px-4">
+          <div className="flex items-center gap-2 mb-8">
+            <img src="/placeholder-logo.svg" alt="SkillSync AI Logo" className="h-8 w-8" />
+            <span className="font-bold text-lg text-blue-700">SkillSync AI</span>
           </div>
-        </div>
+          <nav className="flex-1 space-y-2">
+            <a href="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">🏠 Dashboard</a>
+            <a href="/dashboard/resume" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">📄 Resume Analysis</a>
+            <a href="/dashboard/rewrite-resume" className="flex items-center gap-3 px-3 py-2 rounded-lg text-blue-700 bg-blue-100 font-medium transition">✍️ Resume Rewriting</a>
+            <a href="/dashboard/cover-letter" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">📧 Cover Letter</a>
+            <a href="/dashboard/linkedin-optimization" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">🔗 LinkedIn Optimization</a>
+            <a href="/pricing" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">💳 Subscription Plans</a>
+          </nav>
+        </aside>
+        <main className="flex-1 p-8 flex flex-col items-center justify-center">
+          <div className="max-w-xl w-full bg-white/90 p-8 rounded-2xl shadow-xl border border-blue-100 animate-fade-in text-center">
+            <h1 className="text-3xl font-bold mb-4 text-blue-700">Upgrade Required</h1>
+            <p className="mb-6 text-gray-700">Resume rewriting is a premium feature. Please upgrade your plan to access this feature.</p>
+            <button className="bg-blue-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={() => router.push("/pricing")}>Upgrade Plan</button>
+          </div>
+        </main>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8">Resume Rewriter & LinkedIn Optimizer</h1>
-      
-      <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">Upload Resume and Job Description</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Select Resume (PDF or DOCX, max 5MB)
-            </label>
-            <input
-              type="file"
-              accept=".pdf,.docx"
-              onChange={handleFileChange}
-              className="block w-full text-sm text-gray-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-full file:border-0
-                file:text-sm file:font-semibold
-                file:bg-blue-50 file:text-blue-700
-                hover:file:bg-blue-100"
-              disabled={isLoading}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Job Description
-            </label>
-            <textarea
-              value={jobDescription}
-              onChange={(e) => setJobDescription(e.target.value)}
-              placeholder="Paste the job description here..."
-              className="w-full p-2 border rounded-md min-h-[200px]"
-              disabled={isLoading}
-            />
-          </div>
-          
-          {error && (
-            <div className="text-red-500 text-sm">{error}</div>
-          )}
-          
-          {success && (
-            <div className="text-green-500 text-sm">{success}</div>
-          )}
-          
-          <button
-            type="submit"
-            disabled={!selectedFile || !jobDescription.trim() || isLoading}
-            className={`w-full py-2 px-4 rounded-md text-white font-medium
-              ${!selectedFile || !jobDescription.trim() || isLoading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
-              }`}
-          >
-            {isLoading ? "Processing..." : "Analyze and Rewrite Resume"}
-          </button>
-        </form>
-      </div>
-
-      {matchScore !== null && (
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">Analysis Results</h2>
-          
-          {/* Tabs */}
-          <div className="border-b border-gray-200 mb-4">
-            <nav className="-mb-px flex space-x-8">
-              <button
-                onClick={() => setActiveTab('resume')}
-                className={`${
-                  activeTab === 'resume'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
-              >
-                Resume Analysis
-              </button>
-              <button
-                onClick={() => setActiveTab('linkedin')}
-                className={`${
-                  activeTab === 'linkedin'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
-              >
-                LinkedIn Optimization
-              </button>
-            </nav>
-          </div>
-
-          {/* ATS Score */}
-          <div className="mb-6">
-            <h3 className="font-medium text-gray-900">ATS Score</h3>
-            <div className="mt-2">
-              <div className="w-full bg-gray-200 rounded-full h-4">
-                <div
-                  className="bg-blue-600 h-4 rounded-full"
-                  style={{ width: `${matchScore}%` }}
+    <div className="min-h-screen flex bg-gray-50">
+      {/* Sidebar placeholder for consistency, can be replaced with a component */}
+      <aside className="hidden md:block w-64 bg-white border-r shadow-sm flex flex-col py-8 px-4">
+        <div className="flex items-center gap-2 mb-8">
+          <img src="/placeholder-logo.svg" alt="SkillSync AI Logo" className="h-8 w-8" />
+          <span className="font-bold text-lg text-blue-700">SkillSync AI</span>
+        </div>
+        <nav className="flex-1 space-y-2">
+          <a href="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">🏠 Dashboard</a>
+          <a href="/dashboard/resume" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">📄 Resume Analysis</a>
+          <a href="/dashboard/rewrite-resume" className="flex items-center gap-3 px-3 py-2 rounded-lg text-blue-700 bg-blue-100 font-medium transition">✍️ Resume Rewriting</a>
+          <a href="/dashboard/cover-letter" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">📧 Cover Letter</a>
+          <a href="/dashboard/linkedin-optimization" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">🔗 LinkedIn Optimization</a>
+          <a href="/pricing" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">💳 Subscription Plans</a>
+        </nav>
+      </aside>
+      <main className="flex-1 p-8 flex flex-col items-center justify-center">
+        <div className="max-w-xl w-full bg-white/90 p-8 rounded-2xl shadow-xl border border-blue-100 animate-fade-in">
+          <h1 className="text-3xl font-bold mb-8 text-blue-700 text-center">Resume Rewriter & LinkedIn Optimizer</h1>
+          <div className="bg-white rounded-lg shadow p-6 mb-8">
+            <h2 className="text-xl font-semibold mb-4">Upload Resume and Job Description</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Select Resume (PDF or DOCX, max 5MB)</label>
+                <input
+                  type="file"
+                  accept=".pdf,.docx"
+                  onChange={handleFileChange}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  disabled={isLoading}
                 />
               </div>
-              <p className="text-sm text-gray-600 mt-1">{matchScore}% ATS compatibility</p>
-            </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Job Description</label>
+                <textarea
+                  value={jobDescription}
+                  onChange={e => setJobDescription(e.target.value)}
+                  placeholder="Paste the job description here..."
+                  className="w-full p-2 border rounded-md min-h-[120px]"
+                  disabled={isLoading}
+                />
+              </div>
+              {error && <div className="text-red-500 text-sm">{error}</div>}
+              {success && <div className="text-green-500 text-sm">{success}</div>}
+              <button
+                type="submit"
+                disabled={!selectedFile || isLoading || !jobDescription.trim()}
+                className={`w-full py-2 px-4 rounded-md text-white font-medium ${!selectedFile || isLoading || !jobDescription.trim() ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+              >
+                {isLoading ? "Uploading..." : "Rewrite Resume"}
+              </button>
+            </form>
           </div>
-
-          {/* Resume Analysis Tab */}
-          {activeTab === 'resume' && rewrittenResume && (
-            <div className="space-y-6">
-              <div>
-                <h3 className="font-medium text-gray-900">Rewritten Resume</h3>
-                <div className="mt-2 p-4 bg-gray-50 rounded-md">
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-medium">{rewrittenResume.name}</h4>
-                      <p>{rewrittenResume.email} | {rewrittenResume.phone}</p>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-medium">Professional Summary</h4>
-                      <p className="whitespace-pre-wrap">{rewrittenResume.summary}</p>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-medium">Skills</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {rewrittenResume.skills.map((skill, index) => (
-                          <span
-                            key={index}
-                            className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-medium">Experience</h4>
-                      {rewrittenResume.experience.map((exp, index) => (
-                        <div key={index} className="mt-2">
-                          <p className="font-medium">{exp.role}</p>
-                          <p>{exp.company} | {exp.duration}</p>
-                          <p className="whitespace-pre-wrap">{exp.details}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* LinkedIn Optimization Tab */}
-          {activeTab === 'linkedin' && linkedinProfile && (
-            <div className="space-y-6">
-              <div>
-                <h3 className="font-medium text-gray-900">LinkedIn Profile Optimization</h3>
-                <div className="mt-2 p-4 bg-gray-50 rounded-md">
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-medium">Profile Completeness</h4>
-                      <div className="w-full bg-gray-200 rounded-full h-4 mt-2">
-                        <div
-                          className="bg-green-600 h-4 rounded-full"
-                          style={{ width: `${linkedinProfile.completeness_score}%` }}
-                        />
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {linkedinProfile.completeness_score}% profile completeness
-                      </p>
-                    </div>
-
-                    <div>
-                      <h4 className="font-medium">Headline</h4>
-                      <p>{linkedinProfile.headline}</p>
-                    </div>
-
-                    <div>
-                      <h4 className="font-medium">Summary</h4>
-                      <p className="whitespace-pre-wrap">{linkedinProfile.summary}</p>
-                    </div>
-
-                    <div>
-                      <h4 className="font-medium">Experience</h4>
-                      {linkedinProfile.experience.map((exp, index) => (
-                        <div key={index} className="mt-2">
-                          <p className="font-medium">{exp.title}</p>
-                          <p>{exp.company} | {exp.duration}</p>
-                          <p className="whitespace-pre-wrap">{exp.description}</p>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div>
-                      <h4 className="font-medium">Skills</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {linkedinProfile.skills.map((skill, index) => (
-                          <span
-                            key={index}
-                            className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
-                          >
-                            {skill.name}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="font-medium">Recommendation Templates</h4>
-                      {linkedinProfile.recommendations.map((rec, index) => (
-                        <div key={index} className="mt-2">
-                          <p className="font-medium">{rec.type}</p>
-                          <p className="italic">{rec.template}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Optionally show rewritten resume and LinkedIn info here */}
         </div>
-      )}
+        <style jsx>{`
+          .animate-fade-in {
+            animation: fadeIn 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: none; }
+          }
+        `}</style>
+      </main>
     </div>
   );
 } 

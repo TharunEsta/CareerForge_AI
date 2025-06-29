@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, Form, Depends, HTTPException, Request, status
+from fastapi import FastAPI, File, UploadFile, Form, Depends, HTTPException, Request, status, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from pydantic import BaseModel, EmailStr
@@ -587,24 +587,22 @@ async def match_resume(
     job_description: Optional[str] = Form(None),
     current_user: dict = Depends(get_current_user)
 ):
+    # Restrict to basic or premium plans
+    if current_user.get("plan", "free") == "free":
+        raise HTTPException(status_code=403, detail="Upgrade your plan to access this feature.")
     try:
         if not file.filename:
             raise HTTPException(status_code=400, detail="No file uploaded")
-        
         if not allowed_file(file.filename):
             raise HTTPException(status_code=400, detail="File type not allowed")
-        
         if not job_description:
             raise HTTPException(status_code=400, detail="Job description is required")
-        
         content = await file.read()
         if not content:
             raise HTTPException(status_code=400, detail="Empty file uploaded")
-        
         text = extract_text_from_content(content, file.filename)
         resume_data = parse_resume_with_job_matching(text, job_description)
         return resume_data
-            
     except HTTPException as e:
         raise e
     except Exception as e:
@@ -628,6 +626,28 @@ async def chat_with_resume(
         raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/user/plan")
+def get_user_plan(current_user: dict = Depends(get_current_user)):
+    email = current_user.get("email")
+    user = users_db.get(email)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"plan": user.get("plan", "free")}
+
+@app.post("/api/user/upgrade")
+def upgrade_user_plan(
+    plan: str = Body(..., embed=True),
+    current_user: dict = Depends(get_current_user)
+):
+    email = current_user.get("email")
+    user = users_db.get(email)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if plan not in ["free", "basic", "premium"]:
+        raise HTTPException(status_code=400, detail="Invalid plan")
+    user["plan"] = plan
+    return {"message": f"Plan upgraded to {plan}"}
 
 if __name__ == "__main__":
     uvicorn.run(

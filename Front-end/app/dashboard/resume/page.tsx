@@ -183,101 +183,109 @@ export default function ResumePage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8">Resume Management</h1>
-      
-      <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">Upload Resume</h2>
-        <form onSubmit={handleUpload} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Select Resume (PDF or DOCX, max 5MB)
-            </label>
-            <input
-              type="file"
-              accept=".pdf,.docx"
-              onChange={handleFileChange}
-              className="block w-full text-sm text-gray-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-full file:border-0
-                file:text-sm file:font-semibold
-                file:bg-blue-50 file:text-blue-700
-                hover:file:bg-blue-100"
-              disabled={isLoading}
-            />
+    <div className="min-h-screen flex bg-gray-50">
+      {/* Sidebar placeholder for consistency, can be replaced with a component */}
+      <aside className="hidden md:block w-64 bg-white border-r shadow-sm flex flex-col py-8 px-4">
+        <div className="flex items-center gap-2 mb-8">
+          <img src="/placeholder-logo.svg" alt="SkillSync AI Logo" className="h-8 w-8" />
+          <span className="font-bold text-lg text-blue-700">SkillSync AI</span>
+        </div>
+        <nav className="flex-1 space-y-2">
+          <a href="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">🏠 Dashboard</a>
+          <a href="/dashboard/resume" className="flex items-center gap-3 px-3 py-2 rounded-lg text-blue-700 bg-blue-100 font-medium transition">📄 Resume Analysis</a>
+          <a href="/dashboard/rewrite-resume" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">✍️ Resume Rewriting</a>
+          <a href="/dashboard/cover-letter" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">📧 Cover Letter</a>
+          <a href="/dashboard/linkedin-optimization" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">🔗 LinkedIn Optimization</a>
+          <a href="/pricing" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">💳 Subscription Plans</a>
+        </nav>
+      </aside>
+      <main className="flex-1 p-8 flex flex-col items-center justify-center">
+        <div className="max-w-xl w-full bg-white/90 p-8 rounded-2xl shadow-xl border border-blue-100 animate-fade-in">
+          <h1 className="text-3xl font-bold mb-8 text-blue-700 text-center">Resume Management</h1>
+          <div className="bg-white rounded-lg shadow p-6 mb-8">
+            <h2 className="text-xl font-semibold mb-4">Upload Resume</h2>
+            <form onSubmit={handleUpload} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Select Resume (PDF or DOCX, max 5MB)</label>
+                <input
+                  type="file"
+                  accept=".pdf,.docx"
+                  onChange={handleFileChange}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  disabled={isLoading}
+                />
+              </div>
+              {error && <div className="text-red-500 text-sm">{error}</div>}
+              {success && <div className="text-green-500 text-sm">{success}</div>}
+              <button
+                type="submit"
+                disabled={!selectedFile || isLoading}
+                className={`w-full py-2 px-4 rounded-md text-white font-medium ${!selectedFile || isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+              >
+                {isLoading ? "Uploading..." : "Upload Resume"}
+              </button>
+            </form>
           </div>
-          
-          {error && (
-            <div className="text-red-500 text-sm">{error}</div>
-          )}
-          
-          {success && (
-            <div className="text-green-500 text-sm">{success}</div>
-          )}
-          
-          <button
-            type="submit"
-            disabled={!selectedFile || isLoading}
-            className={`w-full py-2 px-4 rounded-md text-white font-medium
-              ${!selectedFile || isLoading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
-              }`}
-          >
-            {isLoading ? "Uploading..." : "Upload Resume"}
-          </button>
-        </form>
-      </div>
-
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold mb-4">Resume Analysis</h2>
-        {isLoadingParsed ? (
-          <p className="text-gray-600">Loading resume data...</p>
-        ) : parsedResume ? (
-          <div className="space-y-6">
-            <div>
-              <h3 className="font-medium text-gray-900">Personal Information</h3>
-              <div className="mt-2 space-y-1">
-                {parsedResume.full_name && <p>Name: {parsedResume.full_name}</p>}
-                {parsedResume.email && <p>Email: {parsedResume.email}</p>}
-                {parsedResume.phone && <p>Phone: {parsedResume.phone}</p>}
-                {parsedResume.location && <p>Location: {parsedResume.location}</p>}
-              </div>
-            </div>
-
-            {parsedResume.skills.length > 0 && (
-              <div>
-                <h3 className="font-medium text-gray-900">Skills</h3>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {parsedResume.skills.map((skill, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                    >
-                      {skill}
-                    </span>
-                  ))}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold mb-4">Resume Analysis</h2>
+            {isLoadingParsed ? (
+              <p className="text-gray-600">Loading resume data...</p>
+            ) : parsedResume ? (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-medium text-gray-900">Personal Information</h3>
+                  <div className="mt-2 space-y-1">
+                    {parsedResume.full_name && <p>Name: {parsedResume.full_name}</p>}
+                    {parsedResume.email && <p>Email: {parsedResume.email}</p>}
+                    {parsedResume.phone && <p>Phone: {parsedResume.phone}</p>}
+                    {parsedResume.location && <p>Location: {parsedResume.location}</p>}
+                  </div>
                 </div>
-              </div>
-            )}
 
-            {parsedResume.experience.length > 0 && (
-              <div>
-                <h3 className="font-medium text-gray-900">Experience</h3>
-                <div className="mt-2 space-y-2">
-                  {parsedResume.experience.map((exp, index) => (
-                    <div key={index} className="text-sm">
-                      <p className="font-medium">{exp.company}</p>
+                {parsedResume.skills.length > 0 && (
+                  <div>
+                    <h3 className="font-medium text-gray-900">Skills</h3>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {parsedResume.skills.map((skill, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                        >
+                          {skill}
+                        </span>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                )}
+
+                {parsedResume.experience.length > 0 && (
+                  <div>
+                    <h3 className="font-medium text-gray-900">Experience</h3>
+                    <div className="mt-2 space-y-2">
+                      {parsedResume.experience.map((exp, index) => (
+                        <div key={index} className="text-sm">
+                          <p className="font-medium">{exp.company}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
+            ) : (
+              <p className="text-gray-600">No resume uploaded yet.</p>
             )}
           </div>
-        ) : (
-          <p className="text-gray-600">No resume uploaded yet.</p>
-        )}
-      </div>
+        </div>
+        <style jsx>{`
+          .animate-fade-in {
+            animation: fadeIn 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: none; }
+          }
+        `}</style>
+      </main>
     </div>
   );
 } 
