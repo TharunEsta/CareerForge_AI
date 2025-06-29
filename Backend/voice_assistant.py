@@ -1,7 +1,5 @@
 import speech_recognition as sr
-import pyttsx3
 from typing import Dict, List, Optional
-from googletrans import Translator
 from langdetect import detect
 import openai
 import os
@@ -12,8 +10,6 @@ router = APIRouter()
 
 # Initialize components
 recognizer = sr.Recognizer()
-translator = Translator()
-engine = pyttsx3.init()
 
 # Configure OpenAI
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -41,8 +37,8 @@ ASSISTANT_PERSONALITIES = {
         "personality": "Friendly and helpful assistant who loves to chat and help with tasks",
         "greetings": {
             "en": "Hello! I'm Pandu, your friendly AI assistant. How can I help you today?",
-            "hi": "नमस्ते! मैं पंडू हूं, आपका दोस्ताना AI सहायक। आज मैं आपकी कैसे मदद कर सकता हूं?",
-            "te": "నమస్కారం! నేను పండు, మీ స్నేహపూర్వక AI సహాయకుడు. ఈరోజు నేను మీకు ఎలా సహాయం చేయగలను?",
+            "hi": "Namaste! Main Pandu hun, aapka dostana AI sahayak. Aaj main aapki kya madad kar sakta hun?",
+            "te": "Namaskaram! Nenu Pandu, mee snehapoorvaka AI sahayakudu. Eeroju nenu meeku ela sahayam cheyagalanu?",
             "es": "¡Hola! Soy Pandu, tu asistente de IA amigable. ¿Cómo puedo ayudarte hoy?",
             "fr": "Bonjour! Je suis Pandu, votre assistant IA amical. Comment puis-je vous aider aujourd'hui?",
             "de": "Hallo! Ich bin Pandu, Ihr freundlicher KI-Assistent. Wie kann ich Ihnen heute helfen?",
@@ -55,8 +51,8 @@ ASSISTANT_PERSONALITIES = {
         "personality": "Wise and caring grandmother figure who gives thoughtful advice",
         "greetings": {
             "en": "Hello dear! I'm Gammy, and I'm here to take care of you. What's on your mind?",
-            "hi": "नमस्ते प्यारे! मैं गैमी हूं, और मैं आपकी देखभाल करने के लिए यहां हूं। आपके मन में क्या है?",
-            "te": "నమస్కారం ప్రియమైన! నేను గామ్మీ, మరియు నేను మీ జాగ్రత్త తీసుకోవడానికి ఇక్కడ ఉన్నాను. మీ మనస్సులో ఏమి ఉంది?",
+            "hi": "Namaste pyare! Main Gammy hun, aur main aapki dekhbhal karne ke liye yahan hun. Aapke man mein kya hai?",
+            "te": "Namaskaram priyamaina! Nenu Gammy, mariyu nenu mee jagratta teesukovadaniki ikkada unnanu. Mee manasulo emi undi?",
             "es": "¡Hola querido! Soy Gammy, y estoy aquí para cuidarte. ¿Qué tienes en mente?",
             "fr": "Bonjour mon cher! Je suis Gammy, et je suis ici pour prendre soin de vous. Qu'est-ce qui vous préoccupe?",
             "de": "Hallo Liebling! Ich bin Gammy, und ich bin hier, um mich um Sie zu kümmern. Was beschäftigt Sie?",
@@ -69,8 +65,8 @@ ASSISTANT_PERSONALITIES = {
         "personality": "Professional and efficient assistant focused on productivity and tasks",
         "greetings": {
             "en": "Hello! I'm Alex, your productivity assistant. How can I help you accomplish your goals today?",
-            "hi": "नमस्ते! मैं एलेक्स हूं, आपका उत्पादकता सहायक। आज मैं आपके लक्ष्यों को प्राप्त करने में कैसे मदद कर सकता हूं?",
-            "te": "నమస్కారం! నేను అలెక్స్, మీ ఉత్పాదకత సహాయకుడు. ఈరోజు మీ లక్ష్యాలను సాధించడానికి నేను ఎలా సహాయం చేయగలను?",
+            "hi": "Namaste! Main Alex hun, aapka utpadakta sahayak. Aaj main aapke lakshyon ko prapt karne mein kya madad kar sakta hun?",
+            "te": "Namaskaram! Nenu Alex, mee utpadakata sahayakudu. Eeroju mee lakshyalaanu saadhinchadanki nenu ela sahayam cheyagalanu?",
             "es": "¡Hola! Soy Alex, tu asistente de productividad. ¿Cómo puedo ayudarte a alcanzar tus objetivos hoy?",
             "fr": "Bonjour! Je suis Alex, votre assistant de productivité. Comment puis-je vous aider à atteindre vos objectifs aujourd'hui?",
             "de": "Hallo! Ich bin Alex, Ihr Produktivitätsassistent. Wie kann ich Ihnen heute dabei helfen, Ihre Ziele zu erreichen?",
@@ -88,17 +84,6 @@ def detect_language(text: str) -> str:
         return lang
     except Exception:
         return "en"
-
-def translate_text(text: str, target_language: str) -> str:
-    """Translate text to target language"""
-    try:
-        if target_language == "en":
-            return text
-        translation = translator.translate(text, dest=target_language)
-        return translation.text
-    except Exception as e:
-        print(f"Translation error: {e}")
-        return text
 
 def get_assistant_response(user_input: str, assistant_name: str, language: str) -> str:
     """Get AI response using OpenAI or fallback to predefined responses"""
@@ -125,11 +110,6 @@ def get_assistant_response(user_input: str, assistant_name: str, language: str) 
             )
             
             ai_response = response.choices[0].message.content.strip()
-            
-            # Translate if needed
-            if language != "en":
-                ai_response = translate_text(ai_response, language)
-            
             return ai_response
             
     except Exception as e:
@@ -153,8 +133,8 @@ def get_fallback_response(user_input: str, assistant_name: str, language: str) -
     # Default response
     responses = {
         "en": f"I'm {assistant_name}, and I'm here to help! What would you like to know?",
-        "hi": f"मैं {assistant_name} हूं, और मैं मदद करने के लिए यहां हूं! आप क्या जानना चाहते हैं?",
-        "te": f"నేను {assistant_name}, మరియు నేను సహాయం చేయడానికి ఇక్కడ ఉన్నాను! మీరు ఏమి తెలుసుకోవాలనుకుంటున్నారు?",
+        "hi": f"Main {assistant_name} hun, aur main madad karne ke liye yahan hun! Aap kya janna chahte hain?",
+        "te": f"Nenu {assistant_name}, mariyu nenu sahayam cheyadanki ikkada unnanu! Meeru emi telusukovalani korutunnaru?",
         "es": f"¡Soy {assistant_name}, y estoy aquí para ayudar! ¿Qué te gustaría saber?",
         "fr": f"Je suis {assistant_name}, et je suis ici pour vous aider ! Que souhaitez-vous savoir ?",
         "de": f"Ich bin {assistant_name}, und ich bin hier, um zu helfen! Was möchten Sie wissen?",
@@ -193,15 +173,6 @@ async def detect_language_endpoint(text: str):
         return {"language": language, "confidence": 0.9}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error detecting language: {str(e)}")
-
-@router.post("/translate")
-async def translate_text_endpoint(text: str, target_language: str):
-    """Translate text to target language"""
-    try:
-        translated_text = translate_text(text, target_language)
-        return {"original": text, "translated": translated_text, "target_language": target_language}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error translating text: {str(e)}")
 
 @router.get("/assistants")
 async def get_available_assistants():
