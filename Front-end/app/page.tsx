@@ -49,7 +49,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Image } from "@/components/ui/image"
+import Image from 'next/image'
 import { Loader2, Send } from "lucide-react"
 import { Input } from "@/components/ui/input"
 
