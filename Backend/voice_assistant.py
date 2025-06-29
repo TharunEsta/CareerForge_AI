@@ -1,16 +1,12 @@
 import speech_recognition as sr
 import pyttsx3
-import json
-import re
 from typing import Dict, List, Optional
 from googletrans import Translator
 from langdetect import detect
 import openai
 import os
-from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-import asyncio
-import aiofiles
 
 router = APIRouter()
 
@@ -90,7 +86,7 @@ def detect_language(text: str) -> str:
     try:
         lang = detect(text)
         return lang
-    except:
+    except Exception:
         return "en"
 
 def translate_text(text: str, target_language: str) -> str:
