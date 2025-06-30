@@ -654,6 +654,33 @@ async def linkedin_optimization(resume_data: dict = Body(...)):
     from utils import optimize_for_linkedin
     return optimize_for_linkedin(resume_data)
 
+@app.post("/cover-letter-rewrite")
+async def cover_letter_rewrite(
+    resume_data: dict = Body(...),
+    job_description: str = Body(...),
+    original_cover_letter: str = Body(...)
+):
+    # Try OpenAI if available
+    try:
+        if openai.api_key:
+            prompt = f"Rewrite the following cover letter to better match the job description.\n\nJob Description:\n{job_description}\n\nResume Data:\n{resume_data}\n\nOriginal Cover Letter:\n{original_cover_letter}\n\nRewritten Cover Letter:"
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant that rewrites cover letters for job applications."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=500,
+                temperature=0.7
+            )
+            rewritten = response.choices[0].message.content.strip()
+            return {"rewritten_cover_letter": rewritten}
+    except Exception as e:
+        print(f"OpenAI error: {e}")
+    # Fallback: simple template
+    rewritten = f"Dear Hiring Manager,\n\nI am excited to apply for this position. My background in {', '.join(resume_data.get('skills', []))} and experience in similar roles make me a strong fit. I am eager to contribute to your team.\n\nSincerely,\n{resume_data.get('full_name', 'Your Name')}"
+    return {"rewritten_cover_letter": rewritten}
+
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
