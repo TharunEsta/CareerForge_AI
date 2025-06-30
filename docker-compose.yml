@@ -2,22 +2,23 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:16
+    image: postgres:15
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: careerforge
+      POSTGRES_USER: careerforge
+      POSTGRES_PASSWORD: careerforgepass
+      POSTGRES_DB: careerforge_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
   backend:
-    build: ./Backend
+    build:
+      context: ./Backend
     command: uvicorn main:app --host 0.0.0.0 --port 8000
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/careerforge
+      DATABASE_URL: postgresql+psycopg2://careerforge:careerforgepass@db:5432/careerforge_db
       SECRET_KEY: supersecretkey
       ALGORITHM: HS256
       OPENAI_API_KEY: ${OPENAI_API_KEY}
@@ -29,11 +30,12 @@ services:
       - ./Backend:/app
 
   frontend:
-    build: ./Front-end
-    ports:
-      - "3001:3000"
+    build:
+      context: ./Front-end
     environment:
-      NEXT_PUBLIC_BACKEND_URL: http://localhost:8000
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
     volumes:
       - ./Front-end:/app
     command: npm run build && npm start
