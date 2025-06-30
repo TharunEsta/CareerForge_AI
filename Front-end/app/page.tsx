@@ -813,12 +813,5 @@ ACHIEVEMENTS
 
 // Main component that wraps everything with providers
 export default function Home() {
-  return (
-    <div className="p-6 text-center">
-      <h1 className="text-2xl font-bold text-blue-600">Welcome to SkillSync AI!</h1>
-      <p className="mt-4 text-gray-700">
-        Your personalized AI-powered resume and job matching platform.
-      </p>
-    </div>
-  );
+  return <AppContent />;
 }
