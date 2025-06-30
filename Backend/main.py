@@ -640,6 +640,10 @@ def upgrade_user_plan(
     user["plan"] = plan
     return {"message": f"Plan upgraded to {plan}"}
 
+@app.post("/parse-resume")
+async def parse_resume_endpoint(text: str):
+    return parse_resume(text)
+
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
