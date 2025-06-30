@@ -28,6 +28,8 @@ from fastapi import Query
 from typing import List
 import logging
 from voice_assistant import router as voice_router
+from models import SessionLocal
+from schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMatchModel
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
@@ -723,14 +725,30 @@ async def admin_analytics(x_api_key: str = Header(...)):
     if x_api_key != ADMIN_API_KEY:
         logger.warning("Unauthorized analytics access attempt.")
         return {"error": "Unauthorized"}
-    # Dummy analytics data
+    db = SessionLocal()
+    try:
+        user_count = db.query(UserModel).count()
+    except Exception as e:
+        logger.error(f"User count error: {e}")
+        user_count = 0
+    try:
+        resumes_parsed = db.query(ResumeModel).count()
+    except Exception as e:
+        logger.error(f"Resume count error: {e}")
+        resumes_parsed = 0
+    try:
+        jobs_matched = db.query(JobMatchModel).count()
+    except Exception as e:
+        logger.error(f"JobMatch count error: {e}")
+        jobs_matched = 0
     analytics = {
-        "user_count": 42,
-        "resumes_parsed": 123,
-        "jobs_matched": 56,
-        "chats": 78
+        "user_count": user_count,
+        "resumes_parsed": resumes_parsed,
+        "jobs_matched": jobs_matched,
+        "chats": 0  # No chat model yet
     }
     logger.info(f"Admin analytics accessed: {analytics}")
+    db.close()
     return analytics
 
 # Log all requests
