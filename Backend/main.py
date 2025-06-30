@@ -486,25 +486,32 @@ def get_user_info(email: str = Depends(get_current_user)):
         "full_name": user["full_name"],
     }
 
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@example.com")
+
+def send_email(to_email: str, subject: str, body: str):
+    # Placeholder for real email sending logic
+    logger.info(f"Sending email from {ADMIN_EMAIL} to {to_email}: {subject}\n{body}")
+    # Integrate with SMTP or email service here
+
 @app.post("/forgot-password")
 async def forgot_password(email: str = Form(...)):
     if email not in users_db:
         # Don't reveal if email exists or not for security
         return {"message": "If your email is registered, you will receive a password reset link"}
-    
-    # Generate reset token
     token = generate_reset_token()
-    # Store token with expiration (1 hour)
     password_reset_tokens[token] = {
         "email": email,
         "expires": datetime.utcnow() + timedelta(hours=1)
     }
-    
-    # In a real application, you would send an email here
-    # For development, we'll just return the token
+    # Send password reset email
+    reset_link = f"https://yourdomain.com/reset-password?token={token}"
+    send_email(
+        to_email=email,
+        subject="Password Reset Request",
+        body=f"Click the link to reset your password: {reset_link}"
+    )
     return {
-        "message": "If your email is registered, you will receive a password reset link",
-        "token": token  # Remove this in production
+        "message": "If your email is registered, you will receive a password reset link"
     }
 
 @app.post("/reset-password")
