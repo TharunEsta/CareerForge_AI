@@ -1,11 +1,13 @@
 import React from 'react';
-
+import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/components/AuthContext";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <AuthProvider>
-      {children}
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        {children}
+      </AuthProvider>
+    </ThemeProvider>
   );
 } 

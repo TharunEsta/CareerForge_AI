@@ -813,5 +813,72 @@ ACHIEVEMENTS
 
 // Main component that wraps everything with providers
 export default function Home() {
-  return <AppContent />;
+  const { theme, setTheme } = useTheme();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Top Bar */}
+      <header className="sticky top-0 z-50 flex items-center justify-between px-6 py-3 border-b bg-white dark:bg-zinc-900 shadow-sm">
+        <div className="flex items-center gap-3">
+          <button className="md:hidden" onClick={() => setSidebarOpen(!sidebarOpen)}>
+            <Menu className="h-6 w-6" />
+          </button>
+          <span className="font-bold text-xl text-blue-600 tracking-tight">SkillSync AI</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <button
+            aria-label="Toggle theme"
+            className="rounded-full p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          >
+            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </button>
+          <div className="relative">
+            <button className="rounded-full p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800">
+              <User className="h-5 w-5" />
+            </button>
+            {/* User menu dropdown can go here */}
+          </div>
+        </div>
+      </header>
+
+      {/* Sidebar */}
+      <aside className={`fixed top-0 left-0 h-full w-60 bg-white dark:bg-zinc-900 border-r shadow-lg z-40 transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 transition-transform duration-200 ease-in-out`}> 
+        <div className="flex flex-col h-full">
+          <div className="flex items-center justify-between px-6 py-4 border-b">
+            <span className="font-bold text-lg text-blue-600">SkillSync</span>
+            <button className="md:hidden" onClick={() => setSidebarOpen(false)}>
+              <LogOut className="h-5 w-5" />
+            </button>
+          </div>
+          <nav className="flex-1 px-4 py-6 space-y-2">
+            <Link href="/" className="block px-3 py-2 rounded hover:bg-blue-100 dark:hover:bg-zinc-800 font-medium">Home</Link>
+            <Link href="/dashboard" className="block px-3 py-2 rounded hover:bg-blue-100 dark:hover:bg-zinc-800 font-medium">Dashboard</Link>
+            <Link href="/resume" className="block px-3 py-2 rounded hover:bg-blue-100 dark:hover:bg-zinc-800 font-medium">Resume Tools</Link>
+            <Link href="/job_match" className="block px-3 py-2 rounded hover:bg-blue-100 dark:hover:bg-zinc-800 font-medium">Job Match</Link>
+            <Link href="/rewrite-resume" className="block px-3 py-2 rounded hover:bg-blue-100 dark:hover:bg-zinc-800 font-medium">Resume Rewrite</Link>
+            <Link href="/cover-letter" className="block px-3 py-2 rounded hover:bg-blue-100 dark:hover:bg-zinc-800 font-medium">Cover Letter</Link>
+            <Link href="/linkedin-optimization" className="block px-3 py-2 rounded hover:bg-blue-100 dark:hover:bg-zinc-800 font-medium">LinkedIn Optimization</Link>
+            <Link href="/voice-assistant" className="block px-3 py-2 rounded hover:bg-blue-100 dark:hover:bg-zinc-800 font-medium">Voice Assistant</Link>
+            <Link href="/pricing" className="block px-3 py-2 rounded hover:bg-blue-100 dark:hover:bg-zinc-800 font-medium">Pricing</Link>
+          </nav>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col md:ml-60 transition-all duration-200">
+        <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
+          <div className="w-full max-w-2xl">
+            {/* Chat UI */}
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg p-8 mb-8">
+              <h2 className="text-2xl font-bold mb-4 text-center">AI Career Assistant</h2>
+              {/* Chat messages and input go here (reuse your chat logic) */}
+              <AppContent />
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
 }
