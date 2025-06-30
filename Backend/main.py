@@ -30,7 +30,7 @@ import logging
 from voice_assistant import router as voice_router
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
 
 # ─── Load Environment Variables ───────────────────────────────────────
@@ -680,6 +680,39 @@ async def cover_letter_rewrite(
     # Fallback: simple template
     rewritten = f"Dear Hiring Manager,\n\nI am excited to apply for this position. My background in {', '.join(resume_data.get('skills', []))} and experience in similar roles make me a strong fit. I am eager to contribute to your team.\n\nSincerely,\n{resume_data.get('full_name', 'Your Name')}"
     return {"rewritten_cover_letter": rewritten}
+
+@app.post("/job-match")
+async def job_match_endpoint(resume_data: dict = Body(...), job_description: str = Body(...)):
+    from job_matcher import match_resume_to_job
+    result = match_resume_to_job(resume_data.get('skills', []), job_description)
+    logger.info(f"Job match result: {result}")
+    return {"match_result": result}
+
+@app.post("/gpt-chat")
+async def gpt_chat(messages: list = Body(...)):
+    import openai
+    try:
+        if openai.api_key:
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=messages,
+                max_tokens=300,
+                temperature=0.7
+            )
+            reply = response.choices[0].message.content.strip()
+            logger.info(f"GPT chat reply: {reply}")
+            return {"reply": reply}
+    except Exception as e:
+        logger.error(f"OpenAI error: {e}")
+        return {"reply": "Sorry, the AI chat is currently unavailable."}
+    return {"reply": "Sorry, the AI chat is currently unavailable."}
+
+# Log all requests
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    logger.info(f"{request.method} {request.url}")
+    response = await call_next(request)
+    return response
 
 if __name__ == "__main__":
     uvicorn.run(
