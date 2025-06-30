@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, Form, Depends, HTTPException, Request, status, Body
+from fastapi import FastAPI, File, UploadFile, Form, Depends, HTTPException, Request, status, Body, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from pydantic import BaseModel, EmailStr
@@ -706,6 +706,32 @@ async def gpt_chat(messages: list = Body(...)):
         logger.error(f"OpenAI error: {e}")
         return {"reply": "Sorry, the AI chat is currently unavailable."}
     return {"reply": "Sorry, the AI chat is currently unavailable."}
+
+# --- User Logout Endpoint ---
+@app.post("/logout")
+async def logout():
+    """Logout endpoint (JWT logout is client-side; this is for UI flow)"""
+    logger.info("User logged out.")
+    return {"message": "Logged out successfully."}
+
+# --- Admin Analytics Endpoint (API Key Protected) ---
+ADMIN_API_KEY = "supersecretadminkey"  # Change this in production!
+
+@app.get("/admin/analytics")
+async def admin_analytics(x_api_key: str = Header(...)):
+    """Admin analytics endpoint (requires X-API-KEY header)"""
+    if x_api_key != ADMIN_API_KEY:
+        logger.warning("Unauthorized analytics access attempt.")
+        return {"error": "Unauthorized"}
+    # Dummy analytics data
+    analytics = {
+        "user_count": 42,
+        "resumes_parsed": 123,
+        "jobs_matched": 56,
+        "chats": 78
+    }
+    logger.info(f"Admin analytics accessed: {analytics}")
+    return analytics
 
 # Log all requests
 @app.middleware("http")
