@@ -14,7 +14,7 @@ import pypdf
 import uvicorn
 import spacy
 import openai
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sentence_transformers import SentenceTransformer, util
@@ -28,7 +28,7 @@ from fastapi import Query
 from typing import List
 import logging
 from voice_assistant import router as voice_router
-from models import SessionLocal
+from models import SessionLocal, RevokedToken
 from schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMatchModel
 
 # Configure logging
@@ -61,8 +61,8 @@ app.add_middleware(
 app.include_router(voice_router, prefix="/api/voice", tags=["voice-assistant"])
 
 # ─── Security & Config ─────────────────────────────────────────
-SECRET_KEY = "tkfs9uMwZuPsW6OGj-jVu8WfKc7YqsAfLg7rqHeUuRU"  
-ALGORITHM = "HS256"
+SECRET_KEY = os.getenv("SECRET_KEY", "secret")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 # Password reset tokens storage
@@ -135,6 +135,13 @@ def create_access_token(data: dict):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+def get_jti_from_token(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload.get("jti"), payload.get("exp")
+    except Exception:
+        return None, None
+
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -144,13 +151,19 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
-        if username is None:
+        jti: str = payload.get("jti")
+        if username is None or jti is None:
             raise credentials_exception
-        token_data = TokenData(username=username)
-    except JWTError:
+    except Exception:
         raise credentials_exception
-
-    user = users_db.get(token_data.username)
+    db = SessionLocal()
+    # Check if token is revoked
+    revoked = db.query(RevokedToken).filter(RevokedToken.jti == jti, RevokedToken.expires_at > datetime.now(timezone.utc)).first()
+    if revoked:
+        db.close()
+        raise HTTPException(status_code=401, detail="Token has been revoked. Please log in again.")
+    user = db.query(UserModel).filter(UserModel.username == username).first()
+    db.close()
     if user is None:
         raise credentials_exception
     return user
@@ -717,9 +730,18 @@ async def gpt_chat(messages: list = Body(...)):
 
 # --- User Logout Endpoint ---
 @app.post("/logout")
-async def logout():
+async def logout(token: str = Header(...)):
     """Logout endpoint (JWT logout is client-side; this is for UI flow)"""
-    logger.info("User logged out.")
+    jti, exp = get_jti_from_token(token)
+    if not jti or not exp:
+        return {"error": "Invalid token"}
+    db = SessionLocal()
+    expires_at = datetime.fromtimestamp(exp, tz=timezone.utc)
+    revoked = RevokedToken(jti=jti, expires_at=expires_at)
+    db.add(revoked)
+    db.commit()
+    db.close()
+    logger.info(f"User logged out. Token revoked: {jti}")
     return {"message": "Logged out successfully."}
 
 # --- Admin Analytics Endpoint (API Key Protected) ---
