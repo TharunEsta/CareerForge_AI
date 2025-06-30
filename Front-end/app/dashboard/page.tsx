@@ -43,12 +43,12 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="min-h-screen w-full flex bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-800 transition-colors duration-500">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r shadow-sm flex flex-col py-8 px-4">
-        <div className="flex items-center gap-2 mb-8">
-          <img src="/placeholder-logo.svg" alt="SkillSync AI Logo" className="h-8 w-8" />
-          <span className="font-bold text-lg text-blue-700">SkillSync AI</span>
+      <aside className="hidden md:flex flex-col w-64 bg-white/70 backdrop-blur-lg border-r border-blue-100 shadow-xl py-10 px-6 z-10">
+        <div className="flex items-center gap-3 mb-10">
+          <img src="/placeholder-logo.svg" alt="SkillSync AI Logo" className="h-10 w-10 drop-shadow" />
+          <span className="font-extrabold text-2xl text-blue-700 tracking-tight">SkillSync AI</span>
         </div>
         <div className="mb-4 text-sm text-gray-600">
           <span className="font-semibold">Plan:</span> <span className={userPlan === "premium" ? "text-blue-700" : userPlan === "basic" ? "text-blue-500" : "text-gray-700"}>{userPlan.charAt(0).toUpperCase() + userPlan.slice(1)}</span>
@@ -61,12 +61,12 @@ export default function Dashboard() {
             Upgrade Plan
           </button>
         )}
-        <nav className="flex-1 space-y-2">
+        <nav className="flex-1 space-y-3 text-lg">
           {sidebarLinks.map(link => (
             <Link
               key={link.href}
               href={link.href}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition ${link.premium && userPlan === "free" ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "text-gray-700 hover:bg-blue-100 hover:text-blue-700"}`}
+              className={`flex items-center gap-3 px-4 py-2 rounded-xl font-semibold transition ${link.premium && userPlan === "free" ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "text-gray-700 hover:bg-blue-100 hover:text-blue-700"}`}
               tabIndex={link.premium && userPlan === "free" ? -1 : 0}
               aria-disabled={link.premium && userPlan === "free"}
               onClick={e => {
@@ -93,43 +93,55 @@ export default function Dashboard() {
         </button>
       </aside>
       {/* Main Content */}
-      <main className="flex-1 p-10">
-        <h1 className="text-3xl font-bold mb-8 text-blue-700">Welcome to Your Dashboard</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div className="bg-white rounded-xl shadow p-6 flex flex-col items-start">
-            <span className="text-2xl mb-2">📄</span>
-            <h2 className="text-xl font-semibold mb-1">Resume Analysis</h2>
+      <main className="flex-1 flex flex-col items-center justify-center p-4 md:p-12 relative">
+        <div className="w-full max-w-5xl mx-auto mb-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-blue-800 mb-4 drop-shadow animate-fade-in">Welcome to Your Dashboard</h1>
+          <p className="text-lg md:text-xl text-gray-600 mb-2 animate-fade-in delay-100">Access all your AI-powered career tools in one place.</p>
+        </div>
+        <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in delay-200">
+          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-blue-100 flex flex-col items-start hover:scale-105 transition-transform">
+            <span className="text-3xl mb-2">📄</span>
+            <h2 className="text-xl font-bold mb-1 text-blue-800">Resume Analysis</h2>
             <p className="text-gray-600 mb-2">Get detailed feedback on your resume's strengths and areas for improvement.</p>
-            <Link href="/dashboard/resume" className="text-blue-600 hover:underline font-medium">Go to Resume Analysis →</Link>
+            <Link href="/dashboard/resume" className="text-blue-700 hover:underline font-semibold">Go to Resume Analysis →</Link>
           </div>
-          <div className={`bg-white rounded-xl shadow p-6 flex flex-col items-start ${userPlan === "free" ? "opacity-60 pointer-events-none" : ""}`}>
-            <span className="text-2xl mb-2">✍️</span>
-            <h2 className="text-xl font-semibold mb-1">Resume Rewriting</h2>
+          <div className={`bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-blue-100 flex flex-col items-start hover:scale-105 transition-transform ${userPlan === "free" ? "opacity-60 pointer-events-none" : ""}`}> 
+            <span className="text-3xl mb-2">✍️</span>
+            <h2 className="text-xl font-bold mb-1 text-blue-800">Resume Rewriting</h2>
             <p className="text-gray-600 mb-2">Get a professionally rewritten resume optimized for ATS systems.</p>
-            <Link href="/dashboard/rewrite-resume" className="text-blue-600 hover:underline font-medium">Go to Resume Rewriting →</Link>
+            <Link href="/dashboard/rewrite-resume" className="text-blue-700 hover:underline font-semibold">Go to Resume Rewriting →</Link>
             {userPlan === "free" && <span className="mt-2 text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">Premium</span>}
           </div>
-          <div className={`bg-white rounded-xl shadow p-6 flex flex-col items-start ${userPlan === "free" ? "opacity-60 pointer-events-none" : ""}`}>
-            <span className="text-2xl mb-2">📧</span>
-            <h2 className="text-xl font-semibold mb-1">Cover Letter</h2>
+          <div className={`bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-blue-100 flex flex-col items-start hover:scale-105 transition-transform ${userPlan === "free" ? "opacity-60 pointer-events-none" : ""}`}> 
+            <span className="text-3xl mb-2">📧</span>
+            <h2 className="text-xl font-bold mb-1 text-blue-800">Cover Letter</h2>
             <p className="text-gray-600 mb-2">Generate a tailored cover letter based on your job description.</p>
-            <Link href="/dashboard/cover-letter" className="text-blue-600 hover:underline font-medium">Go to Cover Letter →</Link>
+            <Link href="/dashboard/cover-letter" className="text-blue-700 hover:underline font-semibold">Go to Cover Letter →</Link>
             {userPlan === "free" && <span className="mt-2 text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">Premium</span>}
           </div>
-          <div className={`bg-white rounded-xl shadow p-6 flex flex-col items-start ${userPlan === "free" ? "opacity-60 pointer-events-none" : ""}`}>
-            <span className="text-2xl mb-2">🔗</span>
-            <h2 className="text-xl font-semibold mb-1">LinkedIn Optimization</h2>
+          <div className={`bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-blue-100 flex flex-col items-start hover:scale-105 transition-transform ${userPlan === "free" ? "opacity-60 pointer-events-none" : ""}`}> 
+            <span className="text-3xl mb-2">🔗</span>
+            <h2 className="text-xl font-bold mb-1 text-blue-800">LinkedIn Optimization</h2>
             <p className="text-gray-600 mb-2">Optimize your LinkedIn profile for better job opportunities.</p>
-            <Link href="/dashboard/linkedin-optimization" className="text-blue-600 hover:underline font-medium">Go to LinkedIn Optimization →</Link>
+            <Link href="/dashboard/linkedin-optimization" className="text-blue-700 hover:underline font-semibold">Go to LinkedIn Optimization →</Link>
             {userPlan === "free" && <span className="mt-2 text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">Premium</span>}
           </div>
-          <div className="bg-white rounded-xl shadow p-6 flex flex-col items-start">
-            <span className="text-2xl mb-2">💳</span>
-            <h2 className="text-xl font-semibold mb-1">Subscription Plans</h2>
+          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-blue-100 flex flex-col items-start hover:scale-105 transition-transform">
+            <span className="text-3xl mb-2">💳</span>
+            <h2 className="text-xl font-bold mb-1 text-blue-800">Subscription Plans</h2>
             <p className="text-gray-600 mb-2">Upgrade to unlock premium features and unlimited access.</p>
-            <Link href="/pricing" className="text-blue-600 hover:underline font-medium">View Plans →</Link>
+            <Link href="/pricing" className="text-blue-700 hover:underline font-semibold">View Plans →</Link>
           </div>
         </div>
+        <style jsx>{`
+          .animate-fade-in {
+            animation: fadeIn 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: none; }
+          }
+        `}</style>
       </main>
     </div>
   );

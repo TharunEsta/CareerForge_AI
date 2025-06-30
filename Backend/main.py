@@ -30,6 +30,11 @@ import logging
 from voice_assistant import router as voice_router
 from models import SessionLocal, RevokedToken
 from schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMatchModel
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from fastapi.responses import JSONResponse
+from slowapi.decorator import limiter as rate_limiter
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
@@ -382,11 +387,26 @@ def parse_resume(text: str) -> ParsedResume:
 def root():
     return {"message": "CareerForge API is running"}
 
+# Add SlowAPI rate limiter
+limiter = Limiter(key_func=get_remote_address, default_limits=["10/minute"])
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, lambda request, exc: JSONResponse(status_code=429, content={"detail": "Rate limit exceeded"}))
+
+@app.on_event("startup")
+def on_startup():
+    logger.info("API server started with rate limiting.")
+
 @app.post("/api/resume/upload")
+@rate_limiter("3/minute")
 async def upload_resume(
     file: UploadFile = File(...),
     current_user: dict = Depends(get_current_user)
 ):
+    allowed_types = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"]
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Only PDF, DOCX, or TXT files are allowed.")
+    if file.size and file.size > 5 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File size must be less than 5MB.")
     try:
         if not file.filename:
             raise HTTPException(status_code=400, detail="No file uploaded")
@@ -887,6 +907,14 @@ async def log_requests(request: Request, call_next):
     logger.info(f"{request.method} {request.url}")
     response = await call_next(request)
     return response
+
+# SECURITY NOTE: For production, always deploy behind HTTPS (e.g., with a reverse proxy like Nginx or on a platform that enforces HTTPS).
+# For sensitive data at rest, use database encryption or encrypted file storage (e.g., AWS KMS, GCP KMS, or disk encryption).
+
+# ERROR MONITORING: For production, integrate Sentry or another error monitoring service for real-time alerts.
+# Example:
+# import sentry_sdk
+# sentry_sdk.init(dsn="your_sentry_dsn", traces_sample_rate=1.0)
 
 if __name__ == "__main__":
     uvicorn.run(

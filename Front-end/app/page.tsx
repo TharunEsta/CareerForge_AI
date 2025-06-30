@@ -56,6 +56,15 @@ import Image from 'next/image'
 import { Loader2, Send } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import Link from 'next/link'
+import ResumeUploadCard from "@/components/ResumeUploadCard";
+import ResumeRewriteCard from "@/components/ResumeRewriteCard";
+import CoverLetterCard from "@/components/CoverLetterCard";
+import LinkedInOptimizationCard from "@/components/LinkedInOptimizationCard";
+import JobMatchCard from "@/components/JobMatchCard";
+import dynamic from "next/dynamic";
+const MotionButton = dynamic(() => import("framer-motion").then(mod => mod.motion.button), { ssr: false });
+const MotionDiv = dynamic(() => import("framer-motion").then(mod => mod.motion.div), { ssr: false });
+const AnimatePresence = dynamic(() => import("framer-motion").then(mod => mod.AnimatePresence), { ssr: false });
 
 // Types
 type Message = {
@@ -153,6 +162,16 @@ function AppContent() {
   const [isRewritingResume, setIsRewritingResume] = useState(false)
 
   const [mounted, setMounted] = useState(false)
+
+  // Add state for chat cards
+  const [chatCards, setChatCards] = useState<React.ReactNode[]>([]);
+
+  const [showFeatureMenu, setShowFeatureMenu] = useState(false);
+
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackRating, setFeedbackRating] = useState(0);
+  const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   useEffect(() => {
     setMounted(true)
@@ -550,6 +569,95 @@ ACHIEVEMENTS
     return <p>{message.content}</p>
   }
 
+  // Handler to show ResumeUploadCard
+  const handleShowResumeUpload = () => {
+    setChatCards((prev) => [
+      ...prev,
+      <ResumeUploadCard
+        key={Date.now()}
+        onAnalysis={(result) => {
+          setChatCards((prev) => [
+            ...prev,
+            <div className="bg-blue-50 rounded-xl p-4 my-2 animate-fade-in">
+              <h4 className="font-bold text-blue-700 mb-1">Resume Analysis Result</h4>
+              <pre className="text-xs">{JSON.stringify(result, null, 2)}</pre>
+            </div>,
+          ]);
+        }}
+      />,
+    ]);
+  };
+
+  // Add handlers for each feature card
+  const handleShowResumeRewrite = () => {
+    setChatCards((prev) => [
+      ...prev,
+      <ResumeRewriteCard
+        key={Date.now()}
+        onRewrite={(result) => {
+          setChatCards((prev) => [
+            ...prev,
+            <div className="bg-blue-50 rounded-xl p-4 my-2 animate-fade-in">
+              <h4 className="font-bold text-blue-700 mb-1">Rewritten Resume</h4>
+              <pre className="text-xs">{JSON.stringify(result, null, 2)}</pre>
+            </div>,
+          ]);
+        }}
+      />,
+    ]);
+  };
+  const handleShowCoverLetter = () => {
+    setChatCards((prev) => [
+      ...prev,
+      <CoverLetterCard
+        key={Date.now()}
+        onGenerate={(result) => {
+          setChatCards((prev) => [
+            ...prev,
+            <div className="bg-blue-50 rounded-xl p-4 my-2 animate-fade-in">
+              <h4 className="font-bold text-blue-700 mb-1">Generated Cover Letter</h4>
+              <pre className="text-xs">{JSON.stringify(result, null, 2)}</pre>
+            </div>,
+          ]);
+        }}
+      />,
+    ]);
+  };
+  const handleShowLinkedInOptimization = () => {
+    setChatCards((prev) => [
+      ...prev,
+      <LinkedInOptimizationCard
+        key={Date.now()}
+        onOptimize={(result) => {
+          setChatCards((prev) => [
+            ...prev,
+            <div className="bg-blue-50 rounded-xl p-4 my-2 animate-fade-in">
+              <h4 className="font-bold text-blue-700 mb-1">LinkedIn Optimization Suggestions</h4>
+              <pre className="text-xs">{JSON.stringify(result, null, 2)}</pre>
+            </div>,
+          ]);
+        }}
+      />,
+    ]);
+  };
+  const handleShowJobMatch = () => {
+    setChatCards((prev) => [
+      ...prev,
+      <JobMatchCard
+        key={Date.now()}
+        onMatch={(result) => {
+          setChatCards((prev) => [
+            ...prev,
+            <div className="bg-blue-50 rounded-xl p-4 my-2 animate-fade-in">
+              <h4 className="font-bold text-blue-700 mb-1">Job Match Results</h4>
+              <pre className="text-xs">{JSON.stringify(result, null, 2)}</pre>
+            </div>,
+          ]);
+        }}
+      />,
+    ]);
+  };
+
   return (
     <SidebarProvider>
       <div className="flex h-screen bg-background">
@@ -571,7 +679,7 @@ ACHIEVEMENTS
             </Button>
             <div className="flex items-center gap-2">
               <Image
-                src="/logo.svg"
+                src="/placeholder-logo.svg"
                 alt="Logo"
                 width={32}
                 height={32}
@@ -696,39 +804,53 @@ ACHIEVEMENTS
           <main className="flex-1 overflow-auto">
             <div className="container max-w-4xl py-6">
               <div className="space-y-4">
-                {messages.map((message, index) => (
-                  <div
-                    key={index}
-                    className={cn(
-                      "flex gap-3 p-4 rounded-lg",
-                      message.sender === "user"
-                        ? "bg-muted"
-                        : "bg-background border"
-                    )}
-                  >
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage
-                        src={message.sender === "user" ? "/user-avatar.png" : "/bot-avatar.png"}
-                      />
-                      <AvatarFallback>
-                        {message.sender === "user" ? "U" : "AI"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold">
-                          {message.sender === "user" ? "You" : "CareerForge.AI"}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(message.timestamp).toLocaleTimeString()}
-                        </span>
+                {/* Add feature buttons above the chat input */}
+                <div className="flex flex-wrap gap-2 mb-2">
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowResumeUpload}>Resume Analysis</button>
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowResumeRewrite}>Resume Rewrite</button>
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowCoverLetter}>Cover Letter</button>
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowLinkedInOptimization}>LinkedIn Optimization</button>
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowJobMatch}>Job Match</button>
+                </div>
+                <AnimatePresence>
+                  {messages.map((message, index) => (
+                    <MotionDiv
+                      key={index}
+                      initial={{ opacity: 0, y: 24 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 24 }}
+                      transition={{ duration: 0.4, type: "spring" }}
+                      className={cn(
+                        "flex gap-3 p-4 rounded-lg",
+                        message.sender === "user"
+                          ? "bg-muted"
+                          : "bg-background border"
+                      )}
+                    >
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage
+                          src={message.sender === "user" ? "/user-avatar.png" : "/bot-avatar.png"}
+                        />
+                        <AvatarFallback>
+                          {message.sender === "user" ? "U" : "AI"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold">
+                            {message.sender === "user" ? "You" : "CareerForge.AI"}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(message.timestamp).toLocaleTimeString()}
+                          </span>
+                        </div>
+                        <div className="prose prose-sm max-w-none dark:prose-invert">
+                          {renderMessage(message)}
+                        </div>
                       </div>
-                      <div className="prose prose-sm max-w-none dark:prose-invert">
-                        {renderMessage(message)}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                    </MotionDiv>
+                  ))}
+                </AnimatePresence>
               </div>
             </div>
           </main>
@@ -736,11 +858,18 @@ ACHIEVEMENTS
           {/* Input area */}
           <div className="sticky bottom-0 border-t bg-background p-4">
             <div className="container max-w-4xl">
-              <form onSubmit={handleSubmit} className="flex gap-4">
+              <form onSubmit={handleSubmit} className="flex gap-4 items-center">
+                <button
+                  type="button"
+                  aria-label="Start voice input"
+                  className={`rounded-full p-2 border border-blue-200 dark:border-zinc-700 bg-blue-50 dark:bg-zinc-800 hover:bg-blue-100 dark:hover:bg-zinc-700 transition-colors`}
+                >
+                  <Mic className={`h-6 w-6`} />
+                </button>
                 <Input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type your message..."
+                  placeholder="Type your message or use the mic..."
                   className="flex-1"
                   disabled={isLoading}
                 />
@@ -807,6 +936,109 @@ ACHIEVEMENTS
           </div>
         </div>
       </div>
+      <MotionButton
+        whileHover={{ scale: 1.15, rotate: 90 }}
+        whileTap={{ scale: 0.95, rotate: 45 }}
+        className="fixed bottom-8 right-8 z-50 bg-blue-700 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg hover:bg-blue-800 transition-all"
+        onClick={() => setShowFeatureMenu(true)}
+        aria-label="Open feature menu"
+      >
+        <Plus className="w-8 h-8" />
+      </MotionButton>
+      {showFeatureMenu && (
+        <div className="fixed inset-0 z-50 flex items-end justify-end p-8 bg-black/30" onClick={() => setShowFeatureMenu(false)}>
+          <MotionDiv
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 40 }}
+            transition={{ duration: 0.3 }}
+            className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6 flex flex-col gap-4 w-72"
+            onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
+          >
+            <button className="w-full py-3 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold transition" onClick={handleShowResumeUpload}>Resume Upload</button>
+            <button className="w-full py-3 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold transition" onClick={handleShowResumeRewrite}>Resume Rewrite</button>
+            <button className="w-full py-3 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold transition" onClick={handleShowCoverLetter}>Cover Letter</button>
+            <button className="w-full py-3 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold transition" onClick={handleShowLinkedInOptimization}>LinkedIn Optimization</button>
+            <button className="w-full py-3 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold transition" onClick={handleShowJobMatch}>Job Match</button>
+            <button className="w-full py-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold transition" onClick={() => setShowFeatureMenu(false)}>Close</button>
+          </MotionDiv>
+        </div>
+      )}
+      <MotionButton
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        className="fixed bottom-8 left-8 z-50 bg-yellow-400 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-yellow-500 transition-all"
+        onClick={() => setShowFeedback(true)}
+        aria-label="Give feedback"
+      >
+        <Star className="w-7 h-7" />
+      </MotionButton>
+      {showFeedback && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={() => setShowFeedback(false)}>
+          <MotionDiv
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.3 }}
+            className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 w-full max-w-md flex flex-col gap-4"
+            onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
+          >
+            {feedbackSubmitted ? (
+              <div className="flex flex-col items-center gap-4">
+                <MotionDiv
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", duration: 0.5 }}
+                  className="text-green-600"
+                >
+                  <svg width="48" height="48" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#16a34a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </MotionDiv>
+                <div className="text-xl font-bold text-green-700">Thank you for your feedback!</div>
+                <button className="mt-2 px-6 py-2 rounded-lg bg-blue-700 text-white font-semibold" onClick={() => setShowFeedback(false)}>Close</button>
+              </div>
+            ) : (
+              <form
+                className="flex flex-col gap-4"
+                onSubmit={e => {
+                  e.preventDefault();
+                  setFeedbackSubmitted(true);
+                  // TODO: send feedback to backend/analytics
+                  setTimeout(() => setShowFeedback(false), 2000);
+                }}
+              >
+                <div className="text-lg font-bold text-gray-800 dark:text-gray-100">Rate your experience</div>
+                <div className="flex gap-2">
+                  {[1,2,3,4,5].map(star => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setFeedbackRating(star)}
+                      className={feedbackRating >= star ? "text-yellow-400" : "text-gray-300"}
+                      aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
+                    >
+                      <Star className="w-7 h-7" fill={feedbackRating >= star ? "#facc15" : "none"} />
+                    </button>
+                  ))}
+                </div>
+                <textarea
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-700 p-3 min-h-[80px] bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  placeholder="Tell us what you liked or what could be improved..."
+                  value={feedbackText}
+                  onChange={e => setFeedbackText(e.target.value)}
+                  aria-label="Feedback details"
+                />
+                <button
+                  type="submit"
+                  className="mt-2 px-6 py-2 rounded-lg bg-blue-700 text-white font-semibold hover:bg-blue-800 transition"
+                  disabled={feedbackRating === 0 && feedbackText.trim() === ""}
+                >
+                  Submit
+                </button>
+              </form>
+            )}
+          </MotionDiv>
+        </div>
+      )}
     </SidebarProvider>
   )
 }
@@ -817,67 +1049,77 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col font-sans">
-      {/* Top Bar */}
-      <header className="sticky top-0 z-50 flex items-center justify-between px-6 py-3 border-b bg-white dark:bg-zinc-900 shadow-sm">
-        <div className="flex items-center gap-3">
-          <button className="md:hidden" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            <Menu className="h-6 w-6 text-blue-600 dark:text-blue-300" />
-          </button>
-          <span className="font-bold text-xl text-blue-600 tracking-tight">SkillSync AI</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <button
-            aria-label="Toggle theme"
-            className="rounded-full p-2 hover:bg-blue-100 dark:hover:bg-zinc-800 transition-colors"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          >
-            {theme === "dark" ? <Sun className="h-5 w-5 text-yellow-400" /> : <Moon className="h-5 w-5 text-blue-600" />}
-          </button>
-          <div className="relative">
-            <button className="rounded-full p-2 hover:bg-blue-100 dark:hover:bg-zinc-800 transition-colors">
-              <User className="h-5 w-5 text-blue-600 dark:text-blue-300" />
-            </button>
-            {/* User menu dropdown can go here */}
-          </div>
-        </div>
-      </header>
-
+    <div className="min-h-screen w-full flex flex-col md:flex-row bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-800 transition-colors duration-500">
       {/* Sidebar */}
-      <aside className={`fixed top-0 left-0 h-full w-60 bg-gradient-to-b from-blue-50 to-white dark:from-zinc-900 dark:to-zinc-800 border-r shadow-lg z-40 transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 transition-transform duration-200 ease-in-out`}> 
-        <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between px-6 py-4 border-b">
-            <span className="font-bold text-lg text-blue-600">SkillSync</span>
-            <button className="md:hidden" onClick={() => setSidebarOpen(false)}>
-              <LogOut className="h-5 w-5 text-blue-600" />
-            </button>
-          </div>
-          <nav className="flex-1 px-4 py-6 space-y-2">
-            <Link href="/" className="block px-3 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-zinc-700 font-medium transition-colors">Home</Link>
-            <Link href="/dashboard" className="block px-3 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-zinc-700 font-medium transition-colors">Dashboard</Link>
-            <Link href="/resume" className="block px-3 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-zinc-700 font-medium transition-colors">Resume Tools</Link>
-            <Link href="/job_match" className="block px-3 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-zinc-700 font-medium transition-colors">Job Match</Link>
-            <Link href="/rewrite-resume" className="block px-3 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-zinc-700 font-medium transition-colors">Resume Rewrite</Link>
-            <Link href="/cover-letter" className="block px-3 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-zinc-700 font-medium transition-colors">Cover Letter</Link>
-            <Link href="/linkedin-optimization" className="block px-3 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-zinc-700 font-medium transition-colors">LinkedIn Optimization</Link>
-            <Link href="/voice-assistant" className="block px-3 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-zinc-700 font-medium transition-colors">Voice Assistant</Link>
-            <Link href="/pricing" className="block px-3 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-zinc-700 font-medium transition-colors">Pricing</Link>
-          </nav>
+      <aside className="hidden md:flex flex-col w-64 bg-white/70 backdrop-blur-lg border-r border-blue-100 shadow-xl py-10 px-6 z-10">
+        <div className="flex items-center gap-3 mb-10">
+          <img src="/placeholder-logo.svg" alt="SkillSync AI Logo" className="h-10 w-10 drop-shadow" />
+          <span className="font-extrabold text-2xl text-blue-700 tracking-tight">SkillSync AI</span>
         </div>
+        <nav className="flex-1 space-y-3 text-lg">
+          <button onClick={() => alert('Feature coming soon!')} className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition"><span>🏠</span>Dashboard</button>
+          <button onClick={() => alert('Feature coming soon!')} className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition"><span>📄</span>Resume Tools</button>
+          <button onClick={() => alert('Feature coming soon!')} className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition"><span>✍️</span>Resume Rewriting</button>
+          <button onClick={() => alert('Feature coming soon!')} className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition"><span>📧</span>Cover Letter</button>
+          <button onClick={() => alert('Feature coming soon!')} className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition"><span>🔗</span>LinkedIn Optimization</button>
+          <button className="flex items-center gap-3 px-4 py-2 rounded-xl text-blue-700 bg-blue-100 font-semibold transition"><span>💳</span>Subscription Plans</button>
+        </nav>
       </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col md:ml-60 transition-all duration-200 bg-gradient-to-br from-blue-50 to-white dark:from-zinc-900 dark:to-zinc-800">
-        <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
-          <div className="w-full max-w-2xl">
-            {/* Chat UI */}
-            <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl p-8 mb-8 border border-blue-100 dark:border-zinc-800 transition-colors">
-              <h2 className="text-2xl font-bold mb-4 text-center text-blue-700 dark:text-blue-200">AI Career Assistant</h2>
-              {/* Chat messages and input go here (reuse your chat logic) */}
-              <AppContent />
-            </div>
-          </div>
+      {/* Main Chat Area */}
+      <main className="flex-1 flex flex-col items-center justify-center p-4 md:p-12 relative">
+        <div className="w-full max-w-2xl mx-auto mb-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-blue-800 mb-4 drop-shadow animate-fade-in">Welcome to SkillSync AI</h1>
+          <p className="text-lg md:text-xl text-gray-600 mb-2 animate-fade-in delay-100">Your AI-powered career assistant. Chat, upload your resume, get job matches, rewrite documents, and more—all in one place.</p>
         </div>
+        {/* Chat Card */}
+        <div className="w-full max-w-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-blue-100 animate-fade-in delay-200 flex flex-col gap-4">
+          {/* Chat messages (placeholder) */}
+          <div className="flex flex-col gap-3 max-h-96 overflow-y-auto">
+            <div className="self-start bg-blue-100 text-blue-900 rounded-xl px-4 py-2 shadow">Hi! How can I help you with your career today?</div>
+            {/* More messages would go here */}
+          </div>
+          {/* Input area */}
+          <form className="flex items-center gap-2 mt-4">
+            <input
+              type="text"
+              placeholder="Type your message..."
+              className="flex-1 px-4 py-3 rounded-xl border border-blue-200 bg-white/70 dark:bg-gray-800/70 shadow focus:outline-none focus:ring-2 focus:ring-blue-400 text-lg transition"
+            />
+            <button type="submit" className="bg-blue-700 hover:bg-blue-800 text-white rounded-xl px-5 py-3 font-bold text-lg shadow transition-all duration-200 flex items-center gap-2">
+              Send
+            </button>
+            <button type="button" className="ml-2 p-3 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 shadow transition-all duration-200 flex items-center justify-center">
+              <Mic className="w-6 h-6" />
+            </button>
+          </form>
+        </div>
+        {/* Quick Actions */}
+        <div className="w-full max-w-2xl mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <button onClick={() => alert('Feature coming soon!')} className="flex flex-col items-center bg-white/70 dark:bg-gray-900/70 backdrop-blur-lg rounded-2xl shadow-lg p-6 border border-blue-100 hover:scale-105 transition-transform">
+            <FileText className="w-8 h-8 text-blue-700 mb-2" />
+            <span className="font-bold text-blue-800">Resume Analysis</span>
+            <span className="text-gray-600 text-sm mt-1">Upload and analyze your resume</span>
+          </button>
+          <button onClick={() => alert('Feature coming soon!')} className="flex flex-col items-center bg-white/70 dark:bg-gray-900/70 backdrop-blur-lg rounded-2xl shadow-lg p-6 border border-blue-100 hover:scale-105 transition-transform">
+            <Zap className="w-8 h-8 text-blue-700 mb-2" />
+            <span className="font-bold text-blue-800">Resume Rewriting</span>
+            <span className="text-gray-600 text-sm mt-1">Get AI-powered resume rewrites</span>
+          </button>
+          <button onClick={() => alert('Feature coming soon!')} className="flex flex-col items-center bg-white/70 dark:bg-gray-900/70 backdrop-blur-lg rounded-2xl shadow-lg p-6 border border-blue-100 hover:scale-105 transition-transform">
+            <Star className="w-8 h-8 text-blue-700 mb-2" />
+            <span className="font-bold text-blue-800">Cover Letter</span>
+            <span className="text-gray-600 text-sm mt-1">Generate tailored cover letters</span>
+          </button>
+        </div>
+        <style jsx>{`
+          .animate-fade-in {
+            animation: fadeIn 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: none; }
+          }
+        `}</style>
       </main>
     </div>
   );

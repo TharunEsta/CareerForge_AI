@@ -156,26 +156,26 @@ export default function RewriteResumePage() {
 
   if (userPlan === "free") {
     return (
-      <div className="min-h-screen flex bg-gray-50">
-        <aside className="hidden md:block w-64 bg-white border-r shadow-sm flex flex-col py-8 px-4">
-          <div className="flex items-center gap-2 mb-8">
-            <img src="/placeholder-logo.svg" alt="SkillSync AI Logo" className="h-8 w-8" />
-            <span className="font-bold text-lg text-blue-700">SkillSync AI</span>
-            </div>
-          <nav className="flex-1 space-y-2">
-            <a href="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">🏠 Dashboard</a>
-            <a href="/dashboard/resume" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">📄 Resume Analysis</a>
-            <a href="/dashboard/rewrite-resume" className="flex items-center gap-3 px-3 py-2 rounded-lg text-blue-700 bg-blue-100 font-medium transition">✍️ Resume Rewriting</a>
-            <a href="/dashboard/cover-letter" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">📧 Cover Letter</a>
-            <a href="/dashboard/linkedin-optimization" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">🔗 LinkedIn Optimization</a>
-            <a href="/pricing" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">💳 Subscription Plans</a>
+      <div className="min-h-screen w-full flex bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-800 transition-colors duration-500">
+        <aside className="hidden md:flex flex-col w-64 bg-white/70 backdrop-blur-lg border-r border-blue-100 shadow-xl py-10 px-6 z-10">
+          <div className="flex items-center gap-3 mb-10">
+            <img src="/placeholder-logo.svg" alt="SkillSync AI Logo" className="h-10 w-10 drop-shadow" />
+            <span className="font-extrabold text-2xl text-blue-700 tracking-tight">SkillSync AI</span>
+          </div>
+          <nav className="flex-1 space-y-3 text-lg">
+            <a href="/dashboard" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition">🏠 Dashboard</a>
+            <a href="/dashboard/resume" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition">📄 Resume Analysis</a>
+            <a href="/dashboard/rewrite-resume" className="flex items-center gap-3 px-4 py-2 rounded-xl text-blue-700 bg-blue-100 font-semibold transition">✍️ Resume Rewriting</a>
+            <a href="/dashboard/cover-letter" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition">📧 Cover Letter</a>
+            <a href="/dashboard/linkedin-optimization" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition">🔗 LinkedIn Optimization</a>
+            <a href="/pricing" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition">💳 Subscription Plans</a>
           </nav>
         </aside>
-        <main className="flex-1 p-8 flex flex-col items-center justify-center">
-          <div className="max-w-xl w-full bg-white/90 p-8 rounded-2xl shadow-xl border border-blue-100 animate-fade-in text-center">
-            <h1 className="text-3xl font-bold mb-4 text-blue-700">Upgrade Required</h1>
-            <p className="mb-6 text-gray-700">Resume rewriting is a premium feature. Please upgrade your plan to access this feature.</p>
-            <button className="bg-blue-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={() => router.push("/pricing")}>Upgrade Plan</button>
+        <main className="flex-1 flex flex-col items-center justify-center p-4 md:p-12 relative">
+          <div className="w-full max-w-xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-3xl shadow-2xl p-10 border border-blue-100 animate-fade-in text-center">
+            <h1 className="text-4xl font-extrabold mb-4 text-blue-800 drop-shadow">Upgrade Required</h1>
+            <p className="mb-6 text-gray-700 text-lg">Resume rewriting is a <span className='font-bold text-blue-700'>premium</span> feature. Please upgrade your plan to access this feature.</p>
+            <button className="bg-blue-700 text-white py-3 px-8 rounded-xl font-bold text-lg shadow hover:bg-blue-800 transition" onClick={() => router.push("/pricing")}>Upgrade Plan</button>
           </div>
         </main>
       </div>
@@ -183,61 +183,85 @@ export default function RewriteResumePage() {
   }
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      {/* Sidebar placeholder for consistency, can be replaced with a component */}
-      <aside className="hidden md:block w-64 bg-white border-r shadow-sm flex flex-col py-8 px-4">
-        <div className="flex items-center gap-2 mb-8">
-          <img src="/placeholder-logo.svg" alt="SkillSync AI Logo" className="h-8 w-8" />
-          <span className="font-bold text-lg text-blue-700">SkillSync AI</span>
+    <div className="min-h-screen w-full flex bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-800 transition-colors duration-500">
+      {/* Sidebar */}
+      <aside className="hidden md:flex flex-col w-64 bg-white/70 backdrop-blur-lg border-r border-blue-100 shadow-xl py-10 px-6 z-10">
+        <div className="flex items-center gap-3 mb-10">
+          <img src="/placeholder-logo.svg" alt="SkillSync AI Logo" className="h-10 w-10 drop-shadow" />
+          <span className="font-extrabold text-2xl text-blue-700 tracking-tight">SkillSync AI</span>
         </div>
-        <nav className="flex-1 space-y-2">
-          <a href="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">🏠 Dashboard</a>
-          <a href="/dashboard/resume" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">📄 Resume Analysis</a>
-          <a href="/dashboard/rewrite-resume" className="flex items-center gap-3 px-3 py-2 rounded-lg text-blue-700 bg-blue-100 font-medium transition">✍️ Resume Rewriting</a>
-          <a href="/dashboard/cover-letter" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">📧 Cover Letter</a>
-          <a href="/dashboard/linkedin-optimization" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">🔗 LinkedIn Optimization</a>
-          <a href="/pricing" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">💳 Subscription Plans</a>
+        <nav className="flex-1 space-y-3 text-lg">
+          <a href="/dashboard" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition">🏠 Dashboard</a>
+          <a href="/dashboard/resume" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition">📄 Resume Analysis</a>
+          <a href="/dashboard/rewrite-resume" className="flex items-center gap-3 px-4 py-2 rounded-xl text-blue-700 bg-blue-100 font-semibold transition">✍️ Resume Rewriting</a>
+          <a href="/dashboard/cover-letter" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition">📧 Cover Letter</a>
+          <a href="/dashboard/linkedin-optimization" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition">🔗 LinkedIn Optimization</a>
+          <a href="/pricing" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition">💳 Subscription Plans</a>
         </nav>
       </aside>
-      <main className="flex-1 p-8 flex flex-col items-center justify-center">
-        <div className="max-w-xl w-full bg-white/90 p-8 rounded-2xl shadow-xl border border-blue-100 animate-fade-in">
-          <h1 className="text-3xl font-bold mb-8 text-blue-700 text-center">Resume Rewriter & LinkedIn Optimizer</h1>
-      <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">Upload Resume and Job Description</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Select Resume (PDF or DOCX, max 5MB)</label>
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col items-center justify-center p-4 md:p-12 relative">
+        <div className="w-full max-w-3xl mx-auto mb-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-blue-800 mb-4 drop-shadow animate-fade-in">Resume Rewriting</h1>
+          <p className="text-lg md:text-xl text-gray-600 mb-2 animate-fade-in delay-100">Upload your resume and job description to get a professionally rewritten, ATS-optimized resume.</p>
+        </div>
+        {/* Upload & Job Description Card */}
+        <div className="w-full max-w-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-blue-100 animate-fade-in delay-200 mb-8 flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4 items-center">
             <input
               type="file"
               accept=".pdf,.docx"
               onChange={handleFileChange}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-              disabled={isLoading}
+              className="block w-full text-lg text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-lg file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition"
             />
-          </div>
-          <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Job Description</label>
             <textarea
               value={jobDescription}
-                  onChange={e => setJobDescription(e.target.value)}
+              onChange={e => setJobDescription(e.target.value)}
               placeholder="Paste the job description here..."
-                  className="w-full p-2 border rounded-md min-h-[120px]"
-              disabled={isLoading}
+              rows={5}
+              className="w-full rounded-xl border border-blue-200 bg-white/70 dark:bg-gray-800/70 px-4 py-3 text-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
             />
-          </div>
-              {error && <div className="text-red-500 text-sm">{error}</div>}
-              {success && <div className="text-green-500 text-sm">{success}</div>}
-              <button
-                type="submit"
-                disabled={!selectedFile || isLoading || !jobDescription.trim()}
-                className={`w-full py-2 px-4 rounded-md text-white font-medium ${!selectedFile || isLoading || !jobDescription.trim() ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
-              >
-                {isLoading ? "Uploading..." : "Rewrite Resume"}
-              </button>
-            </form>
-          </div>
-          {/* Optionally show rewritten resume and LinkedIn info here */}
+            <button
+              type="submit"
+              className="bg-blue-700 hover:bg-blue-800 text-white rounded-xl px-6 py-3 font-bold text-lg shadow transition-all duration-200"
+              disabled={isLoading || !selectedFile || !jobDescription.trim()}
+            >
+              {isLoading ? "Rewriting..." : "Rewrite Resume"}
+            </button>
+          </form>
+          {error && <div className="mt-2 text-center text-red-700 bg-red-100 rounded-lg px-4 py-2">{error}</div>}
+          {success && <div className="mt-2 text-center text-green-700 bg-green-100 rounded-lg px-4 py-2">{success}</div>}
         </div>
+        {/* Rewritten Resume Card */}
+        {rewrittenResume && (
+          <div className="w-full max-w-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-blue-100 animate-fade-in delay-300 flex flex-col gap-4">
+            <h2 className="text-2xl font-bold text-blue-800 mb-2">Rewritten Resume</h2>
+            <div className="text-left space-y-2">
+              <div><span className="font-semibold">Name:</span> {rewrittenResume.name}</div>
+              <div><span className="font-semibold">Email:</span> {rewrittenResume.email}</div>
+              <div><span className="font-semibold">Phone:</span> {rewrittenResume.phone}</div>
+              <div><span className="font-semibold">Headline:</span> {rewrittenResume.headline}</div>
+              <div><span className="font-semibold">Summary:</span> {rewrittenResume.summary}</div>
+              {rewrittenResume.skills && rewrittenResume.skills.length > 0 && (
+                <div><span className="font-semibold">Skills:</span> <span className="inline-flex flex-wrap gap-2">{rewrittenResume.skills.map(skill => <span key={skill} className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-sm font-medium">{skill}</span>)}</span></div>
+              )}
+              {rewrittenResume.experience && rewrittenResume.experience.length > 0 && (
+                <div><span className="font-semibold">Experience:</span>
+                  <ul className="list-disc ml-6 mt-1">
+                    {rewrittenResume.experience.map((exp, idx) => <li key={idx}><span className="font-semibold">{exp.role}</span> at {exp.company} ({exp.duration}): {exp.details}</li>)}
+                  </ul>
+                </div>
+              )}
+              {rewrittenResume.education && rewrittenResume.education.length > 0 && (
+                <div><span className="font-semibold">Education:</span> {rewrittenResume.education.join(", ")}</div>
+              )}
+              {rewrittenResume.certifications && rewrittenResume.certifications.length > 0 && (
+                <div><span className="font-semibold">Certifications:</span> {rewrittenResume.certifications.join(", ")}</div>
+              )}
+              <div><span className="font-semibold">ATS Score:</span> <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-sm font-bold">{rewrittenResume.ats_score}</span></div>
+            </div>
+          </div>
+        )}
         <style jsx>{`
           .animate-fade-in {
             animation: fadeIn 0.7s cubic-bezier(0.4, 0, 0.2, 1);

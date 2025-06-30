@@ -183,98 +183,73 @@ export default function ResumePage() {
   }
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      {/* Sidebar placeholder for consistency, can be replaced with a component */}
-      <aside className="hidden md:block w-64 bg-white border-r shadow-sm flex flex-col py-8 px-4">
-        <div className="flex items-center gap-2 mb-8">
-          <img src="/placeholder-logo.svg" alt="SkillSync AI Logo" className="h-8 w-8" />
-          <span className="font-bold text-lg text-blue-700">SkillSync AI</span>
+    <div className="min-h-screen w-full flex bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-800 transition-colors duration-500">
+      {/* Sidebar */}
+      <aside className="hidden md:flex flex-col w-64 bg-white/70 backdrop-blur-lg border-r border-blue-100 shadow-xl py-10 px-6 z-10">
+        <div className="flex items-center gap-3 mb-10">
+          <img src="/placeholder-logo.svg" alt="SkillSync AI Logo" className="h-10 w-10 drop-shadow" />
+          <span className="font-extrabold text-2xl text-blue-700 tracking-tight">SkillSync AI</span>
         </div>
-        <nav className="flex-1 space-y-2">
-          <a href="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">🏠 Dashboard</a>
-          <a href="/dashboard/resume" className="flex items-center gap-3 px-3 py-2 rounded-lg text-blue-700 bg-blue-100 font-medium transition">📄 Resume Analysis</a>
-          <a href="/dashboard/rewrite-resume" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">✍️ Resume Rewriting</a>
-          <a href="/dashboard/cover-letter" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">📧 Cover Letter</a>
-          <a href="/dashboard/linkedin-optimization" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">🔗 LinkedIn Optimization</a>
-          <a href="/pricing" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">💳 Subscription Plans</a>
+        <nav className="flex-1 space-y-3 text-lg">
+          <a href="/dashboard" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition">🏠 Dashboard</a>
+          <a href="/dashboard/resume" className="flex items-center gap-3 px-4 py-2 rounded-xl text-blue-700 bg-blue-100 font-semibold transition">📄 Resume Analysis</a>
+          <a href="/dashboard/rewrite-resume" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition">✍️ Resume Rewriting</a>
+          <a href="/dashboard/cover-letter" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition">📧 Cover Letter</a>
+          <a href="/dashboard/linkedin-optimization" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition">🔗 LinkedIn Optimization</a>
+          <a href="/pricing" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition">💳 Subscription Plans</a>
         </nav>
       </aside>
-      <main className="flex-1 p-8 flex flex-col items-center justify-center">
-        <div className="max-w-xl w-full bg-white/90 p-8 rounded-2xl shadow-xl border border-blue-100 animate-fade-in">
-          <h1 className="text-3xl font-bold mb-8 text-blue-700 text-center">Resume Management</h1>
-          <div className="bg-white rounded-lg shadow p-6 mb-8">
-            <h2 className="text-xl font-semibold mb-4">Upload Resume</h2>
-            <form onSubmit={handleUpload} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Select Resume (PDF or DOCX, max 5MB)</label>
-                <input
-                  type="file"
-                  accept=".pdf,.docx"
-                  onChange={handleFileChange}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                  disabled={isLoading}
-                />
-              </div>
-              {error && <div className="text-red-500 text-sm">{error}</div>}
-              {success && <div className="text-green-500 text-sm">{success}</div>}
-              <button
-                type="submit"
-                disabled={!selectedFile || isLoading}
-                className={`w-full py-2 px-4 rounded-md text-white font-medium ${!selectedFile || isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
-              >
-                {isLoading ? "Uploading..." : "Upload Resume"}
-              </button>
-            </form>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">Resume Analysis</h2>
-            {isLoadingParsed ? (
-              <p className="text-gray-600">Loading resume data...</p>
-            ) : parsedResume ? (
-              <div className="space-y-6">
-                <div>
-                  <h3 className="font-medium text-gray-900">Personal Information</h3>
-                  <div className="mt-2 space-y-1">
-                    {parsedResume.full_name && <p>Name: {parsedResume.full_name}</p>}
-                    {parsedResume.email && <p>Email: {parsedResume.email}</p>}
-                    {parsedResume.phone && <p>Phone: {parsedResume.phone}</p>}
-                    {parsedResume.location && <p>Location: {parsedResume.location}</p>}
-                  </div>
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col items-center justify-center p-4 md:p-12 relative">
+        <div className="w-full max-w-3xl mx-auto mb-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-blue-800 mb-4 drop-shadow animate-fade-in">Resume Analysis</h1>
+          <p className="text-lg md:text-xl text-gray-600 mb-2 animate-fade-in delay-100">Upload your resume and get instant, AI-powered feedback and parsing.</p>
+        </div>
+        {/* Upload Card */}
+        <div className="w-full max-w-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-blue-100 animate-fade-in delay-200 mb-8 flex flex-col gap-4">
+          <form onSubmit={handleUpload} className="flex flex-col gap-4 items-center">
+            <input
+              type="file"
+              accept=".pdf,.docx"
+              onChange={handleFileChange}
+              className="block w-full text-lg text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-lg file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition"
+            />
+            <button
+              type="submit"
+              className="bg-blue-700 hover:bg-blue-800 text-white rounded-xl px-6 py-3 font-bold text-lg shadow transition-all duration-200"
+              disabled={isLoading || !selectedFile}
+            >
+              {isLoading ? "Uploading..." : "Upload Resume"}
+            </button>
+          </form>
+          {error && <div className="mt-2 text-center text-red-700 bg-red-100 rounded-lg px-4 py-2">{error}</div>}
+          {success && <div className="mt-2 text-center text-green-700 bg-green-100 rounded-lg px-4 py-2">{success}</div>}
+        </div>
+        {/* Parsed Resume Card */}
+        <div className="w-full max-w-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-blue-100 animate-fade-in delay-300 flex flex-col gap-4">
+          <h2 className="text-2xl font-bold text-blue-800 mb-2">Parsed Resume</h2>
+          {isLoadingParsed ? (
+            <div className="text-gray-500">Loading parsed resume...</div>
+          ) : parsedResume ? (
+            <div className="text-left space-y-2">
+              {parsedResume.full_name && <div><span className="font-semibold">Name:</span> {parsedResume.full_name}</div>}
+              {parsedResume.email && <div><span className="font-semibold">Email:</span> {parsedResume.email}</div>}
+              {parsedResume.phone && <div><span className="font-semibold">Phone:</span> {parsedResume.phone}</div>}
+              {parsedResume.location && <div><span className="font-semibold">Location:</span> {parsedResume.location}</div>}
+              {parsedResume.skills && parsedResume.skills.length > 0 && (
+                <div><span className="font-semibold">Skills:</span> <span className="inline-flex flex-wrap gap-2">{parsedResume.skills.map(skill => <span key={skill} className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-sm font-medium">{skill}</span>)}</span></div>
+              )}
+              {parsedResume.experience && parsedResume.experience.length > 0 && (
+                <div><span className="font-semibold">Experience:</span>
+                  <ul className="list-disc ml-6 mt-1">
+                    {parsedResume.experience.map((exp, idx) => <li key={idx}>{exp.company}</li>)}
+                  </ul>
                 </div>
-
-                {parsedResume.skills.length > 0 && (
-                  <div>
-                    <h3 className="font-medium text-gray-900">Skills</h3>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {parsedResume.skills.map((skill, index) => (
-                        <span
-                          key={index}
-                          className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {parsedResume.experience.length > 0 && (
-                  <div>
-                    <h3 className="font-medium text-gray-900">Experience</h3>
-                    <div className="mt-2 space-y-2">
-                      {parsedResume.experience.map((exp, index) => (
-                        <div key={index} className="text-sm">
-                          <p className="font-medium">{exp.company}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <p className="text-gray-600">No resume uploaded yet.</p>
-            )}
-          </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-gray-500">No resume uploaded yet. Please upload your resume above.</div>
+          )}
         </div>
         <style jsx>{`
           .animate-fade-in {

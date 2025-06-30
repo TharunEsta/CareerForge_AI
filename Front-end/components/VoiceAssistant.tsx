@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
+import { motion } from "framer-motion";
 
 // Type declarations for SpeechRecognition
 declare global {
@@ -323,14 +324,50 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ onMessage, className })
             />
           </div>
           
-          <Button
+          <button
+            type="button"
+            aria-label={isListening ? "Stop voice input" : "Start voice input"}
             onClick={isListening ? stopListening : startListening}
-            variant={isListening ? "destructive" : "default"}
-            size="icon"
-            className="w-10 h-10"
+            className="rounded-full p-2 border border-blue-200 dark:border-zinc-700 bg-blue-50 dark:bg-zinc-800 hover:bg-blue-100 dark:hover:bg-zinc-700 transition-colors"
           >
-            {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-          </Button>
+            <motion.span
+              animate={isListening ? { scale: [1, 1.2, 1], boxShadow: ["0 0 0 0 #2563eb55", "0 0 0 8px #2563eb22", "0 0 0 0 #2563eb00"] } : { scale: 1, boxShadow: "none" }}
+              transition={{ duration: 1, repeat: isListening ? Infinity : 0, ease: "easeInOut" }}
+              className="inline-flex"
+            >
+              <Mic className={`h-6 w-6 ${isListening ? "text-blue-600" : ""}`} />
+            </motion.span>
+          </button>
+          
+          {isListening && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="mt-2 flex items-center gap-2"
+            >
+              <span className="text-blue-600 font-semibold animate-pulse">Listening...</span>
+              {/* Simple animated waveform */}
+              <motion.span
+                animate={{ scaleY: [1, 1.5, 1] }}
+                transition={{ duration: 0.6, repeat: Infinity, repeatType: "reverse" }}
+                className="w-6 h-4 bg-blue-300 rounded"
+                style={{ display: "inline-block", transformOrigin: "bottom" }}
+              />
+              <motion.span
+                animate={{ scaleY: [1, 2, 1] }}
+                transition={{ duration: 0.7, repeat: Infinity, repeatType: "reverse", delay: 0.2 }}
+                className="w-2 h-3 bg-blue-400 rounded"
+                style={{ display: "inline-block", transformOrigin: "bottom" }}
+              />
+              <motion.span
+                animate={{ scaleY: [1, 1.3, 1] }}
+                transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse", delay: 0.4 }}
+                className="w-1 h-2 bg-blue-500 rounded"
+                style={{ display: "inline-block", transformOrigin: "bottom" }}
+              />
+            </motion.div>
+          )}
           
           <Button
             onClick={handleSendMessage}
