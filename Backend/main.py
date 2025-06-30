@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, Form, Depends, HTTPException, Request, status, Body, Header
+from fastapi import FastAPI, File, UploadFile, Form, Depends, HTTPException, Request, status, Body, Header, Path
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from pydantic import BaseModel, EmailStr
@@ -750,6 +750,90 @@ async def admin_analytics(x_api_key: str = Header(...)):
     logger.info(f"Admin analytics accessed: {analytics}")
     db.close()
     return analytics
+
+# --- Admin User Management Endpoints ---
+@app.get("/admin/users")
+async def admin_list_users(x_api_key: str = Header(...)):
+    if x_api_key != ADMIN_API_KEY:
+        return {"error": "Unauthorized"}
+    db = SessionLocal()
+    users = db.query(UserModel).all()
+    user_list = [
+        {
+            "id": u.id,
+            "email": u.email,
+            "username": u.username,
+            "full_name": u.full_name,
+            "plan": u.plan,
+            "is_active": u.is_active,
+            "created_at": u.created_at
+        } for u in users
+    ]
+    db.close()
+    return {"users": user_list}
+
+@app.get("/admin/users/{user_id}")
+async def admin_get_user(user_id: int = Path(...), x_api_key: str = Header(...)):
+    if x_api_key != ADMIN_API_KEY:
+        return {"error": "Unauthorized"}
+    db = SessionLocal()
+    user = db.query(UserModel).filter(UserModel.id == user_id).first()
+    if not user:
+        db.close()
+        return {"error": "User not found"}
+    user_data = {
+        "id": user.id,
+        "email": user.email,
+        "username": user.username,
+        "full_name": user.full_name,
+        "plan": user.plan,
+        "is_active": user.is_active,
+        "created_at": user.created_at
+    }
+    db.close()
+    return user_data
+
+@app.post("/admin/users/{user_id}/deactivate")
+async def admin_deactivate_user(user_id: int = Path(...), x_api_key: str = Header(...)):
+    if x_api_key != ADMIN_API_KEY:
+        return {"error": "Unauthorized"}
+    db = SessionLocal()
+    user = db.query(UserModel).filter(UserModel.id == user_id).first()
+    if not user:
+        db.close()
+        return {"error": "User not found"}
+    user.is_active = False
+    db.commit()
+    db.close()
+    return {"message": "User deactivated"}
+
+@app.post("/admin/users/{user_id}/activate")
+async def admin_activate_user(user_id: int = Path(...), x_api_key: str = Header(...)):
+    if x_api_key != ADMIN_API_KEY:
+        return {"error": "Unauthorized"}
+    db = SessionLocal()
+    user = db.query(UserModel).filter(UserModel.id == user_id).first()
+    if not user:
+        db.close()
+        return {"error": "User not found"}
+    user.is_active = True
+    db.commit()
+    db.close()
+    return {"message": "User activated"}
+
+@app.delete("/admin/users/{user_id}")
+async def admin_delete_user(user_id: int = Path(...), x_api_key: str = Header(...)):
+    if x_api_key != ADMIN_API_KEY:
+        return {"error": "Unauthorized"}
+    db = SessionLocal()
+    user = db.query(UserModel).filter(UserModel.id == user_id).first()
+    if not user:
+        db.close()
+        return {"error": "User not found"}
+    db.delete(user)
+    db.commit()
+    db.close()
+    return {"message": "User deleted"}
 
 # Log all requests
 @app.middleware("http")
