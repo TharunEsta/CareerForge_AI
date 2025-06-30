@@ -644,6 +644,16 @@ def upgrade_user_plan(
 async def parse_resume_endpoint(text: str):
     return parse_resume(text)
 
+@app.post("/resume-rewrite")
+async def resume_rewrite(resume_data: dict = Body(...), job_description: str = Body(...)):
+    from utils import rewrite_resume
+    return rewrite_resume(resume_data, job_description)
+
+@app.post("/linkedin-optimization")
+async def linkedin_optimization(resume_data: dict = Body(...)):
+    from utils import optimize_for_linkedin
+    return optimize_for_linkedin(resume_data)
+
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
