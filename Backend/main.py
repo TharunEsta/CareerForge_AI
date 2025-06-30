@@ -35,6 +35,12 @@ from schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMat
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
 
+# Ensure logging to file
+LOG_FILE = "backend.log"
+file_handler = logging.FileHandler(LOG_FILE)
+file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
+logger.addHandler(file_handler)
+
 # ─── Load Environment Variables ───────────────────────────────────────
 load_dotenv("key.env")
 load_dotenv(".env")
@@ -834,6 +840,17 @@ async def admin_delete_user(user_id: int = Path(...), x_api_key: str = Header(..
     db.commit()
     db.close()
     return {"message": "User deleted"}
+
+@app.get("/admin/logs")
+async def admin_logs(x_api_key: str = Header(...), lines: int = 100):
+    if x_api_key != ADMIN_API_KEY:
+        return {"error": "Unauthorized"}
+    if not os.path.exists(LOG_FILE):
+        return {"logs": []}
+    with open(LOG_FILE, "r", encoding="utf-8") as f:
+        all_lines = f.readlines()
+    last_lines = all_lines[-lines:]
+    return {"logs": last_lines}
 
 # Log all requests
 @app.middleware("http")
