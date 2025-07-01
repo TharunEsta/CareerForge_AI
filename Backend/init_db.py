@@ -3,6 +3,7 @@ from Backend.schemas import Base
 from Backend.auth import get_password_hash
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
+import os
 
 # Load environment variables
 load_dotenv("key.env")
