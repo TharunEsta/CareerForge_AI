@@ -20,7 +20,7 @@ from dotenv import load_dotenv
 import hashlib
 import secrets
 from pathlib import Path
-from Backend.utils import parse_resume, parse_resume_with_job_matching, allowed_file, rewrite_resume, optimize_for_linkedin
+from utils import parse_resume, parse_resume_with_job_matching, allowed_file, rewrite_resume, optimize_for_linkedin
 from fastapi import Query
 from typing import List
 import logging
