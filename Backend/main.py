@@ -36,6 +36,13 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from fastapi.responses import JSONResponse  
 
+limiter = Limiter(key_func=get_remote_address)
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, lambda request, exc: JSONResponse(
+    status_code=429, content={"detail": "Rate limit exceeded."})
+)
+app.add_middleware(SlowAPIMiddleware)
 
 # ─── Logging ───────────────────────────────────────────────────────────
 LOG_FILE = "backend.log"
