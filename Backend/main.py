@@ -33,10 +33,13 @@ from schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMat
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 from fastapi.responses import JSONResponse  
 
 
 # ─── Logging ───────────────────────────────────────────────────────────
+LOG_FILE = "backend.log"
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
 file_handler = logging.FileHandler("backend.log")
