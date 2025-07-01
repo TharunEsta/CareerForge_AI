@@ -398,11 +398,26 @@ def parse_resume(text: str) -> ParsedResume:
 
 # ─── Routes ─────────────────────────────────────────────────────
 @app.post("/api/resume/upload")
-@rate_limiter.limit("3/minute")
+@limiter.limit("3/minute")
 async def upload_resume(
+    request: Request,
     file: UploadFile = File(...),
     current_user: dict = Depends(get_current_user)
 ):
+    if not allowed_file(file.filename):
+        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Unsupported file type.")
+
+    contents = await file.read()
+    try:
+        extracted_text = extract_text_from_content(contents, file.filename)
+        parsed_data = parse_resume(extracted_text)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to process resume: {str(e)}")
+
+    return {
+        "message": "Resume uploaded and parsed successfully",
+        "parsed_resume": parsed_data.dict()
+    }
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
     return JSONResponse(
