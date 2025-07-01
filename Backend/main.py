@@ -385,20 +385,37 @@ async def upload_resume(
     file: UploadFile = File(...),
     current_user: dict = Depends(get_current_user)
 ):
-    if not allowed_file(file.filename):
-        raise HTTPException(status_code=400, detail="Unsupported file type.")
-
+    allowed_types = [
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "text/plain"
+    ]
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Only PDF, DOCX, or TXT files are allowed.")
+    
+    if file.filename == "":
+        raise HTTPException(status_code=400, detail="No file uploaded")
+    
     contents = await file.read()
+    
+    if not contents:
+        raise HTTPException(status_code=400, detail="Empty file uploaded")
+    
+    if len(contents) > 5 * 1024 * 1024:  # 5MB limit
+        raise HTTPException(status_code=400, detail="File size must be less than 5MB.")
+    
     try:
-        extracted_text = extract_text_from_content(contents, file.filename)
-        parsed_data = parse_resume(extracted_text)
+        text = extract_text_from_content(contents, file.filename)
+        parsed_data = parse_resume(text)
+        return {
+            "message": "Resume uploaded and parsed successfully",
+            "parsed_resume": parsed_data.dict()
+        }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to process resume: {str(e)}")
+        logger.error(f"Error processing resume: {e}")
+        raise HTTPException(status_code=500, detail="Failed to process resume")
 
-    return {
-        "message": "Resume uploaded and parsed successfully",
-        "parsed_resume": parsed_data.dict()
-    }
+
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
     return JSONResponse(
@@ -425,31 +442,7 @@ app.add_exception_handler(RateLimitExceeded, lambda request, exc: JSONResponse(s
 @app.on_event("startup")
 def on_startup():
     logger.info("API server started with rate limiting.")
-    allowed_types = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"]
-    if file.content_type not in allowed_types:
-        raise HTTPException(status_code=400, detail="Only PDF, DOCX, or TXT files are allowed.")
-    if file.size and file.size > 5 * 1024 * 1024:
-        raise HTTPException(status_code=400, detail="File size must be less than 5MB.")
-    try:
-        if not file.filename:
-            raise HTTPException(status_code=400, detail="No file uploaded")
         
-        if not allowed_file(file.filename):
-            raise HTTPException(status_code=400, detail="File type not allowed")
-        
-        contents = await file.read()
-        if not contents:
-            raise HTTPException(status_code=400, detail="Empty file uploaded")
-        
-        text = extract_text_from_content(contents, file.filename)
-        resume_data = parse_resume(text)
-        return resume_data
-            
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        logger.error(f"Error uploading resume: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/resume/parsed")
 async def get_parsed_resume(current_user: User = Depends(get_current_user)):
