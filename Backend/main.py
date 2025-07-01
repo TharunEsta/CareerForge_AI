@@ -33,9 +33,9 @@ from schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMat
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
-from fastapi.responses import JSONResponse
-from slowapi import limiter as rate_limiter  
+from fastapi.responses import JSONResponse  
 
+rate_limiter = Limiter(key_func=get_remote_address)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
