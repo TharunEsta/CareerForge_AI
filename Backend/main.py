@@ -412,7 +412,7 @@ async def upload_resume(
             "parsed_resume": parsed_data.dict()
         }
     except Exception as e:
-        logger.error(f"Error processing resume: {e}")
+        logger.error("Error processing resume: %s", e)
         raise HTTPException(status_code=500, detail="Failed to process resume")
 
 
