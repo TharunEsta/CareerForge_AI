@@ -97,7 +97,7 @@ def extract_name(doc):
     pattern = [{'POS': 'PROPN'}, {'POS': 'PROPN'}]  # simple two proper nouns pattern
     matcher.add('NAME', [pattern])
     matches = matcher(doc)
-    for match_id, start, end in matches:
+    for _, start, end in matches:
         span = doc[start:end]
         return span.text
     return None

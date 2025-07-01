@@ -1,10 +1,8 @@
 # job_matcher.py
 
 def extract_skills_from_text(text):
-    skills_list = [
-        'python', 'java', 'flask', 'sql', 'nlp', 'machine learning',
-        'aws', 'docker', 'kubernetes', 'react', 'angular', 'git'
-    ]
+    # skills_list removed as it is unused
+    pass  # Implement skill extraction logic here if needed
 
 SKILL_KEYWORDS = [
     "python", "flask", "sql", "git", "docker", "aws",
