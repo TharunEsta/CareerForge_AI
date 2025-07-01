@@ -23,28 +23,18 @@ import hashlib
 import secrets
 from pathlib import Path
 import json
-from utils import parse_resume, parse_resume_with_job_matching, allowed_file
+from Backend.utils import parse_resume, parse_resume_with_job_matching, allowed_file, rewrite_resume, optimize_for_linkedin
 from fastapi import Query
 from typing import List
 import logging
-from voice_assistant import router as voice_router
-from models import SessionLocal, RevokedToken
-from schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMatchModel
+from Backend.models import SessionLocal, RevokedToken
+from Backend.schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMatchModel
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
-from slowapi.middleware import SlowAPIMiddleware
-from fastapi.responses import JSONResponse  
-
-limiter = Limiter(key_func=get_remote_address)
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, lambda request, exc: JSONResponse(
-    status_code=429, content={"detail": "Rate limit exceeded."})
-)
-app.add_middleware(SlowAPIMiddleware)
-
-# ─── Logging ───────────────────────────────────────────────────────────
-LOG_FILE = "backend.log"
+from fastapi.responses import JSONResponse
+from slowapi.decorator import limiter as rate_limiter
+from Backend.job_matcher import match_resume_to_job
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
@@ -67,17 +57,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# ─── Rate Limiting Setup ───────────────────────────────────────────────
-rate_limiter = Limiter(key_func=get_remote_address)
-app.state.limiter = rate_limiter
-app.add_exception_handler(RateLimitExceeded, lambda r, e: JSONResponse(
-    status_code=429, content={"detail": "Rate limit exceeded. Try again later."})
-)
-app.add_middleware(SlowAPIMiddleware)  # ✅ Attach middleware for rate limiting
-
-# ─── Voice Assistant Router ─────────────────────────────────────────────
-app.include_router(voice_router, prefix="/api/voice", tags=["voice-assistant"])
 
 # ─── Security & Config ─────────────────────────────────────────
 SECRET_KEY = os.getenv("SECRET_KEY", "secret")
@@ -202,6 +181,9 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 # ─── NLP Models ─────────────────────────────────────────────────
 nlp = spacy.load("en_core_web_sm")
 model = SentenceTransformer("all-MiniLM-L6-v2")
+
+# Define 'client' before use at line 167
+client = None
 
 async def openai_chat(messages: List[Dict]):
     res = client.chat.completions.create(
@@ -398,7 +380,7 @@ def parse_resume(text: str) -> ParsedResume:
 
 # ─── Routes ─────────────────────────────────────────────────────
 @app.post("/api/resume/upload")
-@limiter.limit("3/minute")
+@rate_limiter.limit("3/minute")
 async def upload_resume(
     request: Request,
     file: UploadFile = File(...),
@@ -427,11 +409,12 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
 
 # ─── Example Rate-Limited GET Endpoint ───
 @app.get("/api/some-endpoint")
-@limiter.limit("3/minute")
+@rate_limiter.limit("3/minute")
 async def my_endpoint(request: Request):
     return {"message": "Hello! You are within the rate limit."}
 
 
+@app.get("/")
 def root():
     return {"message": "CareerForge API is running"}
 
@@ -455,11 +438,11 @@ def on_startup():
         if not allowed_file(file.filename):
             raise HTTPException(status_code=400, detail="File type not allowed")
         
-        content = await file.read()
-        if not content:
+        contents = await file.read()
+        if not contents:
             raise HTTPException(status_code=400, detail="Empty file uploaded")
         
-        text = extract_text_from_content(content, file.filename)
+        text = extract_text_from_content(contents, file.filename)
         resume_data = parse_resume(text)
         return resume_data
             
@@ -609,11 +592,11 @@ async def job_match(
         if not allowed_file(file.filename):
             raise HTTPException(status_code=400, detail="File type not allowed")
         
-        content = await file.read()
-        if not content:
+        contents = await file.read()
+        if not contents:
             raise HTTPException(status_code=400, detail="Empty file uploaded")
         
-        text = extract_text_from_content(content, file.filename)
+        text = extract_text_from_content(contents, file.filename)
         resume_data = parse_resume(text)
         return resume_data
             
@@ -640,11 +623,11 @@ async def analyze_resume(
         if not allowed_file(file.filename):
             raise HTTPException(status_code=400, detail="File type not allowed")
         
-        content = await file.read()
-        if not content:
+        contents = await file.read()
+        if not contents:
             raise HTTPException(status_code=400, detail="Empty file uploaded")
         
-        text = extract_text_from_content(content, file.filename)
+        text = extract_text_from_content(contents, file.filename)
         if job_description:
             resume_data = parse_resume_with_job_matching(text, job_description)
         else:
@@ -677,10 +660,10 @@ async def match_resume(
             raise HTTPException(status_code=400, detail="File type not allowed")
         if not job_description:
             raise HTTPException(status_code=400, detail="Job description is required")
-        content = await file.read()
-        if not content:
+        contents = await file.read()
+        if not contents:
             raise HTTPException(status_code=400, detail="Empty file uploaded")
-        text = extract_text_from_content(content, file.filename)
+        text = extract_text_from_content(contents, file.filename)
         resume_data = parse_resume_with_job_matching(text, job_description)
         return resume_data
     except HTTPException as e:
@@ -735,12 +718,10 @@ async def parse_resume_endpoint(text: str):
 
 @app.post("/resume-rewrite")
 async def resume_rewrite(resume_data: dict = Body(...), job_description: str = Body(...)):
-    from utils import rewrite_resume
     return rewrite_resume(resume_data, job_description)
 
 @app.post("/linkedin-optimization")
 async def linkedin_optimization(resume_data: dict = Body(...)):
-    from utils import optimize_for_linkedin
     return optimize_for_linkedin(resume_data)
 
 @app.post("/cover-letter-rewrite")
@@ -772,7 +753,6 @@ async def cover_letter_rewrite(
 
 @app.post("/job-match")
 async def job_match_endpoint(resume_data: dict = Body(...), job_description: str = Body(...)):
-    from job_matcher import match_resume_to_job
     result = match_resume_to_job(resume_data.get('skills', []), job_description)
     logger.info(f"Job match result: {result}")
     return {"match_result": result}
