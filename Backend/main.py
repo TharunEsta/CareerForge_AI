@@ -6,6 +6,7 @@ from typing import List, Optional, Dict
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 import fitz  # <--- PyMuPDF
+from datetime import datetime, timedelta, timezone
 import os
 import re
 import tempfile
@@ -25,11 +26,39 @@ from fastapi import Query
 import logging
 from models import SessionLocal, RevokedToken
 from schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMatchModel
+import logging
+import hashlib
+import secrets
+from dotenv import load_dotenv
+from jose import jwt
+from sentence_transformers import SentenceTransformer
+from pathlib import Path
+from utils import parse_resume, parse_resume_with_job_matching, allowed_file, rewrite_resume, optimize_for_linkedin
+from fastapi import Query
+from typing import List
+import logging
+from Backend.models import SessionLocal, RevokedToken
+from Backend.schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMatchModel
 from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
 from fastapi.responses import JSONResponse
 from slowapi.util import get_remote_address
 from job_matcher import match_resume_to_job
+from slowapi.decorator import limiter as rate_limiter
+from Backend.utils import (
+    parse_resume,
+    parse_resume_with_job_matching,
+    allowed_file,
+    rewrite_resume,
+    optimize_for_linkedin,
+)
+from Backend.models import SessionLocal, RevokedToken
+from Backend.schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMatchModel
+from Backend.job_matcher import match_resume_to_job
+from Backend.tools import router as tools_router
+from Backend.voice_assistant import router as voice_router
+from Backend.agent import router as agent_router
+
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
@@ -422,7 +451,6 @@ limiter = Limiter(key_func=get_remote_address, default_limits=["10/minute"])
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, lambda request, exc: JSONResponse(status_code=429, content={"detail": "Rate limit exceeded"}))
 
-<<<<<<< HEAD
 @app.on_event("startup")
 def on_startup():
     logger.info("API server started with rate limiting.")
