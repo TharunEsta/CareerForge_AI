@@ -1,6 +1,6 @@
 # job_matcher.py
 
-def extract_skills_from_text(text):
+def extract_skills_from_text(_):
     # skills_list removed as it is unused
     pass  # Implement skill extraction logic here if needed
 
