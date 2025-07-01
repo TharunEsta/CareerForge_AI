@@ -495,9 +495,15 @@ if __name__ == "__main__":
     class DummyFileStorage:
         """Simulate Flask's FileStorage for testing with local files."""
         def __init__(self, filepath):
-            self.filename = filepath.split('/')[-1]
-            self.filepath = filepath
-            self.stream = open(filepath, 'rb')
+            import os
+            # Only allow files from a specific safe directory, e.g., 'uploads/'
+            safe_dir = os.path.abspath('uploads')
+            abs_path = os.path.abspath(filepath)
+            if not abs_path.startswith(safe_dir):
+                raise ValueError("Unsafe file path detected.")
+            self.filename = os.path.basename(filepath)
+            self.filepath = abs_path
+            self.stream = open(abs_path, 'rb')
         def read(self):
             return self.stream.read()
         def close(self):
