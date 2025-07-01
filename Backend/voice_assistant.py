@@ -1,6 +1,12 @@
-import speech_recognition as sr
+try:
+    import speech_recognition as sr
+except ImportError:
+    sr = None
+try:
+    from langdetect import detect
+except ImportError:
+    detect = None
 from typing import Dict, List, Optional
-from langdetect import detect
 import openai
 import os
 from fastapi import APIRouter, HTTPException

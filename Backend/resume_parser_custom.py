@@ -93,3 +93,24 @@ def parse_resume(text):
         'certifications': certifications  # NEW FIELD
     }
 
+def extract_certifications(text):
+    return []
+
+def extract_name(text):
+    return ""
+
+def extract_mobile(text):
+    return ""
+
+def normalize_degrees(degrees):
+    return degrees
+
+def normalize_skills(skills):
+    return skills
+
+def extract_languages(text):
+    return []
+
+def extract_total_experience(text):
+    return 0
+

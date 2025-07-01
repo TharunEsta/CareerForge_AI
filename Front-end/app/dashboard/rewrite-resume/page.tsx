@@ -161,7 +161,7 @@ export default function RewriteResumePage() {
           <div className="flex items-center gap-3 mb-10">
             <img src="/placeholder-logo.svg" alt="SkillSync AI Logo" className="h-10 w-10 drop-shadow" />
             <span className="font-extrabold text-2xl text-blue-700 tracking-tight">SkillSync AI</span>
-          </div>
+            </div>
           <nav className="flex-1 space-y-3 text-lg">
             <a href="/dashboard" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition">🏠 Dashboard</a>
             <a href="/dashboard/resume" className="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-semibold transition">📄 Resume Analysis</a>
@@ -221,17 +221,17 @@ export default function RewriteResumePage() {
               rows={5}
               className="w-full rounded-xl border border-blue-200 bg-white/70 dark:bg-gray-800/70 px-4 py-3 text-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
             />
-            <button
-              type="submit"
+          <button
+            type="submit"
               className="bg-blue-700 hover:bg-blue-800 text-white rounded-xl px-6 py-3 font-bold text-lg shadow transition-all duration-200"
               disabled={isLoading || !selectedFile || !jobDescription.trim()}
-            >
+          >
               {isLoading ? "Rewriting..." : "Rewrite Resume"}
-            </button>
-          </form>
+          </button>
+        </form>
           {error && <div className="mt-2 text-center text-red-700 bg-red-100 rounded-lg px-4 py-2">{error}</div>}
           {success && <div className="mt-2 text-center text-green-700 bg-green-100 rounded-lg px-4 py-2">{success}</div>}
-        </div>
+      </div>
         {/* Rewritten Resume Card */}
         {rewrittenResume && (
           <div className="w-full max-w-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-blue-100 animate-fade-in delay-300 flex flex-col gap-4">
@@ -260,8 +260,8 @@ export default function RewriteResumePage() {
               )}
               <div><span className="font-semibold">ATS Score:</span> <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-sm font-bold">{rewrittenResume.ats_score}</span></div>
             </div>
-          </div>
-        )}
+        </div>
+      )}
         <style jsx>{`
           .animate-fade-in {
             animation: fadeIn 0.7s cubic-bezier(0.4, 0, 0.2, 1);

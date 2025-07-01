@@ -5,7 +5,6 @@ def extract_skills_from_text(text):
         'python', 'java', 'flask', 'sql', 'nlp', 'machine learning',
         'aws', 'docker', 'kubernetes', 'react', 'angular', 'git'
     ]
-# job_matcher.py
 
 SKILL_KEYWORDS = [
     "python", "flask", "sql", "git", "docker", "aws",
@@ -22,9 +21,6 @@ def match_skills(resume_skills, job_skills):
     missing_skills = [skill for skill in job_skills if skill not in resume_skills]
     return matched_skills, missing_skills
 
-    found_skills = [skill for skill in skills_list if skill in text.lower()]
-    return found_skills
-
 def match_resume_to_job(resume_skills, job_description):
     job_skills = extract_skills_from_text(job_description)
     matched_skills = [skill for skill in resume_skills if skill in job_skills]
@@ -35,6 +31,7 @@ def match_resume_to_job(resume_skills, job_description):
         'matched_skills': matched_skills,
         'missing_skills': missing_skills,
     }
+
 # Example: predefined skills list (you can expand or load from a file)
 SKILL_KEYWORDS = ["python", "java", "sql", "flask", "docker", "git", "aws", "react"]
 

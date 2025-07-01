@@ -1,9 +1,7 @@
-from database import engine
-from schemas import Base
-from auth import get_password_hash
+from Backend.database import engine, SessionLocal
+from Backend.schemas import Base
+from Backend.auth import get_password_hash
 from sqlalchemy.orm import Session
-from database import SessionLocal
-import os
 from dotenv import load_dotenv
 
 # Load environment variables

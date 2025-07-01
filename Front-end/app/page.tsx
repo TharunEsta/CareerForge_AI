@@ -813,43 +813,43 @@ ACHIEVEMENTS
                   <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowJobMatch}>Job Match</button>
                 </div>
                 <AnimatePresence>
-                  {messages.map((message, index) => (
+                {messages.map((message, index) => (
                     <MotionDiv
-                      key={index}
+                    key={index}
                       initial={{ opacity: 0, y: 24 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 24 }}
                       transition={{ duration: 0.4, type: "spring" }}
-                      className={cn(
-                        "flex gap-3 p-4 rounded-lg",
-                        message.sender === "user"
-                          ? "bg-muted"
-                          : "bg-background border"
-                      )}
-                    >
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage
-                          src={message.sender === "user" ? "/user-avatar.png" : "/bot-avatar.png"}
-                        />
-                        <AvatarFallback>
-                          {message.sender === "user" ? "U" : "AI"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold">
-                            {message.sender === "user" ? "You" : "CareerForge.AI"}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(message.timestamp).toLocaleTimeString()}
-                          </span>
-                        </div>
-                        <div className="prose prose-sm max-w-none dark:prose-invert">
-                          {renderMessage(message)}
-                        </div>
+                    className={cn(
+                      "flex gap-3 p-4 rounded-lg",
+                      message.sender === "user"
+                        ? "bg-muted"
+                        : "bg-background border"
+                    )}
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage
+                        src={message.sender === "user" ? "/user-avatar.png" : "/bot-avatar.png"}
+                      />
+                      <AvatarFallback>
+                        {message.sender === "user" ? "U" : "AI"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold">
+                          {message.sender === "user" ? "You" : "CareerForge.AI"}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(message.timestamp).toLocaleTimeString()}
+                        </span>
                       </div>
+                      <div className="prose prose-sm max-w-none dark:prose-invert">
+                        {renderMessage(message)}
+                      </div>
+                    </div>
                     </MotionDiv>
-                  ))}
+                ))}
                 </AnimatePresence>
               </div>
             </div>
@@ -898,7 +898,7 @@ ACHIEVEMENTS
                   <div className="flex items-center space-x-4">
                     <div className="p-3 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full">
                       <Mic className="w-6 h-6 text-white" />
-                    </div>
+        </div>
                     <div>
                       <h3 className="text-xl font-semibold text-purple-900 dark:text-purple-100">
                         AI Voice Assistant
@@ -906,7 +906,7 @@ ACHIEVEMENTS
                       <p className="text-purple-700 dark:text-purple-300">
                         Speak naturally in multiple languages with our intelligent voice assistant
                       </p>
-                    </div>
+      </div>
                   </div>
                   <Link href="/voice-assistant">
                     <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white">
