@@ -35,7 +35,6 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from fastapi.responses import JSONResponse  
 
-rate_limiter = Limiter(key_func=get_remote_address)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
@@ -54,6 +53,7 @@ load_dotenv(".env")
 # ─── App Setup ─────────────────────────────────────────────────
 app = FastAPI(title="CareerForge API")
 
+
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
@@ -65,6 +65,21 @@ app.add_middleware(
 
 # Include voice assistant router
 app.include_router(voice_router, prefix="/api/voice", tags=["voice-assistant"])
+rate_limiter = Limiter(key_func=get_remote_address)
+# Register rate limit exception handler
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    return JSONResponse(
+        status_code=429,
+        content={"detail": "Rate limit exceeded. Try again later."}
+    )
+
+# Rate-limited route
+@app.get("/api/some-endpoint")
+@rate_limiter.limit("3/minute")
+async def my_endpoint(request: Request):
+    return {"message": "Hello! You are within the rate limit."}
+
 
 # ─── Security & Config ─────────────────────────────────────────
 SECRET_KEY = os.getenv("SECRET_KEY", "secret")
