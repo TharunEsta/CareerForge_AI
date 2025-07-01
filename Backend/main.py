@@ -394,7 +394,7 @@ def parse_resume(text: str) -> ParsedResume:
 
 # ─── Example Rate-Limited Endpoint ──────────────────────────────────────
 @app.get("/api/some-endpoint")
-@limiter.limit("3/minute")
+@rate_limiter.limit("3/minute")
 async def my_endpoint(request: Request):
     return {"message": "Hello! You are within the rate limit."}
     
@@ -412,7 +412,7 @@ def on_startup():
     logger.info("API server started with rate limiting.")
 
 @app.post("/api/resume/upload")
-@limiter.limit("3/minute")
+@rate_limiter.limit("3/minute")
 async def upload_resume(
     file: UploadFile = File(...),
     current_user: dict = Depends(get_current_user)
