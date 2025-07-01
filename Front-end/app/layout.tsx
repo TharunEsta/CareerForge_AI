@@ -1,13 +1,9 @@
-"use client";
-
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { Metadata } from "next";
 import { cn } from "@/lib/utils";
 import Providers from "../components/Providers";
-import { useEffect } from "react";
-// @ts-ignore
-import plausibleImport from "plausible-tracker";
+import AnalyticsWrapper from "@/components/AnalyticsWrapper"; // 👈 New client component
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,14 +14,6 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  useEffect(() => {
-    // @ts-ignore
-    const plausibleInstance = plausibleImport({ domain: "careerforge.ai" });
-    plausibleInstance.trackPageview();
-    // @ts-ignore
-    window.plausible = plausibleInstance;
-  }, []);
-
   return (
     <html lang="en">
       <head>
@@ -33,11 +21,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={cn(inter.className)}>
         <Providers>
+          <AnalyticsWrapper /> {/* ✅ Client-only hook moved here */}
           <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-800 transition-colors duration-500 relative">
-            <main role="main">
-              {children}
-            </main>
-            {/* Global floating mic button */}
+            <main role="main">{children}</main>
             <button
               className="fixed bottom-6 right-6 z-50 bg-blue-700 hover:bg-blue-800 text-white rounded-full shadow-2xl p-5 flex items-center justify-center transition-all duration-300 animate-mic-float focus:outline-none focus:ring-4 focus:ring-blue-300"
               aria-label="Activate Voice Assistant"
@@ -62,3 +48,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
+
