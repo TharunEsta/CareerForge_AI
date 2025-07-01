@@ -392,11 +392,24 @@ def parse_resume(text: str) -> ParsedResume:
 
 # ─── Routes ─────────────────────────────────────────────────────
 
-# ─── Example Rate-Limited Endpoint ──────────────────────────────────────
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    return JSONResponse(
+        status_code=429,
+        content={"detail": "Rate limit exceeded. Try again later."}
+    )
+
+# ─── Example Rate-Limited GET Endpoint ───
 @app.get("/api/some-endpoint")
-@rate_limiter.limit("3/minute")
+@limiter.limit("3/minute")
 async def my_endpoint(request: Request):
     return {"message": "Hello! You are within the rate limit."}
+
+# ─── Example Rate-Limited POST Endpoint ───
+@app.post("/api/upload-resume")
+@limiter.limit("3/minute")
+async def upload_resume(request: Request, file: UploadFile = File(...)):
+    return {"filename": file.filename}
     
 @app.get("/")
 def root():
