@@ -23,11 +23,11 @@ import hashlib
 import secrets
 from pathlib import Path
 import json
-from Backend.utils import parse_resume, parse_resume_with_job_matching, allowed_file
+from utils import parse_resume, parse_resume_with_job_matching, allowed_file
 from fastapi import Query
 from typing import List
 import logging
-from Backend.voice_assistant import router as voice_router
+from voice_assistant import router as voice_router
 from models import SessionLocal, RevokedToken
 from schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMatchModel
 from slowapi import Limiter
