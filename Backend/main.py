@@ -387,7 +387,7 @@ async def upload_resume(
     current_user: dict = Depends(get_current_user)
 ):
     if not allowed_file(file.filename):
-        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Unsupported file type.")
+        raise HTTPException(status_code=400, detail="Unsupported file type.")
 
     contents = await file.read()
     try:
