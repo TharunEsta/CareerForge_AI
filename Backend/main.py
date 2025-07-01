@@ -73,12 +73,6 @@ app.add_middleware(SlowAPIMiddleware)  # ✅ Attach middleware for rate limiting
 # ─── Voice Assistant Router ─────────────────────────────────────────────
 app.include_router(voice_router, prefix="/api/voice", tags=["voice-assistant"])
 
-# ─── Example Rate-Limited Endpoint ──────────────────────────────────────
-@app.get("/api/some-endpoint")
-@rate_limiter.limit("3/minute")
-async def my_endpoint(request: Request):
-    return {"message": "Hello! You are within the rate limit."}
-
 # ─── Security & Config ─────────────────────────────────────────
 SECRET_KEY = os.getenv("SECRET_KEY", "secret")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
@@ -397,6 +391,13 @@ def parse_resume(text: str) -> ParsedResume:
     )
 
 # ─── Routes ─────────────────────────────────────────────────────
+
+# ─── Example Rate-Limited Endpoint ──────────────────────────────────────
+@app.get("/api/some-endpoint")
+@limiter.limit("3/minute")
+async def my_endpoint(request: Request):
+    return {"message": "Hello! You are within the rate limit."}
+    
 @app.get("/")
 def root():
     return {"message": "CareerForge API is running"}
@@ -411,7 +412,7 @@ def on_startup():
     logger.info("API server started with rate limiting.")
 
 @app.post("/api/resume/upload")
-@rate_limiter("3/minute")
+@limiter.limit("3/minute")
 async def upload_resume(
     file: UploadFile = File(...),
     current_user: dict = Depends(get_current_user)
