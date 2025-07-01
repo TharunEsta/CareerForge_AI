@@ -37,7 +37,6 @@ from slowapi.middleware import SlowAPIMiddleware
 from fastapi.responses import JSONResponse  
 
 limiter = Limiter(key_func=get_remote_address)
-
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, lambda request, exc: JSONResponse(
     status_code=429, content={"detail": "Rate limit exceeded."})
@@ -398,7 +397,12 @@ def parse_resume(text: str) -> ParsedResume:
     )
 
 # ─── Routes ─────────────────────────────────────────────────────
-
+@app.post("/api/resume/upload")
+@rate_limiter.limit("3/minute")
+async def upload_resume(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
     return JSONResponse(
@@ -424,13 +428,6 @@ app.add_exception_handler(RateLimitExceeded, lambda request, exc: JSONResponse(s
 @app.on_event("startup")
 def on_startup():
     logger.info("API server started with rate limiting.")
-
-@app.post("/api/resume/upload")
-@rate_limiter.limit("3/minute")
-async def upload_resume(
-    file: UploadFile = File(...),
-    current_user: dict = Depends(get_current_user)
-):
     allowed_types = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"]
     if file.content_type not in allowed_types:
         raise HTTPException(status_code=400, detail="Only PDF, DOCX, or TXT files are allowed.")
