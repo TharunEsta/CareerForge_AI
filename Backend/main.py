@@ -266,14 +266,15 @@ def parse_resume(text: str) -> ParsedResume:
                 for context_line in context_lines:
                     doc_line = nlp(context_line)
                     for ent in doc_line.ents:
-                        if ent.label_ == "PERSON":
-                            name_parts = ent.text.split()
-                            if len(name_parts) <= 3:  # Names are usually 1-3 words
-                                if (not any(header in ent.text.lower() for header in section_headers) and
-                                    not any(word in ent.text.lower() for word in non_name_words) and
-                                    all(part[0].isupper() for part in name_parts)):
-                                    name = ent.text
-                                    break
+                        if (
+                            ent.label_ == "PERSON"
+                            and len(name_parts := ent.text.split()) <= 3
+                            and not any(header in ent.text.lower() for header in section_headers)
+                            and not any(word in ent.text.lower() for word in non_name_words)
+                            and all(part[0].isupper() for part in name_parts)
+                        ):
+                            name = ent.text
+                            break
                     if name:
                         break
                 if name:
@@ -299,14 +300,15 @@ def parse_resume(text: str) -> ParsedResume:
                 
                 doc_line = nlp(line)
                 for ent in doc_line.ents:
-                    if ent.label_ == "PERSON":
-                        name_parts = ent.text.split()
-                        if len(name_parts) <= 3:
-                            if (not any(header in ent.text.lower() for header in section_headers) and
-                                not any(word in ent.text.lower() for word in non_name_words) and
-                                all(part[0].isupper() for part in name_parts)):
-                                name = ent.text
-                                break
+                    if (
+                        ent.label_ == "PERSON"
+                        and len(name_parts := ent.text.split()) <= 3
+                        and not any(header in ent.text.lower() for header in section_headers)
+                        and not any(word in ent.text.lower() for word in non_name_words)
+                        and all(part[0].isupper() for part in name_parts)
+                    ):
+                        name = ent.text
+                        break
                 if name:
                     break
     
