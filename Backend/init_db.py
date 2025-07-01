@@ -1,7 +1,6 @@
 from Backend.database import engine, SessionLocal
 from Backend.schemas import Base, User
 from Backend.auth import get_password_hash
-from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 import os
 

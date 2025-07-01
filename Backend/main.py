@@ -10,19 +10,16 @@ import os
 import re
 import tempfile
 import docx2txt
-import pypdf
 import uvicorn
 import spacy
 import openai
 from datetime import datetime, timedelta, timezone
-from jose import JWTError, jwt
-from passlib.context import CryptContext
-from sentence_transformers import SentenceTransformer, util
+from jose import jwt
+from sentence_transformers import SentenceTransformer
 from dotenv import load_dotenv
 import hashlib
 import secrets
 from pathlib import Path
-import json
 from Backend.utils import parse_resume, parse_resume_with_job_matching, allowed_file, rewrite_resume, optimize_for_linkedin
 from fastapi import Query
 from typing import List
