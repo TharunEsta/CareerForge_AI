@@ -36,13 +36,10 @@ from slowapi.errors import RateLimitExceeded
 from fastapi.responses import JSONResponse  
 
 
-# Configure logging
+# ─── Logging ───────────────────────────────────────────────────────────
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
-
-# Ensure logging to file
-LOG_FILE = "backend.log"
-file_handler = logging.FileHandler(LOG_FILE)
+file_handler = logging.FileHandler("backend.log")
 file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
 logger.addHandler(file_handler)
 
@@ -50,11 +47,10 @@ logger.addHandler(file_handler)
 load_dotenv("key.env")
 load_dotenv(".env")
 
-# ─── App Setup ─────────────────────────────────────────────────
+# ─── FastAPI Setup ────────────────────────────────────────────────────
 app = FastAPI(title="CareerForge API")
 
-
-# Add CORS middleware
+# ─── CORS ──────────────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -63,23 +59,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include voice assistant router
-app.include_router(voice_router, prefix="/api/voice", tags=["voice-assistant"])
+# ─── Rate Limiting Setup ───────────────────────────────────────────────
 rate_limiter = Limiter(key_func=get_remote_address)
-# Register rate limit exception handler
-@app.exception_handler(RateLimitExceeded)
-async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
-    return JSONResponse(
-        status_code=429,
-        content={"detail": "Rate limit exceeded. Try again later."}
-    )
+app.state.limiter = rate_limiter
+app.add_exception_handler(RateLimitExceeded, lambda r, e: JSONResponse(
+    status_code=429, content={"detail": "Rate limit exceeded. Try again later."})
+)
+app.add_middleware(SlowAPIMiddleware)  # ✅ Attach middleware for rate limiting
 
-# Rate-limited route
+# ─── Voice Assistant Router ─────────────────────────────────────────────
+app.include_router(voice_router, prefix="/api/voice", tags=["voice-assistant"])
+
+# ─── Example Rate-Limited Endpoint ──────────────────────────────────────
 @app.get("/api/some-endpoint")
 @rate_limiter.limit("3/minute")
 async def my_endpoint(request: Request):
     return {"message": "Hello! You are within the rate limit."}
-
 
 # ─── Security & Config ─────────────────────────────────────────
 SECRET_KEY = os.getenv("SECRET_KEY", "secret")
