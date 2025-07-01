@@ -193,23 +193,23 @@ async def openai_chat(messages: List[Dict]):
     )
     return res.choices[0].message.content.strip()
 
-def extract_text_from_content(content: bytes, filename: str) -> str:
+def extract_text_from_content(contents: bytes, filename: str) -> str:
     suffix = os.path.splitext(filename)[1].lower()
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-        tmp.write(content)
+        tmp.write(contents)
         tmp.flush()
         tmp_path = tmp.name
     
     try:
         if suffix == ".pdf":
-            with fitz.open(stream=content, filetype="pdf") as doc:
+            with fitz.open(stream=contents, filetype="pdf") as doc:
                 text = ""
                 for page in doc:
                     text += page.get_text()
         elif suffix in [".docx", ".doc"]:
             text = docx2txt.process(tmp_path)
         else:
-            text = content.decode('utf-8', errors='ignore')
+            text = contents.decode('utf-8', errors='ignore')
         return text
     finally:
         os.unlink(tmp_path)
