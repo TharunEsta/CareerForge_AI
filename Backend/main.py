@@ -405,13 +405,7 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
 async def my_endpoint(request: Request):
     return {"message": "Hello! You are within the rate limit."}
 
-# ─── Example Rate-Limited POST Endpoint ───
-@app.post("/api/upload-resume")
-@limiter.limit("3/minute")
-async def upload_resume(request: Request, file: UploadFile = File(...)):
-    return {"filename": file.filename}
-    
-@app.get("/")
+
 def root():
     return {"message": "CareerForge API is running"}
 
