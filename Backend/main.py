@@ -22,7 +22,6 @@ import secrets
 from pathlib import Path
 from Backend.utils import parse_resume, parse_resume_with_job_matching, allowed_file, rewrite_resume, optimize_for_linkedin
 from fastapi import Query
-from typing import List
 import logging
 from Backend.models import SessionLocal, RevokedToken
 from Backend.schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMatchModel
@@ -94,10 +93,8 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-class TokenData:
-    def __init__(self, username: Optional[str] = None):
-        self.username = username
-
+class TokenData(BaseModel):
+    username: Optional[str] = None
 
 class User(BaseModel):
     username: str
@@ -180,15 +177,15 @@ nlp = spacy.load("en_core_web_sm")
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 # Define 'client' before use at line 167
-client = None
+# client = None
 
-async def openai_chat(messages: List[Dict]):
-    res = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=messages,
-        max_tokens=800
-    )
-    return res.choices[0].message.content.strip()
+# async def openai_chat(messages: List[Dict]):
+#     res = client.chat.completions.create(
+#         model="gpt-3.5-turbo",
+#         messages=messages,
+#         max_tokens=800
+#     )
+#     return res.choices[0].message.content.strip()
 
 def extract_text_from_content(contents: bytes, filename: str) -> str:
     suffix = os.path.splitext(filename)[1].lower()
@@ -211,91 +208,42 @@ def extract_text_from_content(contents: bytes, filename: str) -> str:
     finally:
         os.unlink(tmp_path)
 
-def parse_resume(text: str) -> ParsedResume:
-    doc = nlp(text)
-    
-    # Extract email first
-    email = next(iter(re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+', text)), None)
-    
-    # Extract name (improved logic)
+def extract_email(text: str):
+    return next(iter(re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+', text)), None)
+
+def extract_name(text: str, email: str, nlp):
     name = None
-    
     # Try to extract name from email first
     if email:
-        # Get the part before @ and split by common separators
         email_name = email.split('@')[0]
-        # Remove common separators and numbers
         email_name = re.sub(r'[._0-9]', ' ', email_name)
-        # Split into words and capitalize
         name_parts = [word.capitalize() for word in email_name.split() if word]
         if name_parts:
             name = ' '.join(name_parts)
-    
-    # If no name found from email, look in the resume text
-    if not name:
-        # Common section headers to exclude
-        section_headers = [
-            'key skills', 'experience', 'education', 'summary', 'objective',
-            'performance', 'dashboards', 'projects', 'achievements', 'certifications',
-            'technical skills', 'professional experience', 'work experience'
-        ]
-        
-        # Common non-name words to exclude
-        non_name_words = [
-            'resume', 'cv', 'curriculum vitae', 'llama', 'gpt', 'chat', 'ai',
-            'machine learning', 'artificial intelligence', 'data science'
-        ]
-        
-        # First try to find name near the email
-        if email:
-            # Get lines containing the email
-            email_lines = [line for line in text.split('\n') if email in line]
-            for line in email_lines:
-                # Look at the line before and after the email line
-                line_index = text.split('\n').index(line)
-                context_lines = []
-                if line_index > 0:
-                    context_lines.append(text.split('\n')[line_index - 1])
-                context_lines.append(line)
-                if line_index < len(text.split('\n')) - 1:
-                    context_lines.append(text.split('\n')[line_index + 1])
-                
-                for context_line in context_lines:
-                    doc_line = nlp(context_line)
-                    for ent in doc_line.ents:
-                        if (
-                            ent.label_ == "PERSON"
-                            and len(name_parts := ent.text.split()) <= 3
-                            and not any(header in ent.text.lower() for header in section_headers)
-                            and not any(word in ent.text.lower() for word in non_name_words)
-                            and all(part[0].isupper() for part in name_parts)
-                        ):
-                            name = ent.text
-                            break
-                    if name:
-                        break
-                if name:
-                    break
-        
-        # If still no name found, try the first few lines
-        if not name:
-            first_lines = text.split('\n')[:10]
-            for line in first_lines:
-                line = line.strip()
-                if not line:
-                    continue
-                
-                line_lower = line.lower()
-                if any(header in line_lower for header in section_headers):
-                    continue
-                
-                if len(line.split()) > 4:
-                    continue
-                
-                if any(word in line_lower for word in non_name_words):
-                    continue
-                
-                doc_line = nlp(line)
+    if name:
+        return name
+    section_headers = [
+        'key skills', 'experience', 'education', 'summary', 'objective',
+        'performance', 'dashboards', 'projects', 'achievements', 'certifications',
+        'technical skills', 'professional experience', 'work experience'
+    ]
+    non_name_words = [
+        'resume', 'cv', 'curriculum vitae', 'llama', 'gpt', 'chat', 'ai',
+        'machine learning', 'artificial intelligence', 'data science'
+    ]
+    # Try to find name near the email
+    if email:
+        email_lines = [line for line in text.split('\n') if email in line]
+        for line in email_lines:
+            line_index = text.split('\n').index(line)
+            context_lines = []
+            if line_index > 0:
+                context_lines.append(text.split('\n')[line_index - 1])
+            context_lines.append(line)
+            if line_index < len(text.split('\n')) - 1:
+                context_lines.append(text.split('\n')[line_index + 1])
+            for context_line in context_lines:
+                doc_line = nlp(context_line)
                 for ent in doc_line.ents:
                     if (
                         ent.label_ == "PERSON"
@@ -304,18 +252,39 @@ def parse_resume(text: str) -> ParsedResume:
                         and not any(word in ent.text.lower() for word in non_name_words)
                         and all(part[0].isupper() for part in name_parts)
                     ):
-                        name = ent.text
-                        break
-                if name:
-                    break
-    
-    # Extract phone
-    phone = next(iter(re.findall(r'(\+?\d[\d \-()]{7,}\d)', text)), None)
-    
-    # Extract location
-    location = next((ent.text for ent in doc.ents if ent.label_ == "GPE"), None)
-    
-    # Extract skills (look for technical terms and tools)
+                        return ent.text
+    # Try the first few lines
+    first_lines = text.split('\n')[:10]
+    for line in first_lines:
+        line = line.strip()
+        if not line:
+            continue
+        line_lower = line.lower()
+        if any(header in line_lower for header in section_headers):
+            continue
+        if len(line.split()) > 4:
+            continue
+        if any(word in line_lower for word in non_name_words):
+            continue
+        doc_line = nlp(line)
+        for ent in doc_line.ents:
+            if (
+                ent.label_ == "PERSON"
+                and len(name_parts := ent.text.split()) <= 3
+                and not any(header in ent.text.lower() for header in section_headers)
+                and not any(word in ent.text.lower() for word in non_name_words)
+                and all(part[0].isupper() for part in name_parts)
+            ):
+                return ent.text
+    return name
+
+def extract_phone(text: str):
+    return next(iter(re.findall(r'(\+?\d[\d \-()]{7,}\d)', text)), None)
+
+def extract_location(doc):
+    return next((ent.text for ent in doc.ents if ent.label_ == "GPE"), None)
+
+def extract_skills(text: str):
     skills = []
     skill_keywords = [
         "python", "java", "javascript", "react", "node", "sql", "aws", "docker",
@@ -327,19 +296,17 @@ def parse_resume(text: str) -> ParsedResume:
     for skill in skill_keywords:
         if skill in text_lower:
             skills.append(skill.title())
-    
-    # Extract experience (look for company names and job titles)
+    return list(set(skills))
+
+def extract_experience(text: str):
     experience = []
     lines = text.split('\n')
     current_company = None
     current_role = None
-    
     for line in lines:
         line = line.strip()
         if not line:
             continue
-            
-        # Look for company names (usually in all caps or with specific patterns)
         if re.search(r'[A-Z][A-Z\s]+(?:Inc\.?|LLC|Ltd\.?|Corp\.?|Company|Technologies|Solutions)?$', line):
             if current_company and current_role:
                 experience.append({
@@ -348,31 +315,40 @@ def parse_resume(text: str) -> ParsedResume:
                 })
             current_company = line
             current_role = None
-        # Look for job titles (usually contain words like "Engineer", "Developer", "Manager", etc.)
         elif re.search(r'(?:Engineer|Developer|Manager|Analyst|Consultant|Specialist|Lead|Architect)', line, re.IGNORECASE):
             current_role = line
-    
-    # Add the last experience entry if exists
     if current_company and current_role:
         experience.append({
             "company": current_company,
             "role": current_role
         })
-    
-    # Extract education
+    return experience
+
+def extract_education(text: str):
     education = []
     education_keywords = ['bachelor', 'master', 'phd', 'bca', 'mca', 'b.tech', 'm.tech']
+    lines = text.split('\n')
     for line in lines:
         line = line.strip().lower()
         if any(keyword in line for keyword in education_keywords):
             education.append(line.title())
-    
+    return education
+
+def parse_resume(text: str) -> ParsedResume:
+    doc = nlp(text)
+    email = extract_email(text)
+    name = extract_name(text, email, nlp)
+    phone = extract_phone(text)
+    location = extract_location(doc)
+    skills = extract_skills(text)
+    experience = extract_experience(text)
+    education = extract_education(text)
     return ParsedResume(
         full_name=name,
         email=email,
         phone=phone,
         location=location,
-        skills=list(set(skills)),  # Remove duplicates
+        skills=skills,
         experience=experience,
         education=education
     )
@@ -393,6 +369,7 @@ async def upload_resume(
         extracted_text = extract_text_from_content(contents, file.filename)
         parsed_data = parse_resume(extracted_text)
     except Exception as e:
+        logger.error("Error uploading resume: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to process resume: {str(e)}")
 
     return {
@@ -422,35 +399,6 @@ limiter = Limiter(key_func=get_remote_address, default_limits=["10/minute"])
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, lambda request, exc: JSONResponse(status_code=429, content={"detail": "Rate limit exceeded"}))
 
-@app.on_event("startup")
-def on_startup():
-    logger.info("API server started with rate limiting.")
-    allowed_types = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"]
-    if file.content_type not in allowed_types:
-        raise HTTPException(status_code=400, detail="Only PDF, DOCX, or TXT files are allowed.")
-    if file.size and file.size > 5 * 1024 * 1024:
-        raise HTTPException(status_code=400, detail="File size must be less than 5MB.")
-    try:
-        if not file.filename:
-            raise HTTPException(status_code=400, detail="No file uploaded")
-        
-        if not allowed_file(file.filename):
-            raise HTTPException(status_code=400, detail="File type not allowed")
-        
-        contents = await file.read()
-        if not contents:
-            raise HTTPException(status_code=400, detail="Empty file uploaded")
-        
-        text = extract_text_from_content(contents, file.filename)
-        resume_data = parse_resume(text)
-        return resume_data
-            
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        logger.error(f"Error uploading resume: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
 @app.get("/api/resume/parsed")
 async def get_parsed_resume(current_user: User = Depends(get_current_user)):
     try:
@@ -470,11 +418,6 @@ async def get_parsed_resume(current_user: User = Depends(get_current_user)):
         
         # Parse resume
         with open(latest_file, "rb") as f:
-            class DummyUploadFile:
-                def __init__(self, file, filename):
-                    self.file = file
-                    self.filename = filename
-            dummy_file = DummyUploadFile(f, latest_file.name)
             text = extract_text_from_content(f.read(), latest_file.name)
             parsed_data = parse_resume(text)
         
@@ -533,7 +476,7 @@ ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@example.com")
 
 def send_email(to_email: str, subject: str, body: str):
     # Placeholder for real email sending logic
-    logger.info(f"Sending email from {ADMIN_EMAIL} to {to_email}: {subject}\n{body}")
+    logger.info("Sending email from %s to %s: %s\n%s", ADMIN_EMAIL, to_email, subject, body)
     # Integrate with SMTP or email service here
 
 @app.post("/forgot-password")
@@ -602,7 +545,7 @@ async def job_match(
     except HTTPException as e:
         raise e
     except Exception as e:
-        logger.error(f"Error matching job: {e}")
+        logger.error("Error matching job: %s", e)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/test")
@@ -636,7 +579,7 @@ async def analyze_resume(
     except HTTPException as e:
         raise e
     except Exception as e:
-        logger.error(f"Error analyzing resume: {e}")
+        logger.error("Error analyzing resume: %s", e)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/health")
@@ -668,6 +611,7 @@ async def match_resume(
     except HTTPException as e:
         raise e
     except Exception as e:
+        logger.error("Error matching resume: %s", e)
         logger.error(f"Error matching resume: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -758,7 +702,6 @@ async def job_match_endpoint(resume_data: dict = Body(...), job_description: str
 
 @app.post("/gpt-chat")
 async def gpt_chat(messages: list = Body(...)):
-    import openai
     try:
         if openai.api_key:
             response = openai.ChatCompletion.create(
@@ -788,7 +731,7 @@ async def logout(token: str = Header(...)):
     db.add(revoked)
     db.commit()
     db.close()
-    logger.info(f"User logged out. Token revoked: {jti}")
+    logger.info("User logged out. Token revoked: %s", jti)
     return {"message": "Logged out successfully."}
 
 # --- Admin Analytics Endpoint (API Key Protected) ---
@@ -935,6 +878,9 @@ async def log_requests(request: Request, call_next):
 # Example:
 # import sentry_sdk
 # sentry_sdk.init(dsn="your_sentry_dsn", traces_sample_rate=1.0)
+
+# Add this after the imports
+LOG_FILE = "backend.log"
 
 if __name__ == "__main__":
     uvicorn.run(
