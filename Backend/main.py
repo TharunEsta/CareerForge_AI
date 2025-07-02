@@ -38,6 +38,9 @@ file_handler = logging.FileHandler("backend.log")
 file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
 logger.addHandler(file_handler)
 
+rate_limiter = Limiter(key_func=get_remote_address)
+
+
 # ─── Load Environment Variables ───────────────────────────────────────
 load_dotenv("key.env")
 load_dotenv(".env")
