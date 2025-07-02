@@ -141,4 +141,4 @@ careerforge.tar
 
 # OS files
 .DS_Store
-Thumbs.db 
+Thumbs.db Backend/test.db
