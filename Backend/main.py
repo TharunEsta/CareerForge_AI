@@ -27,10 +27,9 @@ import logging
 from models import SessionLocal, RevokedToken
 from schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMatchModel
 from slowapi import Limiter
-from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from fastapi.responses import JSONResponse
-from slowapi.decorator import limiter as rate_limiter
+from slowapi.util import get_remote_address
 from job_matcher import match_resume_to_job
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
