@@ -6,7 +6,6 @@ import dynamic from "next/dynamic";
 
 // Prevent SSR for this page since it uses useAuth
 const CoverLetterPage = () => {
-  const { token } = useAuth();
   const router = useRouter();
   const [userPlan, setUserPlan] = useState("free");
   const [jobDescription, setJobDescription] = useState("");
@@ -16,6 +15,8 @@ const CoverLetterPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Check for token in localStorage on client side
+    const token = localStorage.getItem("token");
     if (!token) {
       router.push("/login");
     } else {
@@ -26,7 +27,7 @@ const CoverLetterPage = () => {
         .then(data => setUserPlan(data.plan || "free"))
         .catch(() => setUserPlan("free"));
     }
-  }, [token, router]);
+  }, [router]);
 
   if (userPlan === "free") {
     return (
