@@ -2,8 +2,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthContext";
+import dynamic from "next/dynamic";
 
-export default function CoverLetterPage() {
+// Prevent SSR for this page since it uses useAuth
+const CoverLetterPage = () => {
   const { token } = useAuth();
   const router = useRouter();
   const [userPlan, setUserPlan] = useState("free");
@@ -141,4 +143,7 @@ export default function CoverLetterPage() {
       </main>
     </div>
   );
-} 
+};
+
+// Export with dynamic import to prevent SSR
+export default dynamic(() => Promise.resolve(CoverLetterPage), { ssr: false }); 
