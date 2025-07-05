@@ -247,7 +247,7 @@ async def match_job_realtime(resume_skills: List[str], job_description: str) -> 
         }
         
     except Exception as e:
-        logger.error(f"Error in job matching: {e}")
+        logger.error("Error in job matching: %s", e)
         raise HTTPException(status_code=500, detail=f"Job matching failed: {str(e)}")
 
 def extract_skills_from_job_description(job_description: str) -> List[str]:
@@ -312,7 +312,7 @@ async def analyze_market_trends(skills: List[str], location: str = "global") -> 
         }
         
     except Exception as e:
-        logger.error(f"Error analyzing market trends: {e}")
+        logger.error("Error analyzing market trends: %s", e)
         raise HTTPException(status_code=500, detail=f"Market analysis failed: {str(e)}")
 
 # ============================================================================

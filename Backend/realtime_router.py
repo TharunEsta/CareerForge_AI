@@ -105,7 +105,7 @@ async def analyze_skills_realtime(text: str, job_description: Optional[str] = No
         }
         
     except Exception as e:
-        logger.error(f"Error in real-time skills analysis: {e}")
+        logger.error("Error in real-time skills analysis: %s", e)
         raise HTTPException(status_code=500, detail=f"Skills analysis failed: {str(e)}")
 
 def extract_skills_from_text(text: str) -> List[str]:
@@ -191,7 +191,7 @@ async def match_skills_to_job(skills: List[str], job_description: str) -> Dict[s
         }
         
     except Exception as e:
-        logger.error(f"Error in job matching: {e}")
+        logger.error("Error in job matching: %s", e)
         raise HTTPException(status_code=500, detail=f"Job matching failed: {str(e)}")
 
 # ============================================================================
@@ -211,7 +211,7 @@ async def optimize_resume_realtime(resume_data: Dict[str, Any], job_description:
             raise HTTPException(status_code=400, detail="Invalid optimization type")
             
     except Exception as e:
-        logger.error(f"Error in resume optimization: {e}")
+        logger.error("Error in resume optimization: %s", e)
         raise HTTPException(status_code=500, detail=f"Resume optimization failed: {str(e)}")
 
 async def optimize_for_ats(resume_data: Dict[str, Any], job_description: str) -> Dict[str, Any]:
@@ -256,7 +256,7 @@ async def optimize_for_ats(resume_data: Dict[str, Any], job_description: str) ->
         }
         
     except Exception as e:
-        logger.error(f"Error in ATS optimization: {e}")
+        logger.error("Error in ATS optimization: %s", e)
         raise HTTPException(status_code=500, detail=f"ATS optimization failed: {str(e)}")
 
 async def optimize_for_linkedin_realtime(resume_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -302,7 +302,7 @@ async def optimize_for_linkedin_realtime(resume_data: Dict[str, Any]) -> Dict[st
         }
         
     except Exception as e:
-        logger.error(f"Error in LinkedIn optimization: {e}")
+        logger.error("Error in LinkedIn optimization: %s", e)
         raise HTTPException(status_code=500, detail=f"LinkedIn optimization failed: {str(e)}")
 
 async def generate_cover_letter_realtime(resume_data: Dict[str, Any], job_description: str) -> Dict[str, Any]:
@@ -344,7 +344,7 @@ async def generate_cover_letter_realtime(resume_data: Dict[str, Any], job_descri
         }
         
     except Exception as e:
-        logger.error(f"Error in cover letter generation: {e}")
+        logger.error("Error in cover letter generation: %s", e)
         raise HTTPException(status_code=500, detail=f"Cover letter generation failed: {str(e)}")
 
 # ============================================================================
@@ -406,7 +406,7 @@ async def comprehensive_analysis(request: RealTimeAnalysisRequest):
         }
         
     except Exception as e:
-        logger.error(f"Error in comprehensive analysis: {e}")
+        logger.error("Error in comprehensive analysis: %s", e)
         raise HTTPException(status_code=500, detail=f"Comprehensive analysis failed: {str(e)}")
 
 # ============================================================================
