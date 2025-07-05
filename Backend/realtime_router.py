@@ -424,7 +424,8 @@ class ConnectionManager:
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
 
-    async def send_personal_message(self, message: str, websocket: WebSocket):
+    @staticmethod
+    async def send_personal_message(message: str, websocket: WebSocket):
         await websocket.send_text(message)
 
     async def broadcast(self, message: str):
@@ -447,7 +448,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
             # Process real-time analysis based on message type
             if message.type == "skills_analysis":
                 result = await analyze_skills_realtime(message.data["text"])
-                await manager.send_personal_message(
+                await ConnectionManager.send_personal_message(
                     json.dumps({"type": "skills_result", "data": result}),
                     websocket
                 )
@@ -457,7 +458,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                     message.data["skills"], 
                     message.data["job_description"]
                 )
-                await manager.send_personal_message(
+                await ConnectionManager.send_personal_message(
                     json.dumps({"type": "job_match_result", "data": result}),
                     websocket
                 )
@@ -468,7 +469,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                     message.data["job_description"],
                     message.data["optimization_type"]
                 )
-                await manager.send_personal_message(
+                await ConnectionManager.send_personal_message(
                     json.dumps({"type": "optimization_result", "data": result}),
                     websocket
                 )
@@ -481,7 +482,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                         user_id=user_id
                     )
                 )
-                await manager.send_personal_message(
+                await ConnectionManager.send_personal_message(
                     json.dumps({"type": "comprehensive_result", "data": result}),
                     websocket
                 )
