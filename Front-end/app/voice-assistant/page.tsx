@@ -85,15 +85,15 @@ export default function VoiceAssistantPage() {
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-center gap-2">
                       <Badge variant="outline" className="text-xs">Try saying:</Badge>
-                      "Hello Pandu" or "Hello Gammy"
+                      &quot;Hello Pandu&quot; or &quot;Hello Gammy&quot;
                     </li>
                     <li className="flex items-center gap-2">
                       <Badge variant="outline" className="text-xs">Ask questions:</Badge>
-                      "What's the weather like?"
+                      &quot;What&apos;s the weather like?&quot;
                     </li>
                     <li className="flex items-center gap-2">
                       <Badge variant="outline" className="text-xs">Get help:</Badge>
-                      "Can you help me with my resume?"
+                      &quot;Can you help me with my resume?&quot;
                     </li>
                   </ul>
                 </div>

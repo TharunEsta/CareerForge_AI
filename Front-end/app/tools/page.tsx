@@ -121,7 +121,7 @@ export default function ToolsPage() {
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
             Discover our comprehensive suite of AI-powered tools designed to accelerate your career growth. 
-            From resume optimization to interview preparation, we've got everything you need to succeed.
+            From resume optimization to interview preparation, we&apos;ve got everything you need to succeed.
           </p>
         </div>
 
