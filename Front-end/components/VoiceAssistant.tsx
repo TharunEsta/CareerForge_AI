@@ -18,11 +18,19 @@ const getSpeechRecognition = () => {
 const isSpeechSynthesisSupported = typeof window !== "undefined" && "speechSynthesis" in window;
 
 const VoiceAssistant: React.FC = () => {
+  const [assistantName, setAssistantName] = useState<string>("Voice Assistant");
+  const [nameInput, setNameInput] = useState<string>("");
   const [listening, setListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [response, setResponse] = useState("");
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const recognitionRef = useRef<any>(null);
+
+  // Load assistant name from localStorage
+  useEffect(() => {
+    const savedName = typeof window !== "undefined" ? localStorage.getItem("assistantName") : null;
+    if (savedName) setAssistantName(savedName);
+  }, []);
 
   // PWA install prompt
   useEffect(() => {
@@ -47,7 +55,7 @@ const VoiceAssistant: React.FC = () => {
       let interim = "";
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
-          setTranscript((prev) => prev + event.results[i][0].transcript + " ");
+          setTranscript((prev: string) => prev + event.results[i][0].transcript + " ");
         } else {
           interim += event.results[i][0].transcript;
         }
@@ -101,15 +109,38 @@ const VoiceAssistant: React.FC = () => {
     }
   };
 
+  const handleNameSave = () => {
+    setAssistantName(nameInput || "Voice Assistant");
+    if (typeof window !== "undefined") {
+      localStorage.setItem("assistantName", nameInput || "Voice Assistant");
+    }
+    setNameInput("");
+  };
+
   return (
     <Card className="w-full max-w-lg mx-auto mt-8 shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Mic className="h-5 w-5 text-blue-600" />
-          Voice Assistant
+          {assistantName}
         </CardTitle>
         <CardDescription>
-          Talk to your AI assistant. Works on desktop and mobile. Install as an app for best experience!
+          <div className="flex flex-col gap-2">
+            <span>Talk to your AI assistant. Works on desktop and mobile. Install as an app for best experience!</span>
+            <div className="flex gap-2 items-center mt-2">
+              <input
+                type="text"
+                className="border rounded px-2 py-1 text-sm"
+                placeholder="Set assistant name..."
+                value={nameInput}
+                onChange={e => setNameInput(e.target.value)}
+                maxLength={32}
+              />
+              <Button onClick={handleNameSave} size="sm" variant="secondary" disabled={!nameInput.trim()}>
+                Save Name
+              </Button>
+            </div>
+          </div>
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
