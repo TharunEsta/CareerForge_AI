@@ -253,7 +253,7 @@ async def match_job_realtime(resume_skills: List[str], job_description: str) -> 
 def extract_skills_from_job_description(job_description: str) -> List[str]:
     """Extract skills from job description using pattern matching"""
     all_skills = []
-    for category, skills in SKILLS_DATABASE.items():
+    for _, skills in SKILLS_DATABASE.items():
         all_skills.extend(skills)
     
     found_skills = []
