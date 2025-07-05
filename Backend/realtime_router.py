@@ -496,8 +496,29 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
 def extract_keywords_from_job(job_description: str) -> List[str]:
     """Extract keywords from job description"""
     keywords = []
-    # Add keyword extraction logic here
-    return keywords
+    
+    # Common job-related keywords to extract
+    keyword_patterns = [
+        r'\b(senior|junior|lead|principal|staff)\b',
+        r'\b(developer|engineer|architect|manager|director)\b',
+        r'\b(experience|years|required|preferred|minimum)\b',
+        r'\b(responsibilities|duties|requirements|qualifications)\b',
+        r'\b(salary|compensation|benefits|remote|hybrid|onsite)\b',
+        r'\b(team|collaboration|communication|leadership)\b',
+        r'\b(agile|scrum|waterfall|kanban|devops)\b',
+        r'\b(api|rest|graphql|microservices|monolith)\b',
+        r'\b(testing|qa|quality|automation|ci/cd)\b',
+        r'\b(cloud|aws|azure|gcp|docker|kubernetes)\b'
+    ]
+    
+    job_desc_lower = job_description.lower()
+    
+    for pattern in keyword_patterns:
+        matches = re.findall(pattern, job_desc_lower)
+        keywords.extend(matches)
+    
+    # Remove duplicates and return
+    return list(set(keywords))
 
 # ============================================================================
 # HEALTH CHECK AND STATUS
