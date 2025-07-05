@@ -104,7 +104,7 @@ export default function AdminPage() {
                 </div>
               </div>
             </div>
-          </div>
+      </div>
 
           {/* Tabs */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
@@ -140,7 +140,7 @@ export default function AdminPage() {
                 >
                   Analytics
                 </button>
-                <button
+      <button
                   onClick={() => setActiveTab('settings')}
                   className={`py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === 'settings'
@@ -305,7 +305,7 @@ export default function AdminPage() {
                           <span className="text-sm text-gray-700">Email Notifications</span>
                           <button className="bg-blue-600 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                             <span className="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
-                          </button>
+      </button>
                         </div>
                       </div>
                     </div>
