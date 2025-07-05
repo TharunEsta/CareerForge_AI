@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
-const sidebarVariants = cva(
+const SidebarVariants = cva(
   "group relative flex h-full w-full flex-col gap-4 border-r bg-background p-4",
   {
     variants: {
@@ -18,19 +18,22 @@ const sidebarVariants = cva(
   }
 )
 
-const sidebar = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof sidebarVariants>
->(({ className, variant, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(sidebarVariants({ variant }), className)}
-    {...props}
-  />
-))
-sidebar.displayName = "Sidebar"
+export interface SidebarProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof SidebarVariants> {}
 
-const sidebarHeader = React.forwardRef<
+export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
+  ({ className, variant, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(SidebarVariants({ variant }), className)}
+      {...props}
+    />
+  )
+)
+Sidebar.displayName = "Sidebar"
+
+export const SidebarHeader = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
@@ -40,7 +43,7 @@ const sidebarHeader = React.forwardRef<
     {...props}
   />
 ))
-sidebarHeader.displayName = "SidebarHeader"
+SidebarHeader.displayName = "SidebarHeader"
 
 const sidebarTitle = React.forwardRef<
   HTMLParagraphElement,
@@ -81,7 +84,7 @@ const sidebarSection = React.forwardRef<
 ))
 sidebarSection.displayName = "SidebarSection"
 
-const sidebarFooter = React.forwardRef<
+export const SidebarFooter = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
@@ -91,7 +94,7 @@ const sidebarFooter = React.forwardRef<
     {...props}
   />
 ))
-sidebarFooter.displayName = "SidebarFooter"
+SidebarFooter.displayName = "SidebarFooter"
 
 const sidebarNav = React.forwardRef<
   HTMLDivElement,
@@ -265,12 +268,12 @@ const sidebarNavItemGroupItemBadge = React.forwardRef<
 sidebarNavItemGroupItemBadge.displayName = "SidebarNavItemGroupItemBadge"
 
 export {
-  sidebar,
-  sidebarHeader,
+  Sidebar,
+  SidebarHeader,
   sidebarTitle,
   sidebarDescription,
   sidebarSection,
-  sidebarFooter,
+  SidebarFooter,
   sidebarNav,
   sidebarNavItem,
   sidebarNavItemIcon,
