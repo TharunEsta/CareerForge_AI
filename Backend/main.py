@@ -38,7 +38,7 @@ from fastapi import Query
 from typing import List
 import logging
 from models import SessionLocal, RevokedToken
-from Backend.schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMatchModel
+from schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMatchModel
 from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
 from fastapi.responses import JSONResponse
@@ -58,8 +58,7 @@ from Backend.job_matcher import match_resume_to_job
 from Backend.tools import router as tools_router
 from Backend.voice_assistant import router as voice_router
 from Backend.agent import router as agent_router
-
-
+from job_matcher import match_resume_to_job
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
 file_handler = logging.FileHandler("backend.log")
