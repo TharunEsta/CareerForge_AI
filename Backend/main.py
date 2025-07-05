@@ -1,11 +1,13 @@
-from fastapi import FastAPI, File, UploadFile, Form, Depends, HTTPException, Request, status, Body, Header, Path
+from fastapi import (
+    FastAPI, File, UploadFile, Form, Depends, HTTPException, 
+    Request, status, Body, Header, Path, Query
+)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, EmailStr
 from typing import List, Optional, Dict
-from fastapi import Depends
-from fastapi.security import OAuth2PasswordBearer
-import fitz  # <--- PyMuPDF
+import fitz  # PyMuPDF
 from datetime import datetime, timedelta, timezone
 import os
 import re
@@ -14,68 +16,45 @@ import docx2txt
 import uvicorn
 import spacy
 import openai
-from datetime import datetime, timedelta, timezone
 from jose import jwt
 from sentence_transformers import SentenceTransformer
 from dotenv import load_dotenv
 import hashlib
 import secrets
-from pathlib import Path
-from utils import parse_resume, parse_resume_with_job_matching, allowed_file, rewrite_resume, optimize_for_linkedin
-from fastapi import Query
 import logging
-from models import SessionLocal, RevokedToken
-from schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMatchModel
-import logging
-import hashlib
-import secrets
-from dotenv import load_dotenv
-from jose import jwt
-from sentence_transformers import SentenceTransformer
-from pathlib import Path
-from utils import parse_resume, parse_resume_with_job_matching, allowed_file, rewrite_resume, optimize_for_linkedin
-from fastapi import Query
-from typing import List
-import logging
-from models import SessionLocal, RevokedToken
-from schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMatchModel
 from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
-from fastapi.responses import JSONResponse
 from slowapi.util import get_remote_address
-from job_matcher import match_resume_to_job
-from slowapi.decorator import limiter as rate_limiter
-from Backend.utils import (
-    parse_resume,
-    parse_resume_with_job_matching,
-    allowed_file,
-    rewrite_resume,
-    optimize_for_linkedin,
+
+# Local imports
+from utils import (
+    parse_resume, parse_resume_with_job_matching, allowed_file
 )
-from Backend.models import SessionLocal, RevokedToken
-from Backend.schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMatchModel
-from Backend.job_matcher import match_resume_to_job
-from Backend.tools import router as tools_router
-from Backend.voice_assistant import router as voice_router
-from Backend.agent import router as agent_router
-from job_matcher import match_resume_to_job
+from models import SessionLocal, RevokedToken
+from schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMatchModel
+
+# Import new routers
+from realtime_router import router as realtime_router
+from skills_jobs_router import router as skills_jobs_router
+
+# Load environment variables
+load_dotenv("key.env")
+load_dotenv(".env")
+
+# Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
 file_handler = logging.FileHandler("backend.log")
 file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
 logger.addHandler(file_handler)
 
+# Rate limiter
 rate_limiter = Limiter(key_func=get_remote_address)
 
-
-# ─── Load Environment Variables ───────────────────────────────────────
-load_dotenv("key.env")
-load_dotenv(".env")
-
-# ─── FastAPI Setup ────────────────────────────────────────────────────
+# FastAPI Setup
 app = FastAPI(title="CareerForge API")
 
-# ─── CORS ──────────────────────────────────────────────────────────────
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -84,7 +63,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ─── Security & Config ─────────────────────────────────────────
+# Include routers
+app.include_router(realtime_router)
+app.include_router(skills_jobs_router)
+
+# Security & Config
 SECRET_KEY = os.getenv("SECRET_KEY", "secret")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -107,7 +90,7 @@ def generate_reset_token() -> str:
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-# ─── Databases ─────────────────────────────────────────────────
+# Databases
 users_db = {
     "testuser": {
         "username": "testuser",
@@ -118,7 +101,7 @@ users_db = {
     }
 }
 
-# ─── Models ─────────────────────────────────────────────────────
+# Models
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -146,7 +129,7 @@ class ParsedResume(BaseModel):
     location: Optional[str]
     education: List[str]
 
-# ─── Utilities ──────────────────────────────────────────────────
+# Utilities
 def get_user(username: str):
     return users_db.get(username)
 
@@ -176,14 +159,20 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         jti: str = payload.get("jti")
         if username is None or jti is None:
             raise credentials_exception
-    except Exception:
-        raise credentials_exception
+    except Exception as err:
+        raise credentials_exception from err
     db = SessionLocal()
     # Check if token is revoked
-    revoked = db.query(RevokedToken).filter(RevokedToken.jti == jti, RevokedToken.expires_at > datetime.now(timezone.utc)).first()
+    revoked = db.query(RevokedToken).filter(
+        RevokedToken.jti == jti, 
+        RevokedToken.expires_at > datetime.now(timezone.utc)
+    ).first()
     if revoked:
         db.close()
-        raise HTTPException(status_code=401, detail="Token has been revoked. Please log in again.")
+        raise HTTPException(
+            status_code=401, 
+            detail="Token has been revoked. Please log in again."
+        )
     user = db.query(UserModel).filter(UserModel.username == username).first()
     db.close()
     if user is None:
@@ -202,7 +191,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     access_token = create_access_token(data={"sub": user["username"]})
     return {"access_token": access_token, "token_type": "bearer"}
 
-# ─── NLP Models ─────────────────────────────────────────────────
+# NLP Models
 nlp = spacy.load("en_core_web_sm")
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
@@ -337,7 +326,10 @@ def extract_experience(text: str):
         line = line.strip()
         if not line:
             continue
-        if re.search(r'[A-Z][A-Z\s]+(?:Inc\.?|LLC|Ltd\.?|Corp\.?|Company|Technologies|Solutions)?$', line):
+        if re.search(
+            r'[A-Z][A-Z\s]+(?:Inc\.?|LLC|Ltd\.?|Corp\.?|Company|Technologies|Solutions)?$', 
+            line
+        ):
             if current_company and current_role:
                 experience.append({
                     "company": current_company,
@@ -345,7 +337,11 @@ def extract_experience(text: str):
                 })
             current_company = line
             current_role = None
-        elif re.search(r'(?:Engineer|Developer|Manager|Analyst|Consultant|Specialist|Lead|Architect)', line, re.IGNORECASE):
+        elif re.search(
+            r'(?:Engineer|Developer|Manager|Analyst|Consultant|Specialist|Lead|Architect)', 
+            line, 
+            re.IGNORECASE
+        ):
             current_role = line
     if current_company and current_role:
         experience.append({
@@ -364,26 +360,9 @@ def extract_education(text: str):
             education.append(line.title())
     return education
 
-def parse_resume(text: str) -> ParsedResume:
-    doc = nlp(text)
-    email = extract_email(text)
-    name = extract_name(text, email, nlp)
-    phone = extract_phone(text)
-    location = extract_location(doc)
-    skills = extract_skills(text)
-    experience = extract_experience(text)
-    education = extract_education(text)
-    return ParsedResume(
-        full_name=name,
-        email=email,
-        phone=phone,
-        location=location,
-        skills=skills,
-        experience=experience,
-        education=education
-    )
 
-# ─── Routes ─────────────────────────────────────────────────────
+
+# Routes
 @app.post("/api/resume/upload")
 @rate_limiter.limit("3/minute")
 async def upload_resume(
@@ -397,7 +376,10 @@ async def upload_resume(
         "text/plain"
     ]
     if file.content_type not in allowed_types:
-        raise HTTPException(status_code=400, detail="Only PDF, DOCX, or TXT files are allowed.")
+        raise HTTPException(
+            status_code=400, 
+            detail="Only PDF, DOCX, or TXT files are allowed."
+        )
     
     if file.filename == "":
         raise HTTPException(status_code=400, detail="No file uploaded")
@@ -418,14 +400,8 @@ async def upload_resume(
             "parsed_resume": parsed_data.dict()
         }
     except Exception as e:
-
         logger.error("Error processing resume: %s", e)
-        raise HTTPException(status_code=500, detail="Failed to process resume")
-
-
-        logger.error("Error uploading resume: %s", e)
-        raise HTTPException(status_code=500, detail=f"Failed to process resume: {str(e)}")
-
+        raise HTTPException(status_code=500, detail="Failed to process resume") from e
 
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
@@ -434,12 +410,11 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
         content={"detail": "Rate limit exceeded. Try again later."}
     )
 
-# ─── Example Rate-Limited GET Endpoint ───
+# Example Rate-Limited GET Endpoint
 @app.get("/api/some-endpoint")
 @rate_limiter.limit("3/minute")
 async def my_endpoint(request: Request):
     return {"message": "Hello! You are within the rate limit."}
-
 
 @app.get("/")
 def root():
@@ -454,9 +429,6 @@ app.add_exception_handler(RateLimitExceeded, lambda request, exc: JSONResponse(s
 def on_startup():
     logger.info("API server started with rate limiting.")
         
-
-
-
 @app.get("/api/resume/parsed")
 async def get_parsed_resume(current_user: User = Depends(get_current_user)):
     try:
@@ -604,7 +576,7 @@ async def job_match(
         raise e
     except Exception as e:
         logger.error("Error matching job: %s", e)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 @app.get("/api/test")
 async def test_endpoint():
@@ -638,7 +610,7 @@ async def analyze_resume(
         raise e
     except Exception as e:
         logger.error("Error analyzing resume: %s", e)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 @app.get("/health")
 async def health_check():
@@ -652,7 +624,10 @@ async def match_resume(
 ):
     # Restrict to basic or premium plans
     if current_user.get("plan", "free") == "free":
-        raise HTTPException(status_code=403, detail="Upgrade your plan to access this feature.")
+        raise HTTPException(
+            status_code=403, 
+            detail="Upgrade your plan to access this feature."
+        )
     try:
         if not file.filename:
             raise HTTPException(status_code=400, detail="No file uploaded")
@@ -671,7 +646,7 @@ async def match_resume(
     except Exception as e:
         logger.error("Error matching resume: %s", e)
         logger.error(f"Error matching resume: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 @app.post("/chat_with_resume")
 async def chat_with_resume(
@@ -681,15 +656,20 @@ async def chat_with_resume(
 ):
     try:
         if not prompt or not resume_text:
-            raise HTTPException(status_code=400, detail="Prompt and resume text are required")
+            raise HTTPException(
+                status_code=400, 
+                detail="Prompt and resume text are required"
+            )
         # For demonstration, echo the prompt and resume_text
         # Replace with OpenAI or other LLM call as needed
-        response = f"Prompt: {prompt}\nResume: {resume_text[:100]}..."  # Truncate resume for brevity
+        response = (
+            f"Prompt: {prompt}\nResume: {resume_text[:100]}..."  # Truncate resume for brevity
+        )
         return {"response": response}
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 @app.get("/api/user/plan")
 def get_user_plan(current_user: dict = Depends(get_current_user)):
@@ -713,18 +693,6 @@ def upgrade_user_plan(
     user["plan"] = plan
     return {"message": f"Plan upgraded to {plan}"}
 
-@app.post("/parse-resume")
-async def parse_resume_endpoint(text: str):
-    return parse_resume(text)
-
-@app.post("/resume-rewrite")
-async def resume_rewrite(resume_data: dict = Body(...), job_description: str = Body(...)):
-    return rewrite_resume(resume_data, job_description)
-
-@app.post("/linkedin-optimization")
-async def linkedin_optimization(resume_data: dict = Body(...)):
-    return optimize_for_linkedin(resume_data)
-
 @app.post("/cover-letter-rewrite")
 async def cover_letter_rewrite(
     resume_data: dict = Body(...),
@@ -734,11 +702,20 @@ async def cover_letter_rewrite(
     # Try OpenAI if available
     try:
         if openai.api_key:
-            prompt = f"Rewrite the following cover letter to better match the job description.\n\nJob Description:\n{job_description}\n\nResume Data:\n{resume_data}\n\nOriginal Cover Letter:\n{original_cover_letter}\n\nRewritten Cover Letter:"
+            prompt = (
+                f"Rewrite the following cover letter to better match the job description.\n\n"
+                f"Job Description:\n{job_description}\n\n"
+                f"Resume Data:\n{resume_data}\n\n"
+                f"Original Cover Letter:\n{original_cover_letter}\n\n"
+                f"Rewritten Cover Letter:"
+            )
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant that rewrites cover letters for job applications."},
+                    {
+                        "role": "system", 
+                        "content": "You are a helpful assistant that rewrites cover letters for job applications."
+                    },
                     {"role": "user", "content": prompt}
                 ],
                 max_tokens=500,
@@ -749,14 +726,18 @@ async def cover_letter_rewrite(
     except Exception as e:
         print(f"OpenAI error: {e}")
     # Fallback: simple template
-    rewritten = f"Dear Hiring Manager,\n\nI am excited to apply for this position. My background in {', '.join(resume_data.get('skills', []))} and experience in similar roles make me a strong fit. I am eager to contribute to your team.\n\nSincerely,\n{resume_data.get('full_name', 'Your Name')}"
+    skills = ', '.join(resume_data.get('skills', []))
+    full_name = resume_data.get('full_name', 'Your Name')
+    rewritten = (
+        f"Dear Hiring Manager,\n\n"
+        f"I am excited to apply for this position. My background in {skills} "
+        f"and experience in similar roles make me a strong fit. "
+        f"I am eager to contribute to your team.\n\n"
+        f"Sincerely,\n{full_name}"
+    )
     return {"rewritten_cover_letter": rewritten}
 
-@app.post("/job-match")
-async def job_match_endpoint(resume_data: dict = Body(...), job_description: str = Body(...)):
-    result = match_resume_to_job(resume_data.get('skills', []), job_description)
-    logger.info(f"Job match result: {result}")
-    return {"match_result": result}
+
 
 @app.post("/gpt-chat")
 async def gpt_chat(messages: list = Body(...)):
@@ -776,7 +757,7 @@ async def gpt_chat(messages: list = Body(...)):
         return {"reply": "Sorry, the AI chat is currently unavailable."}
     return {"reply": "Sorry, the AI chat is currently unavailable."}
 
-# --- User Logout Endpoint ---
+# User Logout Endpoint
 @app.post("/logout")
 async def logout(token: str = Header(...)):
     """Logout endpoint (JWT logout is client-side; this is for UI flow)"""
@@ -792,7 +773,7 @@ async def logout(token: str = Header(...)):
     logger.info("User logged out. Token revoked: %s", jti)
     return {"message": "Logged out successfully."}
 
-# --- Admin Analytics Endpoint (API Key Protected) ---
+# Admin Analytics Endpoint (API Key Protected)
 ADMIN_API_KEY = "supersecretadminkey"  # Change this in production!
 
 @app.get("/admin/analytics")
@@ -827,7 +808,7 @@ async def admin_analytics(x_api_key: str = Header(...)):
     db.close()
     return analytics
 
-# --- Admin User Management Endpoints ---
+# Admin User Management Endpoints
 @app.get("/admin/users")
 async def admin_list_users(x_api_key: str = Header(...)):
     if x_api_key != ADMIN_API_KEY:

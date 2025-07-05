@@ -20,11 +20,15 @@ def match_resume_to_job(resume_skill_list, job_desc):
     }
 
 # Example usage
-example_job_description = "We are looking for a python developer with flask, git, and aws skills."
+example_job_description = (
+    "We are looking for a python developer with flask, git, and aws skills."
+)
 example_resume_skills = ["python", "flask", "sql", "git"]
 
 example_job_skills = extract_skills_from_job_description(example_job_description)
-example_matched_skills, example_missing_skills = match_skills(example_job_skills, example_resume_skills)
+example_matched_skills, example_missing_skills = match_skills(
+    example_job_skills, example_resume_skills
+)
 
 print("Job Skills:", example_job_skills)
 print("Matched Skills:", example_matched_skills)

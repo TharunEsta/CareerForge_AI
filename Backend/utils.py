@@ -5,7 +5,7 @@ import pdfplumber
 from spacy.matcher import Matcher
 import tempfile
 import os
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 # Load spaCy model once
 nlp = spacy.load("en_core_web_sm")
@@ -41,10 +41,22 @@ LINKEDIN_SECTIONS = {
 }
 
 LINKEDIN_KEYWORDS = {
-    'headline': ['senior', 'lead', 'principal', 'architect', 'engineer', 'developer', 'manager', 'director'],
-    'summary': ['passionate', 'experienced', 'expert', 'specialist', 'professional', 'dedicated'],
-    'experience': ['achieved', 'increased', 'decreased', 'improved', 'developed', 'led', 'managed', 'created'],
-    'skills': ['expert', 'proficient', 'skilled', 'experienced', 'advanced', 'intermediate', 'beginner']
+    'headline': [
+        'senior', 'lead', 'principal', 'architect', 'engineer', 
+        'developer', 'manager', 'director'
+    ],
+    'summary': [
+        'passionate', 'experienced', 'expert', 'specialist', 
+        'professional', 'dedicated'
+    ],
+    'experience': [
+        'achieved', 'increased', 'decreased', 'improved', 
+        'developed', 'led', 'managed', 'created'
+    ],
+    'skills': [
+        'expert', 'proficient', 'skilled', 'experienced', 
+        'advanced', 'intermediate', 'beginner'
+    ]
 }
 
 ALLOWED_EXTENSIONS = {'pdf', 'docx', 'txt'}

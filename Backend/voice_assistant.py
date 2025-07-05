@@ -6,7 +6,7 @@ try:
     from langdetect import detect
 except ImportError:
     detect = None
-from typing import Dict, List, Optional
+from typing import Optional
 import openai
 import os
 from fastapi import APIRouter, HTTPException
@@ -96,14 +96,20 @@ def get_assistant_response(user_input: str, assistant_name: str, language: str) 
     try:
         # Try to use OpenAI for more intelligent responses
         if openai.api_key:
-            personality = ASSISTANT_PERSONALITIES.get(assistant_name, ASSISTANT_PERSONALITIES["Pandu"])
+            personality = ASSISTANT_PERSONALITIES.get(
+                assistant_name, 
+                ASSISTANT_PERSONALITIES["Pandu"]
+            )
             
-            prompt = f"""You are {assistant_name}, an AI assistant with the following personality: {personality['personality']}
-            
-            User message: {user_input}
-            
-            Please respond in a helpful, natural way that matches your personality. Keep responses concise but friendly.
-            If the user is greeting you, respond warmly. If they're asking for help, provide useful assistance."""
+            prompt = (
+                f"You are {assistant_name}, an AI assistant with the following personality: "
+                f"{personality['personality']}\n\n"
+                f"User message: {user_input}\n\n"
+                f"Please respond in a helpful, natural way that matches your personality. "
+                f"Keep responses concise but friendly. "
+                f"If the user is greeting you, respond warmly. "
+                f"If they're asking for help, provide useful assistance."
+            )
             
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
@@ -129,11 +135,17 @@ def get_fallback_response(user_input: str, assistant_name: str, language: str) -
     input_lower = user_input.lower()
     
     # Check for greetings
-    greetings = ["hello", "hi", "hey", "namaste", "नमस्ते", "నమస్కారం", "hola", "bonjour", "hallo", "こんにちは", "안녕하세요", "你好"]
+    greetings = [
+        "hello", "hi", "hey", "namaste", "नमस्ते", "నమస్కారం", 
+        "hola", "bonjour", "hallo", "こんにちは", "안녕하세요", "你好"
+    ]
     
     for greeting in greetings:
         if greeting in input_lower:
-            assistant = ASSISTANT_PERSONALITIES.get(assistant_name, ASSISTANT_PERSONALITIES["Pandu"])
+            assistant = ASSISTANT_PERSONALITIES.get(
+                assistant_name, 
+                ASSISTANT_PERSONALITIES["Pandu"]
+            )
             return assistant["greetings"].get(language, assistant["greetings"]["en"])
     
     # Default response
@@ -160,7 +172,11 @@ async def process_voice_message(message: VoiceMessage):
             message.language = detect_language(message.text)
         
         # Get AI response
-        response_text = get_assistant_response(message.text, message.assistant_name, message.language)
+        response_text = get_assistant_response(
+            message.text, 
+            message.assistant_name, 
+            message.language
+        )
         
         return VoiceResponse(
             text=response_text,
@@ -169,7 +185,10 @@ async def process_voice_message(message: VoiceMessage):
         )
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error processing voice message: {str(e)}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error processing voice message: {str(e)}"
+        ) from e
 
 @router.post("/detect-language")
 async def detect_language_endpoint(text: str):
@@ -178,7 +197,10 @@ async def detect_language_endpoint(text: str):
         language = detect_language(text)
         return {"language": language, "confidence": 0.9}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error detecting language: {str(e)}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error detecting language: {str(e)}"
+        ) from e
 
 @router.get("/assistants")
 async def get_available_assistants():

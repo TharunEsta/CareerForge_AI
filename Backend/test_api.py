@@ -37,7 +37,12 @@ def test_analyze_resume(file_content, job_desc, expected_status):
     files = {"file": ("resume.txt", file_content)}
     data = {"job_description": job_desc} if job_desc else {}
     headers = get_auth_headers()
-    response = client.post("/api/analyze-resume", files=files, data=data, headers=headers)
+    response = client.post(
+        "/api/analyze-resume", 
+        files=files, 
+        data=data, 
+        headers=headers
+    )
     assert response.status_code == expected_status
 
 # /match_resume endpoint

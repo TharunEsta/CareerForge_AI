@@ -39,9 +39,11 @@ def extract_education(text):
     lines = text.split('\n')
     for line in lines:
         lower = line.lower()
-        if any(deg in lower for deg in ['bca', 'b.tech', 'mca', 'b.sc', 'msc', 'bachelor', 'master', 'phd']):
+        degree_keywords = ['bca', 'b.tech', 'mca', 'b.sc', 'msc', 'bachelor', 'master', 'phd']
+        if any(deg in lower for deg in degree_keywords):
             degrees.append(line.strip())
-        if any(keyword in lower for keyword in ['university', 'college', 'institute', 'school of']):
+        college_keywords = ['university', 'college', 'institute', 'school of']
+        if any(keyword in lower for keyword in college_keywords):
             colleges.append(line.strip())
     return list(set(degrees)), list(set(colleges))
 
@@ -50,7 +52,8 @@ def extract_experience(text):
     experience = []
     lines = text.split('\n')
     for line in lines:
-        if any(word in line.lower() for word in ['worked', 'experience', 'company', 'engineer', 'developer']):
+        experience_keywords = ['worked', 'experience', 'company', 'engineer', 'developer']
+        if any(word in line.lower() for word in experience_keywords):
             experience.append({
                 "company": None,
                 "designation": None,
@@ -64,7 +67,8 @@ def extract_projects(text):
     projects = []
     lines = text.split('\n')
     for line in lines:
-        if any(word in line.lower() for word in ['project', 'developed', 'built', 'implemented', 'designed']):
+        project_keywords = ['project', 'developed', 'built', 'implemented', 'designed']
+        if any(word in line.lower() for word in project_keywords):
             projects.append({
                 "title": None,
                 "description": line.strip()

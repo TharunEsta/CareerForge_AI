@@ -16,10 +16,11 @@ def init_db():
     try:
         admin = db.query(User).filter(User.username == "admin").first()
         if not admin:
+            admin_password = os.getenv("ADMIN_PASSWORD", "admin123")
             admin = User(
                 username="admin",
                 email="admin@careerforge.ai",
-                hashed_password=get_password_hash(os.getenv("ADMIN_PASSWORD", "admin123")),
+                hashed_password=get_password_hash(admin_password),
                 full_name="Admin User",
                 credits=1000,
                 plan="premium",
