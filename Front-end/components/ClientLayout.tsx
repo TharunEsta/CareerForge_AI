@@ -12,13 +12,13 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { 
-  sidebar, 
-  sidebarHeader, 
-  sidebarNav, 
-  sidebarNavItem, 
-  sidebarNavItemIcon, 
-  sidebarNavItemText 
+import {
+  Sidebar,
+  SidebarHeader,
+  SidebarNav,
+  SidebarNavItem,
+  SidebarNavItemIcon,
+  SidebarNavItemText
 } from '@/components/ui/sidebar';
 import { 
   Home, 

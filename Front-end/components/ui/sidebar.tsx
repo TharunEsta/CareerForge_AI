@@ -96,7 +96,7 @@ export const SidebarFooter = React.forwardRef<
 ))
 SidebarFooter.displayName = "SidebarFooter"
 
-const sidebarNav = React.forwardRef<
+export const SidebarNav = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
@@ -106,9 +106,9 @@ const sidebarNav = React.forwardRef<
     {...props}
   />
 ))
-sidebarNav.displayName = "SidebarNav"
+SidebarNav.displayName = "SidebarNav"
 
-const sidebarNavItem = React.forwardRef<
+export const SidebarNavItem = React.forwardRef<
   HTMLAnchorElement,
   React.AnchorHTMLAttributes<HTMLAnchorElement> & {
     active?: boolean
@@ -124,9 +124,9 @@ const sidebarNavItem = React.forwardRef<
     {...props}
   />
 ))
-sidebarNavItem.displayName = "SidebarNavItem"
+SidebarNavItem.displayName = "SidebarNavItem"
 
-const sidebarNavItemIcon = React.forwardRef<
+export const SidebarNavItemIcon = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
@@ -139,9 +139,9 @@ const sidebarNavItemIcon = React.forwardRef<
     {...props}
   />
 ))
-sidebarNavItemIcon.displayName = "SidebarNavItemIcon"
+SidebarNavItemIcon.displayName = "SidebarNavItemIcon"
 
-const sidebarNavItemText = React.forwardRef<
+export const SidebarNavItemText = React.forwardRef<
   HTMLSpanElement,
   React.HTMLAttributes<HTMLSpanElement>
 >(({ className, ...props }, ref) => (
@@ -151,7 +151,7 @@ const sidebarNavItemText = React.forwardRef<
     {...props}
   />
 ))
-sidebarNavItemText.displayName = "SidebarNavItemText"
+SidebarNavItemText.displayName = "SidebarNavItemText"
 
 const sidebarNavItemBadge = React.forwardRef<
   HTMLDivElement,
@@ -270,20 +270,10 @@ sidebarNavItemGroupItemBadge.displayName = "SidebarNavItemGroupItemBadge"
 export {
   Sidebar,
   SidebarHeader,
-  sidebarTitle,
-  sidebarDescription,
-  sidebarSection,
   SidebarFooter,
-  sidebarNav,
-  sidebarNavItem,
-  sidebarNavItemIcon,
-  sidebarNavItemText,
-  sidebarNavItemBadge,
-  sidebarNavItemGroup,
-  sidebarNavItemGroupLabel,
-  sidebarNavItemGroupContent,
-  sidebarNavItemGroupItem,
-  sidebarNavItemGroupItemIcon,
-  sidebarNavItemGroupItemText,
-  sidebarNavItemGroupItemBadge,
+  SidebarNav,
+  SidebarNavItem,
+  SidebarNavItemIcon,
+  SidebarNavItemText,
+  SidebarVariants
 }

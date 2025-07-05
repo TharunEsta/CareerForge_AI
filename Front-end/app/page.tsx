@@ -30,10 +30,8 @@ import {
 import { useTheme } from "@/components/theme-provider"
 import {
   Sidebar,
-  SidebarContent,
   SidebarFooter,
-  SidebarHeader,
-  SidebarProvider,
+  SidebarHeader
 } from "@/components/ui/sidebar"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Image from 'next/image'
@@ -297,293 +295,194 @@ function AppContent() {
 
   return (
     <div className="flex h-screen bg-background">
-      <SidebarProvider>
-        <Sidebar>
-          <SidebarHeader>
-            <div className="flex items-center gap-2 px-4 py-2">
-              <Image src="/placeholder-logo.svg" alt="Logo" width={32} height={32} />
-              <span className="font-bold">CareerForge.AI</span>
-            </div>
-          </SidebarHeader>
-          <SidebarContent>
-            <div className="space-y-2 p-4">
-              <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-muted">
-                <MessageSquare className="w-4 h-4 mr-2" />
-                New Chat
-              </button>
-              <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-muted">
-                <FileText className="w-4 h-4 mr-2" />
-                Resume Tools
-              </button>
-              <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-muted">
-                <Briefcase className="w-4 h-4 mr-2" />
-                Job Search
-              </button>
-            </div>
-          </SidebarContent>
-          <SidebarFooter>
-            <div className="p-4">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="w-full justify-start">
-                    <User className="w-4 h-4 mr-2" />
-                    Account
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem>
-                    <Settings className="w-4 h-4 mr-2" />
-                    Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </SidebarFooter>
-        </Sidebar>
-
-        <div className="flex-1 flex flex-col">
-          <header className="border-b bg-background p-4">
-            <div className="flex items-center justify-between">
-              <h1 className="text-xl font-semibold">CareerForge.AI</h1>
-              <div className="flex items-center gap-4">
-                <Button variant="outline" size="sm">
+      <Sidebar>
+        <SidebarHeader>
+          <div className="flex items-center gap-2 px-4 py-2">
+            <Image src="/placeholder-logo.svg" alt="Logo" width={32} height={32} />
+            <span className="font-bold">CareerForge.AI</span>
+          </div>
+        </SidebarHeader>
+        <div className="space-y-2 p-4">
+          <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-muted">
+            <MessageSquare className="w-4 h-4 mr-2" />
+            New Chat
+          </button>
+          <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-muted">
+            <FileText className="w-4 h-4 mr-2" />
+            Resume Tools
+          </button>
+          <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-muted">
+            <Briefcase className="w-4 h-4 mr-2" />
+            Job Search
+          </button>
+        </div>
+        <SidebarFooter>
+          <div className="p-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="w-full justify-start">
+                  <User className="w-4 h-4 mr-2" />
+                  Account
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem>
                   <Settings className="w-4 h-4 mr-2" />
                   Settings
-                </Button>
-              </div>
-            </div>
-          </header>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </SidebarFooter>
+      </Sidebar>
 
-          <main className="flex-1 overflow-auto">
-            <div className="container max-w-4xl mx-auto p-4">
-              <div className="space-y-4">
-                <div className="flex gap-2 flex-wrap">
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowResumeUpload}>Resume Analysis</button>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowResumeRewrite}>Resume Rewrite</button>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowCoverLetter}>Cover Letter</button>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowLinkedInOptimization}>LinkedIn Optimization</button>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowJobMatch}>Job Match</button>
-                </div>
-                <div>
-                {messages.map((message, index) => (
-                    <div
-                    key={index}
-                    className={cn(
-                      "flex gap-3 p-4 rounded-lg",
-                      message.sender === "user"
-                        ? "bg-muted"
-                        : "bg-background border"
-                    )}
-                  >
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage
-                        src={message.sender === "user" ? "/user-avatar.png" : "/bot-avatar.png"}
-                      />
-                      <AvatarFallback>
-                        {message.sender === "user" ? "U" : "AI"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold">
-                          {message.sender === "user" ? "You" : "CareerForge.AI"}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(message.timestamp).toLocaleTimeString()}
-                        </span>
-                      </div>
-                      <div className="prose prose-sm max-w-none dark:prose-invert">
-                        {renderMessage(message)}
-                      </div>
-                    </div>
-                    </div>
-                ))}
-                </div>
-              </div>
+      <div className="flex-1 flex flex-col">
+        <header className="border-b bg-background p-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-semibold">CareerForge.AI</h1>
+            <div className="flex items-center gap-4">
+              <Button variant="outline" size="sm">
+                <Settings className="w-4 h-4 mr-2" />
+                Settings
+              </Button>
             </div>
-          </main>
+          </div>
+        </header>
 
-          {/* Input area */}
-          <div className="sticky bottom-0 border-t bg-background p-4">
-            <div className="container max-w-4xl">
-              <form onSubmit={handleSubmit} className="flex gap-4 items-center">
-                <button
-                  type="button"
-                  aria-label="Start voice input"
-                  className={`rounded-full p-2 border border-blue-200 dark:border-zinc-700 bg-blue-50 dark:bg-zinc-800 hover:bg-blue-100 dark:hover:bg-zinc-700 transition-colors`}
-                >
-                  <Mic className={`h-6 w-6`} />
-                </button>
-                <Input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type your message or use the mic..."
-                  className="flex-1"
-                  disabled={isLoading}
-                />
-                <Button type="submit" disabled={isLoading || !input.trim()}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Thinking...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="mr-2 h-4 w-4" />
-                      Send
-                    </>
+        <main className="flex-1 overflow-auto">
+          <div className="container max-w-4xl mx-auto p-4">
+            <div className="space-y-4">
+              <div className="flex gap-2 flex-wrap">
+                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowResumeUpload}>Resume Analysis</button>
+                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowResumeRewrite}>Resume Rewrite</button>
+                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowCoverLetter}>Cover Letter</button>
+                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowLinkedInOptimization}>LinkedIn Optimization</button>
+                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowJobMatch}>Job Match</button>
+              </div>
+              <div>
+              {messages.map((message, index) => (
+                  <div
+                  key={index}
+                  className={cn(
+                    "flex gap-3 p-4 rounded-lg",
+                    message.sender === "user"
+                      ? "bg-muted"
+                      : "bg-background border"
                   )}
-                </Button>
-              </form>
+                >
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage
+                      src={message.sender === "user" ? "/user-avatar.png" : "/bot-avatar.png"}
+                    />
+                    <AvatarFallback>
+                      {message.sender === "user" ? "U" : "AI"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold">
+                        {message.sender === "user" ? "You" : "CareerForge.AI"}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(message.timestamp).toLocaleTimeString()}
+                      </span>
+                    </div>
+                    <div className="prose prose-sm max-w-none dark:prose-invert">
+                      {renderMessage(message)}
+                    </div>
+                  </div>
+                  </div>
+              ))}
+              </div>
             </div>
           </div>
+        </main>
 
-          {/* Voice Assistant Section */}
-          <div className="mb-8">
-            <Card className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-0">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-3 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full">
-                      <Mic className="w-6 h-6 text-white" />
-        </div>
-                    <div>
-                      <h3 className="text-xl font-semibold text-purple-900 dark:text-purple-100">
-                        AI Voice Assistant
-                      </h3>
-                      <p className="text-purple-700 dark:text-purple-300">
-                        Speak naturally in multiple languages with our intelligent voice assistant
-                      </p>
-      </div>
-                  </div>
-                  <Link href="/voice-assistant">
-                    <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white">
-                      <Mic className="w-4 h-4 mr-2" />
-                      Try Voice Assistant
-                    </Button>
-                  </Link>
-                </div>
-                
-                {/* Features */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                  <div className="flex items-center space-x-2">
-                    <Globe className="w-4 h-4 text-green-600" />
-                    <span className="text-sm">9+ Languages</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Brain className="w-4 h-4 text-purple-600" />
-                    <span className="text-sm">Smart Responses</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Zap className="w-4 h-4 text-orange-600" />
-                    <span className="text-sm">Real-time</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </SidebarProvider>
-      <button
-        className="fixed bottom-8 right-8 z-50 bg-blue-700 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg hover:bg-blue-800 transition-all"
-        onClick={() => setShowFeatureMenu(true)}
-        aria-label="Open feature menu"
-      >
-        <Plus className="w-8 h-8" />
-      </button>
-      {showFeatureMenu && (
-        <div className="fixed inset-0 z-50 flex items-end justify-end p-8 bg-black/30" onClick={() => setShowFeatureMenu(false)}>
-          <div
-            className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6 flex flex-col gap-4 w-72"
-            onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
-          >
-            <button className="w-full py-3 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold transition" onClick={handleShowResumeUpload}>Resume Upload</button>
-            <button className="w-full py-3 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold transition" onClick={handleShowResumeRewrite}>Resume Rewrite</button>
-            <button className="w-full py-3 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold transition" onClick={handleShowCoverLetter}>Cover Letter</button>
-            <button className="w-full py-3 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold transition" onClick={handleShowLinkedInOptimization}>LinkedIn Optimization</button>
-            <button className="w-full py-3 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold transition" onClick={handleShowJobMatch}>Job Match</button>
-            <button className="w-full py-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold transition" onClick={() => setShowFeatureMenu(false)}>Close</button>
-          </div>
-        </div>
-      )}
-      <button
-        className="fixed bottom-8 left-8 z-50 bg-yellow-400 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-yellow-500 transition-all"
-        onClick={() => setShowFeedback(true)}
-        aria-label="Give feedback"
-      >
-        <Star className="w-7 h-7" />
-      </button>
-      {showFeedback && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={() => setShowFeedback(false)}>
-          <div
-            className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 w-full max-w-md flex flex-col gap-4"
-            onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
-          >
-            {feedbackSubmitted ? (
-              <div className="flex flex-col items-center gap-4">
-                <div
-                  className="text-green-600"
-                >
-                  <svg width="48" height="48" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#16a34a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                </div>
-                <div className="text-xl font-bold text-green-700">Thank you for your feedback!</div>
-                <button className="mt-2 px-6 py-2 rounded-lg bg-blue-700 text-white font-semibold" onClick={() => setShowFeedback(false)}>Close</button>
-              </div>
-            ) : (
-              <form
-                className="flex flex-col gap-4"
-                onSubmit={e => {
-                  e.preventDefault();
-                  setFeedbackSubmitted(true);
-                  // TODO: send feedback to backend/analytics
-                  setTimeout(() => setShowFeedback(false), 2000);
-                }}
+        {/* Input area */}
+        <div className="sticky bottom-0 border-t bg-background p-4">
+          <div className="container max-w-4xl">
+            <form onSubmit={handleSubmit} className="flex gap-4 items-center">
+              <button
+                type="button"
+                aria-label="Start voice input"
+                className={`rounded-full p-2 border border-blue-200 dark:border-zinc-700 bg-blue-50 dark:bg-zinc-800 hover:bg-blue-100 dark:hover:bg-zinc-700 transition-colors`}
               >
-                <h3 className="text-xl font-bold">How was your experience?</h3>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map(rating => (
-                    <button
-                      key={rating}
-                      type="button"
-                      onClick={() => setFeedbackRating(rating)}
-                      className={`p-2 rounded ${feedbackRating >= rating ? 'text-yellow-400' : 'text-gray-300'}`}
-                    >
-                      <Star className="w-6 h-6" />
-                    </button>
-                  ))}
-                </div>
-                <textarea
-                  value={feedbackText}
-                  onChange={e => setFeedbackText(e.target.value)}
-                  placeholder="Tell us more about your experience..."
-                  className="p-3 border rounded-lg resize-none"
-                  rows={3}
-                />
-                <div className="flex gap-2">
-                  <button
-                    type="submit"
-                    className="flex-1 py-2 px-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700"
-                  >
-                    Submit Feedback
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowFeedback(false)}
-                    className="py-2 px-4 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            )}
+                <Mic className={`h-6 w-6`} />
+              </button>
+              <Input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Type your message or use the mic..."
+                className="flex-1"
+                disabled={isLoading}
+              />
+              <Button type="submit" disabled={isLoading || !input.trim()}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Thinking...
+                  </>
+                ) : (
+                  <>
+                    <Send className="mr-2 h-4 w-4" />
+                    Send
+                  </>
+                )}
+              </Button>
+            </form>
           </div>
         </div>
-      )}
+
+        {/* Voice Assistant Section */}
+        <div className="mb-8">
+          <Card className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-0">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full">
+                    <Mic className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-purple-900 dark:text-purple-100">
+                      AI Voice Assistant
+                    </h3>
+                    <p className="text-purple-700 dark:text-purple-300">
+                      Speak naturally in multiple languages with our intelligent voice assistant
+                    </p>
+                  </div>
+                </div>
+                <Link href="/voice-assistant">
+                  <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white">
+                    <Mic className="w-4 h-4 mr-2" />
+                    Try Voice Assistant
+                  </Button>
+                </Link>
+              </div>
+              
+              {/* Features */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                <div className="flex items-center space-x-2">
+                  <Globe className="w-4 h-4 text-green-600" />
+                  <span className="text-sm">9+ Languages</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Brain className="w-4 h-4 text-purple-600" />
+                  <span className="text-sm">Smart Responses</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Zap className="w-4 h-4 text-orange-600" />
+                  <span className="text-sm">Real-time</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
