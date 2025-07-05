@@ -145,3 +145,20 @@ export const SidebarNavItemText = React.forwardRef<
   )
 )
 SidebarNavItemText.displayName = "SidebarNavItemText"
+
+export const SidebarNavItemBadge = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(
+  (
+    { className, ...props }: React.HTMLAttributes<HTMLDivElement>,
+    ref: React.Ref<HTMLDivElement>
+  ) => (
+    <div
+      ref={ref}
+      className={cn("ml-auto flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground", className)}
+      {...props}
+    />
+  )
+)
+SidebarNavItemBadge.displayName = "SidebarNavItemBadge"
