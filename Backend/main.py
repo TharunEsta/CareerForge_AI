@@ -230,7 +230,7 @@ def extract_text_from_content(contents: bytes, filename: str) -> str:
 def extract_email(text: str):
     return next(iter(re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+', text)), None)
 
-def extract_name(text: str, email: str, nlp):
+def extract_name(text: str, email: str, nlp_model):
     name = None
     # Try to extract name from email first
     if email:
@@ -262,7 +262,7 @@ def extract_name(text: str, email: str, nlp):
             if line_index < len(text.split('\n')) - 1:
                 context_lines.append(text.split('\n')[line_index + 1])
             for context_line in context_lines:
-                doc_line = nlp(context_line)
+                doc_line = nlp_model(context_line)
                 for ent in doc_line.ents:
                     if (
                         ent.label_ == "PERSON"
@@ -285,7 +285,7 @@ def extract_name(text: str, email: str, nlp):
             continue
         if any(word in line_lower for word in non_name_words):
             continue
-        doc_line = nlp(line)
+        doc_line = nlp_model(line)
         for ent in doc_line.ents:
             if (
                 ent.label_ == "PERSON"
