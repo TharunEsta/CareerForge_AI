@@ -36,6 +36,8 @@ from schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMat
 # Import new routers
 from realtime_router import router as realtime_router
 from skills_jobs_router import router as skills_jobs_router
+from subscription_router import router as subscription_router
+from payment_router import router as payment_router
 
 # Load environment variables
 load_dotenv("key.env")
@@ -66,6 +68,8 @@ app.add_middleware(
 # Include routers
 app.include_router(realtime_router)
 app.include_router(skills_jobs_router)
+app.include_router(subscription_router)
+app.include_router(payment_router)
 
 # Security & Config
 SECRET_KEY = os.getenv("SECRET_KEY", "secret")

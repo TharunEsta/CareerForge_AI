@@ -13,6 +13,12 @@ from pydantic import BaseModel, Field
 import openai
 import os
 from dotenv import load_dotenv
+from Backend.job_matcher import (
+    match_resume_to_job as match_resume_to_job_logic,
+    analyze_job_description as analyze_job_description_logic,
+    get_skill_recommendations as get_skill_recommendations_logic,
+    analyze_market_trends as analyze_market_trends_logic,
+)
 
 # Load environment variables
 load_dotenv()
@@ -58,140 +64,42 @@ class WebSocketMessage(BaseModel):
 # REAL-TIME SKILLS ANALYSIS
 # ============================================================================
 
-async def analyze_skills_realtime(text: str, job_description: Optional[str] = None) -> Dict[str, Any]:
+@router.post("/skills-analysis")
+async def realtime_skills_analysis(request: SkillAnalysisRequest):
     """Real-time skills analysis with AI enhancement"""
     try:
-        # Basic skill extraction
-        skills = extract_skills_from_text(text)
-        
-        # AI-enhanced analysis
-        if openai.api_key:
-            prompt = f"""
-            Analyze the following text for technical skills and competencies:
-            
-            Text: {text}
-            
-            Please provide:
-            1. Technical skills found
-            2. Skill proficiency levels
-            3. Missing skills for job market
-            4. Skill recommendations
-            
-            Format as JSON.
-            """
-            
-            response = await openai.ChatCompletion.acreate(
-                model="gpt-3.5-turbo",
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=500,
-                temperature=0.3
-            )
-            
-            ai_analysis = json.loads(response.choices[0].message.content)
-        else:
-            ai_analysis = {"skills": skills, "proficiency": "basic", "recommendations": []}
-        
-        # Job matching if job description provided
+        # Use new logic for comprehensive skill extraction and AI analysis
+        result = await analyze_job_description_logic(request.text)
+        # Optionally, if job_description is provided, do job matching
         job_match = None
-        if job_description:
-            job_match = await match_skills_to_job(skills, job_description)
-        
+        if request.job_description:
+            job_match = await match_resume_to_job_logic(result["skills"], request.job_description)
         return {
-            "skills": skills,
-            "ai_analysis": ai_analysis,
+            "skills": result["skills"],
+            "ai_analysis": result["ai_analysis"],
             "job_match": job_match,
-            "timestamp": datetime.now().isoformat(),
-            "confidence": 0.95
+            "timestamp": result["timestamp"],
+            "confidence": 0.98
         }
-        
     except Exception as e:
         logger.error("Error in real-time skills analysis: %s", e)
         raise HTTPException(status_code=500, detail=f"Skills analysis failed: {str(e)}")
-
-def extract_skills_from_text(text: str) -> List[str]:
-    """Extract skills from text using pattern matching"""
-    skill_patterns = [
-        r'\b(python|java|c\+\+|javascript|react|angular|vue|node\.js)\b',
-        r'\b(sql|mysql|postgresql|mongodb|redis)\b',
-        r'\b(aws|azure|gcp|docker|kubernetes|jenkins)\b',
-        r'\b(machine learning|ai|nlp|computer vision|deep learning)\b',
-        r'\b(html|css|bootstrap|tailwind|sass|less)\b',
-        r'\b(git|github|gitlab|bitbucket|svn)\b',
-        r'\b(agile|scrum|kanban|waterfall)\b',
-        r'\b(linux|unix|windows|macos)\b',
-        r'\b(excel|power bi|tableau|looker)\b',
-        r'\b(photoshop|illustrator|figma|sketch)\b'
-    ]
-    
-    skills = []
-    text_lower = text.lower()
-    
-    for pattern in skill_patterns:
-        matches = re.findall(pattern, text_lower)
-        skills.extend(matches)
-    
-    return list(set(skills))
 
 # ============================================================================
 # REAL-TIME JOB MATCHING
 # ============================================================================
 
-async def match_skills_to_job(skills: List[str], job_description: str) -> Dict[str, Any]:
+@router.post("/job-matching")
+async def realtime_job_matching(request: JobMatchRequest):
     """Real-time job matching with AI enhancement"""
     try:
-        # Extract job requirements
-        job_skills = extract_skills_from_text(job_description)
-        
-        # Calculate match score
-        matched_skills = [skill for skill in job_skills if skill in skills]
-        missing_skills = [skill for skill in job_skills if skill not in skills]
-        
-        match_score = len(matched_skills) / max(1, len(job_skills)) * 100
-        
-        # AI-enhanced analysis
-        if openai.api_key:
-            prompt = f"""
-            Analyze job-candidate match:
-            
-            Job Description: {job_description}
-            Candidate Skills: {', '.join(skills)}
-            Required Skills: {', '.join(job_skills)}
-            
-            Provide:
-            1. Match percentage
-            2. Strengths
-            3. Areas for improvement
-            4. Recommendations
-            
-            Format as JSON.
-            """
-            
-            response = await openai.ChatCompletion.acreate(
-                model="gpt-3.5-turbo",
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=400,
-                temperature=0.3
-            )
-            
-            ai_analysis = json.loads(response.choices[0].message.content)
-        else:
-            ai_analysis = {
-                "match_percentage": match_score,
-                "strengths": matched_skills,
-                "improvements": missing_skills,
-                "recommendations": []
-            }
-        
-        return {
-            "match_score": match_score,
-            "matched_skills": matched_skills,
-            "missing_skills": missing_skills,
-            "ai_analysis": ai_analysis,
-            "timestamp": datetime.now().isoformat()
-        }
-        
+        # Use new logic for comprehensive job matching
+        resume_skills_result = await analyze_job_description_logic(request.resume_text)
+        resume_skills = resume_skills_result["skills"]
+        result = await match_resume_to_job_logic(resume_skills, request.job_description)
+        return result
     except Exception as e:
-        logger.error("Error in job matching: %s", e)
+        logger.error("Error in real-time job matching: %s", e)
         raise HTTPException(status_code=500, detail=f"Job matching failed: {str(e)}")
 
 # ============================================================================
@@ -351,60 +259,22 @@ async def generate_cover_letter_realtime(resume_data: Dict[str, Any], job_descri
 # REAL-TIME ANALYSIS ENDPOINTS
 # ============================================================================
 
-@router.post("/skills-analysis")
-async def realtime_skills_analysis(request: SkillAnalysisRequest):
-    """Real-time skills analysis endpoint"""
-    return await analyze_skills_realtime(request.text, request.job_description)
-
-@router.post("/job-matching")
-async def realtime_job_matching(request: JobMatchRequest):
-    """Real-time job matching endpoint"""
-    skills = extract_skills_from_text(request.resume_text)
-    return await match_skills_to_job(skills, request.job_description)
-
-@router.post("/resume-optimization")
-async def realtime_resume_optimization(request: ResumeOptimizationRequest):
-    """Real-time resume optimization endpoint"""
-    return await optimize_resume_realtime(
-        request.resume_data, 
-        request.job_description, 
-        request.optimization_type
-    )
-
 @router.post("/comprehensive-analysis")
 async def comprehensive_analysis(request: RealTimeAnalysisRequest):
-    """Comprehensive real-time analysis"""
+    """Comprehensive real-time analysis (skills, job match, recommendations, market trends)"""
     try:
-        # Skills analysis
-        skills_result = await analyze_skills_realtime(request.content)
-        
-        # Job matching (if job description available)
-        job_match_result = None
-        if "job" in request.analysis_type.lower():
-            job_match_result = await match_skills_to_job(
-                skills_result["skills"], 
-                request.content
-            )
-        
-        # Resume optimization
-        optimization_result = None
-        if "optimize" in request.analysis_type.lower():
-            optimization_result = await optimize_resume_realtime(
-                {"content": request.content}, 
-                request.content, 
-                "ats"
-            )
-        
+        # Analyze job description
+        job_analysis = await analyze_job_description_logic(request.content)
+        # Skill recommendations (if user_id or target role is provided)
+        skill_recs = await get_skill_recommendations_logic(job_analysis["skills"], request.analysis_type)
+        # Market trends
+        market_trends = await analyze_market_trends_logic(job_analysis["skills"])
         return {
-            "user_id": request.user_id,
-            "analysis_type": request.analysis_type,
-            "skills_analysis": skills_result,
-            "job_matching": job_match_result,
-            "optimization": optimization_result,
-            "timestamp": datetime.now().isoformat(),
-            "processing_time": "real-time"
+            "job_analysis": job_analysis,
+            "skill_recommendations": skill_recs,
+            "market_trends": market_trends,
+            "timestamp": job_analysis["timestamp"]
         }
-        
     except Exception as e:
         logger.error("Error in comprehensive analysis: %s", e)
         raise HTTPException(status_code=500, detail=f"Comprehensive analysis failed: {str(e)}")
@@ -439,56 +309,44 @@ manager = ConnectionManager()
 
 @router.websocket("/ws/{user_id}")
 async def websocket_endpoint(websocket: WebSocket, user_id: str):
-    await manager.connect(websocket)
+    await websocket.accept()
     try:
+        await websocket.send_json({"type": "info", "data": {"message": "Connected. Send your resume/job description for real-time analysis."}})
         while True:
-            data = await websocket.receive_text()
-            message = WebSocketMessage.parse_raw(data)
-            
-            # Process real-time analysis based on message type
-            if message.type == "skills_analysis":
-                result = await analyze_skills_realtime(message.data["text"])
-                await ConnectionManager.send_personal_message(
-                    json.dumps({"type": "skills_result", "data": result}),
-                    websocket
-                )
-            
-            elif message.type == "job_matching":
-                result = await match_skills_to_job(
-                    message.data["skills"], 
-                    message.data["job_description"]
-                )
-                await ConnectionManager.send_personal_message(
-                    json.dumps({"type": "job_match_result", "data": result}),
-                    websocket
-                )
-            
-            elif message.type == "resume_optimization":
-                result = await optimize_resume_realtime(
-                    message.data["resume_data"],
-                    message.data["job_description"],
-                    message.data["optimization_type"]
-                )
-                await ConnectionManager.send_personal_message(
-                    json.dumps({"type": "optimization_result", "data": result}),
-                    websocket
-                )
-            
-            elif message.type == "comprehensive_analysis":
-                result = await comprehensive_analysis(
-                    RealTimeAnalysisRequest(
-                        content=message.data["content"],
-                        analysis_type=message.data["analysis_type"],
-                        user_id=user_id
-                    )
-                )
-                await ConnectionManager.send_personal_message(
-                    json.dumps({"type": "comprehensive_result", "data": result}),
-                    websocket
-                )
-                
+            data = await websocket.receive_json()
+            msg_type = data.get("type")
+            payload = data.get("data", {})
+            if msg_type == "job_match":
+                resume_text = payload.get("resume_text", "")
+                job_description = payload.get("job_description", "")
+                await websocket.send_json({"type": "progress", "data": {"message": "Analyzing resume and job description..."}})
+                resume_skills_result = await analyze_job_description_logic(resume_text)
+                resume_skills = resume_skills_result["skills"]
+                result = await match_resume_to_job_logic(resume_skills, job_description)
+                await websocket.send_json({"type": "job_match_result", "data": result})
+            elif msg_type == "skills_analysis":
+                text = payload.get("text", "")
+                await websocket.send_json({"type": "progress", "data": {"message": "Analyzing skills..."}})
+                result = await analyze_job_description_logic(text)
+                await websocket.send_json({"type": "skills_analysis_result", "data": result})
+            elif msg_type == "skill_recommendations":
+                skills = payload.get("skills", [])
+                target_role = payload.get("target_role", "")
+                await websocket.send_json({"type": "progress", "data": {"message": "Generating skill recommendations..."}})
+                recs = await get_skill_recommendations_logic(skills, target_role)
+                await websocket.send_json({"type": "skill_recommendations_result", "data": recs})
+            elif msg_type == "market_trends":
+                skills = payload.get("skills", [])
+                await websocket.send_json({"type": "progress", "data": {"message": "Analyzing market trends..."}})
+                trends = await analyze_market_trends_logic(skills)
+                await websocket.send_json({"type": "market_trends_result", "data": trends})
+            else:
+                await websocket.send_json({"type": "error", "data": {"message": "Unknown message type."}})
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
+        logger.info(f"WebSocket disconnected: {user_id}")
+    except Exception as e:
+        await websocket.send_json({"type": "error", "data": {"message": str(e)}})
+        logger.error(f"WebSocket error: {e}")
 
 # ============================================================================
 # UTILITY FUNCTIONS
