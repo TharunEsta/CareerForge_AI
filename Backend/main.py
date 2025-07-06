@@ -380,7 +380,7 @@ def extract_education(text: str):
 @app.post("/api/resume/upload")
 @rate_limiter.limit("3/minute")
 async def upload_resume(request: Request, file: UploadFile = None, current_user: dict = None):
-    from fastapi import File, Depends
+    from fastapi import Depends
     if file is None:
         file = File(...)
     if current_user is None:
@@ -564,7 +564,7 @@ async def reset_password(
 
 @app.post("/job_match")
 async def job_match(file: UploadFile = None, current_user: dict = None, top_n: int = 3):
-    from fastapi import File, Depends
+    from fastapi import Depends
     if file is None:
         file = File(...)
     if current_user is None:
@@ -592,7 +592,7 @@ async def test_endpoint():
 
 @app.post("/api/analyze-resume")
 async def analyze_resume(file: UploadFile = None, job_description: str = None, current_user: dict = None):
-    from fastapi import File, Form, Depends
+    from fastapi import Form, Depends
     if file is None:
         file = File(...)
     if job_description is None:
@@ -625,7 +625,7 @@ async def health_check():
 
 @app.post("/match_resume")
 async def match_resume(file: UploadFile = None, job_description: str = None, current_user: dict = None):
-    from fastapi import File, Form, Depends
+    from fastapi import Form, Depends
     if file is None:
         file = File(...)
     if job_description is None:
@@ -694,7 +694,7 @@ def get_user_plan(current_user: dict = None):
 
 @app.post("/api/user/upgrade")
 def upgrade_user_plan(plan: str = None, current_user: dict = None):
-    from fastapi import Body, Depends
+    from fastapi import Depends
     if plan is None:
         plan = Body(..., embed=True)
     if current_user is None:
@@ -710,7 +710,6 @@ def upgrade_user_plan(plan: str = None, current_user: dict = None):
 
 @app.post("/cover-letter-rewrite")
 async def cover_letter_rewrite(resume_data: dict = None, job_description: str = None, original_cover_letter: str = None):
-    from fastapi import Body
     if resume_data is None:
         resume_data = Body(...)
     if job_description is None:
@@ -756,7 +755,6 @@ async def cover_letter_rewrite(resume_data: dict = None, job_description: str = 
 
 @app.post("/gpt-chat")
 async def gpt_chat(messages: list = None):
-    from fastapi import Body
     if messages is None:
         messages = Body(...)
     try:
@@ -779,7 +777,6 @@ async def gpt_chat(messages: list = None):
 @app.post("/logout")
 async def logout(token: str = None):
     """Logout endpoint (JWT logout is client-side; this is for UI flow)"""
-    from fastapi import Header
     if token is None:
         token = Header(...)
     jti, exp = get_jti_from_token(token)
@@ -800,7 +797,6 @@ ADMIN_API_KEY = "supersecretadminkey"  # Change this in production!
 @app.get("/admin/analytics")
 async def admin_analytics(x_api_key: str = None):
     """Admin analytics endpoint (requires X-API-KEY header)"""
-    from fastapi import Header
     if x_api_key is None:
         x_api_key = Header(...)
     if x_api_key != ADMIN_API_KEY:
@@ -835,7 +831,6 @@ async def admin_analytics(x_api_key: str = None):
 # Admin User Management Endpoints
 @app.get("/admin/users")
 async def admin_list_users(x_api_key: str = None):
-    from fastapi import Header
     if x_api_key is None:
         x_api_key = Header(...)
     if x_api_key != ADMIN_API_KEY:
@@ -858,7 +853,7 @@ async def admin_list_users(x_api_key: str = None):
 
 @app.get("/admin/users/{user_id}")
 async def admin_get_user(user_id: int = None, x_api_key: str = None):
-    from fastapi import Path, Header
+    from fastapi import Path
     if user_id is None:
         user_id = Path(...)
     if x_api_key is None:
@@ -884,7 +879,7 @@ async def admin_get_user(user_id: int = None, x_api_key: str = None):
 
 @app.post("/admin/users/{user_id}/deactivate")
 async def admin_deactivate_user(user_id: int = None, x_api_key: str = None):
-    from fastapi import Path, Header
+    from fastapi import Path
     if user_id is None:
         user_id = Path(...)
     if x_api_key is None:
@@ -903,7 +898,7 @@ async def admin_deactivate_user(user_id: int = None, x_api_key: str = None):
 
 @app.post("/admin/users/{user_id}/activate")
 async def admin_activate_user(user_id: int = None, x_api_key: str = None):
-    from fastapi import Path, Header
+    from fastapi import Path
     if user_id is None:
         user_id = Path(...)
     if x_api_key is None:
@@ -922,7 +917,7 @@ async def admin_activate_user(user_id: int = None, x_api_key: str = None):
 
 @app.delete("/admin/users/{user_id}")
 async def admin_delete_user(user_id: int = None, x_api_key: str = None):
-    from fastapi import Path, Header
+    from fastapi import Path
     if user_id is None:
         user_id = Path(...)
     if x_api_key is None:
@@ -941,7 +936,6 @@ async def admin_delete_user(user_id: int = None, x_api_key: str = None):
 
 @app.get("/admin/logs")
 async def admin_logs(x_api_key: str = None, lines: int = 100):
-    from fastapi import Header
     if x_api_key is None:
         x_api_key = Header(...)
     if x_api_key != ADMIN_API_KEY:

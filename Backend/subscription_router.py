@@ -5,7 +5,7 @@ Handles subscription plans, pricing, and usage tracking
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 import logging
 from datetime import datetime
 

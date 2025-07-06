@@ -5,7 +5,7 @@ Handles payment creation, verification, and webhooks for multiple gateways
 
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
+from typing import List, Optional
 from datetime import datetime
 import logging
 import os
@@ -232,7 +232,6 @@ async def paypal_webhook(request: Request):
 async def razorpay_webhook(request: Request):
     """Handle Razorpay webhook events"""
     try:
-        from payment_gateways import payment_manager
         import hashlib
         import hmac
         
