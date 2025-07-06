@@ -28,8 +28,8 @@ logger = logging.getLogger(__name__)
 try:
     model = SentenceTransformer('all-MiniLM-L6-v2')
     logger.info("Loaded pretrained SentenceTransformer: all-MiniLM-L6-v2")
-except Exception as e:
-    logger.error("Error loading sentence transformer: %s", e)
+except Exception as model_error:
+    logger.error("Error loading sentence transformer: %s", model_error)
     model = None
 
 # Comprehensive skills database
@@ -269,10 +269,10 @@ class RealTimeJobMatcher:
                 "timestamp": datetime.now().isoformat()
             }
             
-        except Exception as e:
-            logger.error("Error in job matching: %s", e)
+        except Exception as match_error:
+            logger.error("Error in job matching: %s", match_error)
             return {
-                "error": str(e),
+                "error": str(match_error),
                 "match_score": 0,
                 "matched_skills": [],
                 "missing_skills": [],
