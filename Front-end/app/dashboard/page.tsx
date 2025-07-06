@@ -23,8 +23,8 @@ export default function DashboardPage() {
     <div className="min-h-screen flex bg-gray-50">
       <aside className="hidden md:block w-64 bg-white border-r shadow-sm flex flex-col py-8 px-4">
         <div className="flex items-center gap-2 mb-8">
-          <img src="/placeholder-logo.svg" alt="SkillSync AI Logo" className="h-8 w-8" />
-          <span className="font-bold text-lg text-blue-700">SkillSync AI</span>
+                  <img src="/placeholder-logo.svg" alt="CareerForge AI Logo" className="h-8 w-8" />
+        <span className="font-bold text-lg text-blue-700">CareerForge AI</span>
         </div>
         <nav className="flex-1 space-y-2">
           <a href="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded-lg text-blue-700 bg-blue-100 font-medium transition">🏠 Dashboard</a>
