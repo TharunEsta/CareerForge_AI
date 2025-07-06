@@ -43,6 +43,10 @@ from payment_router import router as payment_router
 load_dotenv("key.env")
 load_dotenv(".env")
 
+# Setup uploads directory
+uploads_dir = "uploads"
+os.makedirs(uploads_dir, exist_ok=True)
+
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)

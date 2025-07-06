@@ -5,6 +5,7 @@ Handles comprehensive job matching with AI enhancement, skill analysis, and real
 
 import logging
 import re
+import json
 from datetime import datetime
 from typing import Dict, List, Optional, Any, Tuple
 import openai
@@ -12,6 +13,7 @@ import os
 from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
 
 # Load environment variables
 load_dotenv()
