@@ -5,7 +5,6 @@ Startup-friendly pricing model with freemium tier
 
 from enum import Enum
 from typing import Dict, List, Optional
-from datetime import datetime, timedelta
 from pydantic import BaseModel
 
 class PlanType(str, Enum):
@@ -227,7 +226,7 @@ class SubscriptionManager:
             "billing_cycle": "monthly"
         }
         
-        for plan_type, plan in self.plans.items():
+        for _, plan in self.plans.items():
             plan_data = {
                 "id": plan.id,
                 "name": plan.name,

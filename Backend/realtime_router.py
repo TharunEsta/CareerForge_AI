@@ -343,10 +343,10 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
             else:
                 await websocket.send_json({"type": "error", "data": {"message": "Unknown message type."}})
     except WebSocketDisconnect:
-        logger.info(f"WebSocket disconnected: {user_id}")
+        logger.info("WebSocket disconnected: %s", user_id)
     except Exception as e:
         await websocket.send_json({"type": "error", "data": {"message": str(e)}})
-        logger.error(f"WebSocket error: {e}")
+        logger.error("WebSocket error: %s", e)
 
 # ============================================================================
 # UTILITY FUNCTIONS

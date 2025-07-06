@@ -3,11 +3,12 @@ Payment Router for CareerForge AI
 Handles payment creation, verification, and webhooks for multiple gateways
 """
 
-from fastapi import APIRouter, HTTPException, Request, Depends
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 import logging
+import os
 
 from payment_gateways import (
     create_payment,
@@ -108,8 +109,6 @@ async def create_payment_endpoint(request: CreatePaymentRequest):
         
         return response
         
-    except HTTPException:
-        raise
     except Exception as e:
         logger.error("Error creating payment: %s", e)
         raise HTTPException(status_code=500, detail="Payment creation failed")
@@ -138,8 +137,6 @@ async def verify_payment_endpoint(request: PaymentVerificationRequest):
             timestamp=datetime.now().isoformat()
         )
         
-    except HTTPException:
-        raise
     except Exception as e:
         logger.error("Error verifying payment: %s", e)
         raise HTTPException(status_code=500, detail="Payment verification failed")
@@ -183,27 +180,25 @@ async def stripe_webhook(request: Request):
             event = stripe.Webhook.construct_event(
                 payload, sig_header, webhook_secret
             )
-        except ValueError as e:
+        except ValueError as _:
             raise HTTPException(status_code=400, detail="Invalid payload")
-        except stripe.error.SignatureVerificationError as e:
+        except stripe.error.SignatureVerificationError as _:
             raise HTTPException(status_code=400, detail="Invalid signature")
         
         # Handle the event
         if event["type"] == "payment_intent.succeeded":
             payment_intent = event["data"]["object"]
-            logger.info(f"Payment succeeded: {payment_intent['id']}")
+            logger.info("Payment succeeded: %s", payment_intent['id'])
             
             # Update user subscription here
             # await update_user_subscription(payment_intent['metadata'])
             
         elif event["type"] == "payment_intent.payment_failed":
             payment_intent = event["data"]["object"]
-            logger.info(f"Payment failed: {payment_intent['id']}")
+            logger.info("Payment failed: %s", payment_intent['id'])
         
         return {"status": "success"}
         
-    except HTTPException:
-        raise
     except Exception as e:
         logger.error("Error handling Stripe webhook: %s", e)
         raise HTTPException(status_code=500, detail="Webhook processing failed")
@@ -218,14 +213,14 @@ async def paypal_webhook(request: Request):
         # Handle PayPal webhook events
         if payload.get("event_type") == "PAYMENT.CAPTURE.COMPLETED":
             payment_id = payload["resource"]["id"]
-            logger.info(f"PayPal payment completed: {payment_id}")
+            logger.info("PayPal payment completed: %s", payment_id)
             
             # Update user subscription here
             # await update_user_subscription(payment_id)
             
         elif payload.get("event_type") == "PAYMENT.CAPTURE.DENIED":
             payment_id = payload["resource"]["id"]
-            logger.info(f"PayPal payment denied: {payment_id}")
+            logger.info("PayPal payment denied: %s", payment_id)
         
         return {"status": "success"}
         
@@ -264,19 +259,17 @@ async def razorpay_webhook(request: Request):
         # Handle Razorpay webhook events
         if data.get("event") == "payment.captured":
             payment_id = data["payload"]["payment"]["entity"]["id"]
-            logger.info(f"Razorpay payment completed: {payment_id}")
+            logger.info("Razorpay payment completed: %s", payment_id)
             
             # Update user subscription here
             # await update_user_subscription(payment_id)
             
         elif data.get("event") == "payment.failed":
             payment_id = data["payload"]["payment"]["entity"]["id"]
-            logger.info(f"Razorpay payment failed: {payment_id}")
+            logger.info("Razorpay payment failed: %s", payment_id)
         
         return {"status": "success"}
         
-    except HTTPException:
-        raise
     except Exception as e:
         logger.error("Error handling Razorpay webhook: %s", e)
         raise HTTPException(status_code=500, detail="Webhook processing failed")

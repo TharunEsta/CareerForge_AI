@@ -3,19 +3,16 @@ Subscription Router for CareerForge AI
 Handles subscription plans, pricing, and usage tracking
 """
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Dict, List, Optional, Any
-from datetime import datetime
 import logging
 
 from subscription_plans import (
     get_plans,
     get_plan_by_id,
     check_user_access,
-    check_user_usage,
-    PlanType,
-    SubscriptionPlan
+    check_user_usage
 )
 
 # Setup logging
@@ -147,8 +144,6 @@ async def get_subscription_plan(plan_id: str):
             savings_percentage=round(savings, 1)
         )
         
-    except HTTPException:
-        raise
     except Exception as e:
         logger.error("Error fetching plan %s: %s", plan_id, e)
         raise HTTPException(status_code=500, detail="Failed to fetch plan")

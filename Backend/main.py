@@ -649,8 +649,7 @@ async def match_resume(
         raise e
     except Exception as e:
         logger.error("Error matching resume: %s", e)
-        logger.error(f"Error matching resume: {e}")
-        raise HTTPException(status_code=500, detail=str(e)) from e
+        raise HTTPException(status_code=500, detail=f"Resume matching failed: {str(e)}")
 
 @app.post("/chat_with_resume")
 async def chat_with_resume(
@@ -754,10 +753,10 @@ async def gpt_chat(messages: list = Body(...)):
                 temperature=0.7
             )
             reply = response.choices[0].message.content.strip()
-            logger.info(f"GPT chat reply: {reply}")
+            logger.info("GPT chat reply: %s", reply)
             return {"reply": reply}
     except Exception as e:
-        logger.error(f"OpenAI error: {e}")
+        logger.error("OpenAI error: %s", e)
         return {"reply": "Sorry, the AI chat is currently unavailable."}
     return {"reply": "Sorry, the AI chat is currently unavailable."}
 
@@ -790,25 +789,25 @@ async def admin_analytics(x_api_key: str = Header(...)):
     try:
         user_count = db.query(UserModel).count()
     except Exception as e:
-        logger.error(f"User count error: {e}")
+        logger.error("User count error: %s", e)
         user_count = 0
     try:
-        resumes_parsed = db.query(ResumeModel).count()
+        resume_count = len([f for f in os.listdir(uploads_dir) if f.endswith('.pdf')])
     except Exception as e:
-        logger.error(f"Resume count error: {e}")
-        resumes_parsed = 0
+        logger.error("Resume count error: %s", e)
+        resume_count = 0
     try:
-        jobs_matched = db.query(JobMatchModel).count()
+        job_match_count = len([f for f in os.listdir(uploads_dir) if f.endswith('.json')])
     except Exception as e:
-        logger.error(f"JobMatch count error: {e}")
-        jobs_matched = 0
+        logger.error("JobMatch count error: %s", e)
+        job_match_count = 0
     analytics = {
         "user_count": user_count,
-        "resumes_parsed": resumes_parsed,
-        "jobs_matched": jobs_matched,
+        "resumes_parsed": resume_count,
+        "jobs_matched": job_match_count,
         "chats": 0  # No chat model yet
     }
-    logger.info(f"Admin analytics accessed: {analytics}")
+    logger.info("Admin analytics accessed: %s", analytics)
     db.close()
     return analytics
 
@@ -910,7 +909,7 @@ async def admin_logs(x_api_key: str = Header(...), lines: int = 100):
 # Log all requests
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    logger.info(f"{request.method} {request.url}")
+    logger.info("%s %s", request.method, request.url)
     response = await call_next(request)
     return response
 

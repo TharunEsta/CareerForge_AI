@@ -4,10 +4,9 @@ Supports PayPal, Stripe, Razorpay, and credit/debit cards
 """
 
 import os
-import json
 import logging
 from typing import Dict, List, Optional, Any
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -105,7 +104,7 @@ class PaymentGatewayManager:
             return country_gateways[0]
             
         except Exception as e:
-            logger.error(f"Error selecting gateway: {e}")
+            logger.error("Error selecting gateway: %s", e)
             return PaymentGateway.STRIPE  # Fallback to Stripe
     
     async def create_payment(self, request: PaymentRequest) -> PaymentResponse:
@@ -127,7 +126,7 @@ class PaymentGatewayManager:
             return await gateway.create_payment(request)
             
         except Exception as e:
-            logger.error(f"Payment creation failed: {e}")
+            logger.error("Payment creation failed: %s", e)
             return PaymentResponse(
                 payment_id="",
                 status=PaymentStatus.FAILED,
@@ -147,7 +146,7 @@ class PaymentGatewayManager:
             return await gateway_instance.verify_payment(payment_id)
             
         except Exception as e:
-            logger.error(f"Payment verification failed: {e}")
+            logger.error("Payment verification failed: %s", e)
             return PaymentResponse(
                 payment_id=payment_id,
                 status=PaymentStatus.FAILED,
@@ -193,7 +192,7 @@ class StripeGateway:
             )
             
         except Exception as e:
-            logger.error(f"Stripe payment creation failed: {e}")
+            logger.error("Stripe payment creation failed: %s", e)
             return PaymentResponse(
                 payment_id="",
                 status=PaymentStatus.FAILED,
@@ -228,7 +227,7 @@ class StripeGateway:
             )
             
         except Exception as e:
-            logger.error(f"Stripe payment verification failed: {e}")
+            logger.error("Stripe payment verification failed: %s", e)
             return PaymentResponse(
                 payment_id=payment_id,
                 status=PaymentStatus.FAILED,
@@ -297,7 +296,7 @@ class PayPalGateway:
                 raise Exception(f"PayPal payment creation failed: {payment.error}")
                 
         except Exception as e:
-            logger.error(f"PayPal payment creation failed: {e}")
+            logger.error("PayPal payment creation failed: %s", e)
             return PaymentResponse(
                 payment_id="",
                 status=PaymentStatus.FAILED,
@@ -337,7 +336,7 @@ class PayPalGateway:
             )
             
         except Exception as e:
-            logger.error(f"PayPal payment verification failed: {e}")
+            logger.error("PayPal payment verification failed: %s", e)
             return PaymentResponse(
                 payment_id=payment_id,
                 status=PaymentStatus.FAILED,
@@ -386,7 +385,7 @@ class RazorpayGateway:
             )
             
         except Exception as e:
-            logger.error(f"Razorpay payment creation failed: {e}")
+            logger.error("Razorpay payment creation failed: %s", e)
             return PaymentResponse(
                 payment_id="",
                 status=PaymentStatus.FAILED,
@@ -422,7 +421,7 @@ class RazorpayGateway:
             )
             
         except Exception as e:
-            logger.error(f"Razorpay payment verification failed: {e}")
+            logger.error("Razorpay payment verification failed: %s", e)
             return PaymentResponse(
                 payment_id=payment_id,
                 status=PaymentStatus.FAILED,

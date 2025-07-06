@@ -3,8 +3,6 @@ Real-time Job Matching System
 Handles comprehensive job matching with AI enhancement, skill analysis, and real-time processing
 """
 
-import asyncio
-import json
 import logging
 import re
 from datetime import datetime
@@ -13,7 +11,6 @@ import openai
 import os
 from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
-import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
 # Load environment variables
@@ -30,7 +27,7 @@ try:
     model = SentenceTransformer('all-MiniLM-L6-v2')
     logger.info("Loaded pretrained SentenceTransformer: all-MiniLM-L6-v2")
 except Exception as e:
-    logger.error(f"Error loading sentence transformer: {e}")
+    logger.error("Error loading sentence transformer: %s", e)
     model = None
 
 # Comprehensive skills database
@@ -79,7 +76,8 @@ class RealTimeJobMatcher:
         self.skills_cache = {}
         self.job_cache = {}
         
-    def extract_skills_from_text(self, text: str) -> List[str]:
+    @staticmethod
+    def extract_skills_from_text(text: str) -> List[str]:
         """Extract skills from text using comprehensive pattern matching"""
         if not text:
             return []
@@ -88,7 +86,7 @@ class RealTimeJobMatcher:
         found_skills = []
         
         # Extract all skills from database
-        for category, skills in SKILLS_DATABASE.items():
+        for _, skills in SKILLS_DATABASE.items():
             for skill in skills:
                 # Check for exact match and variations
                 skill_variations = [
@@ -181,12 +179,12 @@ class RealTimeJobMatcher:
                 "timestamp": datetime.now().isoformat()
             }
             
-        except Exception as e:
-            logger.error("Error analyzing job description: %s", e)
+        except Exception as error:
+            logger.error("Error analyzing job description: %s", error)
             return {
                 "skills": self.extract_skills_from_text(job_description),
                 "ai_analysis": {},
-                "error": str(e)
+                "error": str(error)
             }
     
     async def match_resume_to_job(self, resume_skills: List[str], job_description: str) -> Dict[str, Any]:
@@ -216,8 +214,8 @@ class RealTimeJobMatcher:
                     
                     similarity = cosine_similarity(resume_embedding, job_embedding)[0][0]
                     semantic_score = similarity * 100
-                except Exception as e:
-                    logger.error("Error calculating semantic similarity: %s", e)
+                except Exception as exc:
+                    logger.error("Error calculating semantic similarity: %s", exc)
             
             # AI-enhanced match analysis
             if openai.api_key:
@@ -279,7 +277,8 @@ class RealTimeJobMatcher:
                 "timestamp": datetime.now().isoformat()
             }
     
-    async def get_skill_recommendations(self, current_skills: List[str], target_role: str) -> Dict[str, Any]:
+    @staticmethod
+    async def get_skill_recommendations(current_skills: List[str], target_role: str) -> Dict[str, Any]:
         """Get personalized skill recommendations"""
         try:
             if openai.api_key:
@@ -326,15 +325,16 @@ class RealTimeJobMatcher:
                 "timestamp": datetime.now().isoformat()
             }
             
-        except Exception as e:
-            logger.error("Error getting skill recommendations: %s", e)
+        except Exception as err:
+            logger.error("Error getting skill recommendations: %s", err)
             return {
-                "error": str(e),
+                "error": str(err),
                 "recommendations": {},
                 "timestamp": datetime.now().isoformat()
             }
     
-    async def analyze_market_trends(self, skills: List[str]) -> Dict[str, Any]:
+    @staticmethod
+    async def analyze_market_trends(skills: List[str]) -> Dict[str, Any]:
         """Analyze market trends for skills"""
         try:
             if openai.api_key:
@@ -376,10 +376,10 @@ class RealTimeJobMatcher:
                 "timestamp": datetime.now().isoformat()
             }
             
-        except Exception as e:
-            logger.error("Error analyzing market trends: %s", e)
+        except Exception as exc:
+            logger.error("Error analyzing market trends: %s", exc)
             return {
-                "error": str(e),
+                "error": str(exc),
                 "trends": {},
                 "timestamp": datetime.now().isoformat()
             }

@@ -132,7 +132,7 @@ async def analyze_skill_market_demand(skill: str, location: str = "global") -> D
         }
         
     except Exception as e:
-        logger.error(f"Error analyzing skill demand: {e}")
+        logger.error("Error analyzing skill demand: %s", e)
         raise HTTPException(status_code=500, detail=f"Skill analysis failed: {str(e)}")
 
 async def get_skill_recommendations(current_skills: List[str], target_role: str) -> Dict[str, Any]:
@@ -181,7 +181,7 @@ async def get_skill_recommendations(current_skills: List[str], target_role: str)
         }
         
     except Exception as e:
-        logger.error(f"Error getting skill recommendations: {e}")
+        logger.error("Error getting skill recommendations: %s", e)
         raise HTTPException(status_code=500, detail=f"Skill recommendations failed: {str(e)}")
 
 # ============================================================================
