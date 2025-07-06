@@ -31,7 +31,7 @@ from utils import (
     parse_resume, parse_resume_with_job_matching, allowed_file
 )
 from models import SessionLocal, RevokedToken
-from schemas import User as UserModel, Resume as ResumeModel, JobMatch as JobMatchModel
+from schemas import User as UserModel
 
 # Import new routers
 from realtime_router import router as realtime_router
