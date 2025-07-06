@@ -2,6 +2,7 @@ import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
+import { Logo } from "./logo"
 
 const SidebarVariants = cva(
   "group relative flex h-full w-full flex-col gap-4 border-r bg-background p-4",
@@ -162,3 +163,13 @@ export const SidebarNavItemBadge = React.forwardRef<
   )
 )
 SidebarNavItemBadge.displayName = "SidebarNavItemBadge"
+
+// Enhanced Sidebar with Logo
+export const SidebarWithLogo: React.FC<SidebarProps> = ({ className, ...props }) => (
+  <Sidebar className={className} {...props}>
+    <SidebarHeader>
+      <Logo size="md" className="mx-auto" />
+    </SidebarHeader>
+    {props.children}
+  </Sidebar>
+)
