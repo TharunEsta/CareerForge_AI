@@ -20,20 +20,20 @@ const SidebarVariants = cva(
 )
 
 export interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
+  children?: React.ReactNode;
   className?: string;
   variant?: "default" | "secondary";
 }
 
 export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
-  (
-    { className, variant, ...props }: SidebarProps,
-    ref: React.Ref<HTMLDivElement>
-  ) => (
+  ({ className, children, variant, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(SidebarVariants({ variant }), className)}
       {...props}
-    />
+    >
+      {children}
+    </div>
   )
 )
 Sidebar.displayName = "Sidebar"
@@ -68,11 +68,11 @@ export const SidebarNavItemBadge = React.forwardRef<
 SidebarNavItemBadge.displayName = "SidebarNavItemBadge"
 
 // Enhanced Sidebar with Logo
-export const SidebarWithLogo: React.FC<SidebarProps> = ({ className, ...props }) => (
+export const SidebarWithLogo: React.FC<SidebarProps> = ({ className, children, ...props }) => (
   <Sidebar className={className} {...props}>
     <SidebarHeader>
       <Logo size="md" className="mx-auto" />
     </SidebarHeader>
-    {props.children}
+    {children}
   </Sidebar>
 )

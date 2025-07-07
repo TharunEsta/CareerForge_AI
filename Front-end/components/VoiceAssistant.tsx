@@ -7,11 +7,6 @@ declare global {
   }
 }
 
-const SpeechRecognition =
-  typeof window !== "undefined"
-    ? window.SpeechRecognition || window.webkitSpeechRecognition
-    : null;
-
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
