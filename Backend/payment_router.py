@@ -3,22 +3,22 @@ Payment Router for CareerForge AI
 Handles payment creation, verification, and webhooks for multiple gateways
 """
 
-from fastapi import APIRouter, HTTPException, Request
-from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
-from datetime import datetime
 import logging
 import os
+from datetime import datetime
+
+from fastapi import APIRouter, HTTPException, Request
+from pydantic import BaseModel
 
 from payment_gateways import (
-    create_payment,
-    verify_payment,
-    get_supported_payment_methods,
-    PaymentRequest,
-    PaymentResponse,
     PaymentGateway,
     PaymentMethod,
-    PaymentStatus
+    PaymentRequest,
+    PaymentResponse,
+    PaymentStatus,
+    create_payment,
+    get_supported_payment_methods,
+    verify_payment,
 )
 
 # Setup logging
@@ -26,9 +26,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/payment", tags=["payment"])
 
-# ============================================================================
 # PYDANTIC MODELS
-# ============================================================================
 
 class CreatePaymentRequest(BaseModel):
     plan_id: str
@@ -48,13 +46,13 @@ class WebhookRequest(BaseModel):
     status: str
     amount: float
     currency: str
-    transaction_id: Optional[str] = None
+    transaction_id: str | None = None
 
 class PaymentMethodResponse(BaseModel):
     id: str
     name: str
     gateway: str
-    description: Optional[str] = None
+    description: str | None = None
 
 class PaymentStatusResponse(BaseModel):
     payment_id: str
@@ -62,13 +60,11 @@ class PaymentStatusResponse(BaseModel):
     gateway: str
     amount: float
     currency: str
-    transaction_id: Optional[str] = None
-    error_message: Optional[str] = None
+    transaction_id: str | None = None
+    error_message: str | None = None
     timestamp: str
 
-# ============================================================================
 # PAYMENT ENDPOINTS
-# ============================================================================
 
 @router.post("/create", response_model=PaymentResponse)
 async def create_payment_endpoint(request: CreatePaymentRequest):
@@ -141,7 +137,7 @@ async def verify_payment_endpoint(request: PaymentVerificationRequest):
         logger.error("Error verifying payment: %s", e)
         raise HTTPException(status_code=500, detail="Payment verification failed")
 
-@router.get("/methods/{country}", response_model=List[PaymentMethodResponse])
+@router.get("/methods/{country}", response_model=list[PaymentMethodResponse])
 async def get_payment_methods(country: str):
     """Get supported payment methods for a country"""
     try:
@@ -167,6 +163,7 @@ async def stripe_webhook(request: Request):
     """Handle Stripe webhook events"""
     try:
         import stripe
+
         from payment_gateways import payment_manager
         
         # Get webhook secret
@@ -232,7 +229,6 @@ async def paypal_webhook(request: Request):
 async def razorpay_webhook(request: Request):
     """Handle Razorpay webhook events"""
     try:
-        from payment_gateways import payment_manager
         import hashlib
         import hmac
         

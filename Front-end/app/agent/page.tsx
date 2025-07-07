@@ -224,7 +224,11 @@ export default function AgentPage() {
               </div>
               <h3 className="text-lg font-semibold mb-2">Resume Optimization</h3>
               <p className="text-gray-600 text-sm">
+<<<<<<< Updated upstream
                 Get personalized feedback and suggestions to improve your resume&apos;s effectiveness.
+=======
+                Get personalized feedback and suggestions to improve your resume'apos;apos;apos;s effectiveness.
+>>>>>>> Stashed changes
               </p>
             </div>
 

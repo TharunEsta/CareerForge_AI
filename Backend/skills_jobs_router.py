@@ -6,13 +6,14 @@ Handles skills database, job matching, market analysis, and real-time recommenda
 import asyncio
 import json
 import logging
-from datetime import datetime
-from typing import Dict, List, Optional, Any
-from fastapi import APIRouter, HTTPException, BackgroundTasks
-from pydantic import BaseModel, Field
-import openai
 import os
+from datetime import datetime
+from typing import Any
+
+import openai
 from dotenv import load_dotenv
+from fastapi import APIRouter, BackgroundTasks, HTTPException
+from pydantic import BaseModel, Field
 
 # Load environment variables
 load_dotenv()
@@ -25,9 +26,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/skills-jobs", tags=["skills-jobs"])
 
-# ============================================================================
 # SKILLS DATABASE
-# ============================================================================
 
 SKILLS_DATABASE = {
     "programming_languages": [
@@ -60,35 +59,31 @@ SKILLS_DATABASE = {
     ]
 }
 
-# ============================================================================
 # PYDANTIC MODELS
-# ============================================================================
 
 class SkillRequest(BaseModel):
     skill_name: str = Field(..., description="Name of the skill")
-    category: Optional[str] = Field(None, description="Skill category")
-    proficiency_level: Optional[str] = Field("beginner", description="Proficiency level")
+    category: str | None = Field(None, description="Skill category")
+    proficiency_level: str | None = Field("beginner", description="Proficiency level")
 
 class JobMatchRequest(BaseModel):
-    resume_skills: List[str] = Field(..., description="Skills from resume")
+    resume_skills: list[str] = Field(..., description="Skills from resume")
     job_description: str = Field(..., description="Job description")
-    match_criteria: List[str] = Field(["skills", "experience"], description="Match criteria")
+    match_criteria: list[str] = Field(["skills", "experience"], description="Match criteria")
 
 class MarketAnalysisRequest(BaseModel):
-    skills: List[str] = Field(..., description="Skills to analyze")
-    location: Optional[str] = Field("global", description="Geographic location")
-    timeframe: Optional[str] = Field("6months", description="Analysis timeframe")
+    skills: list[str] = Field(..., description="Skills to analyze")
+    location: str | None = Field("global", description="Geographic location")
+    timeframe: str | None = Field("6months", description="Analysis timeframe")
 
 class SkillRecommendationRequest(BaseModel):
-    current_skills: List[str] = Field(..., description="Current skills")
+    current_skills: list[str] = Field(..., description="Current skills")
     target_role: str = Field(..., description="Target job role")
     experience_level: str = Field("mid", description="Experience level")
 
-# ============================================================================
 # SKILLS ANALYSIS FUNCTIONS
-# ============================================================================
 
-async def analyze_skill_market_demand(skill: str, location: str = "global") -> Dict[str, Any]:
+async def analyze_skill_market_demand(skill: str, location: str = "global") -> dict[str, Any]:
     """Analyze market demand for a specific skill"""
     try:
         if openai.api_key:
@@ -135,7 +130,7 @@ async def analyze_skill_market_demand(skill: str, location: str = "global") -> D
         logger.error("Error analyzing skill demand: %s", e)
         raise HTTPException(status_code=500, detail=f"Skill analysis failed: {str(e)}")
 
-async def get_skill_recommendations(current_skills: List[str], target_role: str) -> Dict[str, Any]:
+async def get_skill_recommendations(current_skills: list[str], target_role: str) -> dict[str, Any]:
     """Get skill recommendations based on current skills and target role"""
     try:
         if openai.api_key:
@@ -184,11 +179,9 @@ async def get_skill_recommendations(current_skills: List[str], target_role: str)
         logger.error("Error getting skill recommendations: %s", e)
         raise HTTPException(status_code=500, detail=f"Skill recommendations failed: {str(e)}")
 
-# ============================================================================
 # JOB MATCHING FUNCTIONS
-# ============================================================================
 
-async def match_job_realtime(resume_skills: List[str], job_description: str) -> Dict[str, Any]:
+async def match_job_realtime(resume_skills: list[str], job_description: str) -> dict[str, Any]:
     """Real-time job matching with detailed analysis"""
     try:
         # Extract job requirements
@@ -250,7 +243,7 @@ async def match_job_realtime(resume_skills: List[str], job_description: str) -> 
         logger.error("Error in job matching: %s", e)
         raise HTTPException(status_code=500, detail=f"Job matching failed: {str(e)}")
 
-def extract_skills_from_job_description(job_description: str) -> List[str]:
+def extract_skills_from_job_description(job_description: str) -> list[str]:
     """Extract skills from job description using pattern matching"""
     all_skills = []
     for _, skills in SKILLS_DATABASE.items():
@@ -265,11 +258,9 @@ def extract_skills_from_job_description(job_description: str) -> List[str]:
     
     return found_skills
 
-# ============================================================================
 # MARKET ANALYSIS FUNCTIONS
-# ============================================================================
 
-async def analyze_market_trends(skills: List[str], location: str = "global") -> Dict[str, Any]:
+async def analyze_market_trends(skills: list[str], location: str = "global") -> dict[str, Any]:
     """Analyze market trends for multiple skills"""
     try:
         if openai.api_key:
@@ -315,9 +306,7 @@ async def analyze_market_trends(skills: List[str], location: str = "global") -> 
         logger.error("Error analyzing market trends: %s", e)
         raise HTTPException(status_code=500, detail=f"Market analysis failed: {str(e)}")
 
-# ============================================================================
 # API ENDPOINTS
-# ============================================================================
 
 @router.get("/skills")
 async def get_all_skills():
@@ -392,9 +381,7 @@ async def get_skill_categories():
         }
     }
 
-# ============================================================================
 # BACKGROUND TASKS
-# ============================================================================
 
 async def update_skills_database():
     """Background task to update skills database"""
@@ -409,9 +396,7 @@ async def trigger_skills_update(background_tasks: BackgroundTasks):
     background_tasks.add_task(update_skills_database)
     return {"message": "Skills database update triggered"}
 
-# ============================================================================
 # HEALTH CHECK
-# ============================================================================
 
 @router.get("/health")
 async def skills_jobs_health():

@@ -3,17 +3,18 @@ Subscription Router for CareerForge AI
 Handles subscription plans, pricing, and usage tracking
 """
 
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
 import logging
 from datetime import datetime
+from typing import Any
+
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 
 from subscription_plans import (
-    get_plans,
-    get_plan_by_id,
     check_user_access,
-    check_user_usage
+    check_user_usage,
+    get_plan_by_id,
+    get_plans,
 )
 
 # Setup logging
@@ -21,9 +22,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/subscription", tags=["subscription"])
 
-# ============================================================================
 # PYDANTIC MODELS
-# ============================================================================
 
 class PlanResponse(BaseModel):
     id: str
@@ -31,8 +30,8 @@ class PlanResponse(BaseModel):
     price_monthly: float
     price_yearly: float
     description: str
-    features: List[Dict[str, Any]]
-    limits: Dict[str, int]
+    features: list[dict[str, Any]]
+    limits: dict[str, int]
     popular: bool = False
     savings_percentage: float
 
@@ -58,16 +57,14 @@ class FeatureAccessResponse(BaseModel):
     plan_name: str
 
 class PlansComparisonResponse(BaseModel):
-    plans: List[Dict[str, Any]]
-    features: List[str]
+    plans: list[dict[str, Any]]
+    features: list[str]
     currency: str
     billing_cycle: str
 
-# ============================================================================
 # SUBSCRIPTION ENDPOINTS
-# ============================================================================
 
-@router.get("/plans", response_model=List[PlanResponse])
+@router.get("/plans", response_model=list[PlanResponse])
 async def get_subscription_plans():
     """Get all available subscription plans"""
     try:

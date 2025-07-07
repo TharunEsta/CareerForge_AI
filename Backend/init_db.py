@@ -1,8 +1,9 @@
-from Backend.database import engine, SessionLocal
-from Backend.schemas import Base, User
-from Backend.auth import get_password_hash
-from dotenv import load_dotenv
 import os
+
+from Backend.auth import get_password_hash
+from Backend.database import SessionLocal, engine
+from Backend.schemas import Base, User
+from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv("key.env")

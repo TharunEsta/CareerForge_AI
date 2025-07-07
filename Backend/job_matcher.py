@@ -3,17 +3,23 @@ Real-time Job Matching System
 Handles comprehensive job matching with AI enhancement, skill analysis, and real-time processing
 """
 
-import logging
-import re
+
 import json
-from datetime import datetime
-from typing import Dict, List, Optional, Any, Tuple
-import openai
+import logging
 import os
+import re
+from datetime import datetime
+from typing import Any
+
+import openai
 from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
+
+
+def extract_skills_from_text(_):
+    # skills_list removed as it is unused
+    pass  # Implement skill extraction logic here if needed
 
 # Load environment variables
 load_dotenv()
@@ -79,7 +85,7 @@ class RealTimeJobMatcher:
         self.job_cache = {}
         
     @staticmethod
-    def extract_skills_from_text(text: str) -> List[str]:
+    def extract_skills_from_text(text: str) -> list[str]:
         """Extract skills from text using comprehensive pattern matching"""
         if not text:
             return []
@@ -123,7 +129,7 @@ class RealTimeJobMatcher:
         
         return list(set(found_skills))
     
-    async def analyze_job_description(self, job_description: str) -> Dict[str, Any]:
+    async def analyze_job_description(self, job_description: str) -> dict[str, Any]:
         """Analyze job description with AI enhancement"""
         try:
             # Extract skills from job description
@@ -189,7 +195,7 @@ class RealTimeJobMatcher:
                 "error": str(error)
             }
     
-    async def match_resume_to_job(self, resume_skills: List[str], job_description: str) -> Dict[str, Any]:
+    async def match_resume_to_job(self, resume_skills: list[str], job_description: str) -> dict[str, Any]:
         """Real-time resume to job matching with comprehensive analysis"""
         try:
             # Analyze job description
@@ -280,7 +286,7 @@ class RealTimeJobMatcher:
             }
     
     @staticmethod
-    async def get_skill_recommendations(current_skills: List[str], target_role: str) -> Dict[str, Any]:
+    async def get_skill_recommendations(current_skills: list[str], target_role: str) -> dict[str, Any]:
         """Get personalized skill recommendations"""
         try:
             if openai.api_key:
@@ -336,7 +342,7 @@ class RealTimeJobMatcher:
             }
     
     @staticmethod
-    async def analyze_market_trends(skills: List[str]) -> Dict[str, Any]:
+    async def analyze_market_trends(skills: list[str]) -> dict[str, Any]:
         """Analyze market trends for skills"""
         try:
             if openai.api_key:
@@ -390,18 +396,18 @@ class RealTimeJobMatcher:
 job_matcher = RealTimeJobMatcher()
 
 # Convenience functions for API endpoints
-async def match_resume_to_job(resume_skills: List[str], job_description: str) -> Dict[str, Any]:
+async def match_resume_to_job(resume_skills: list[str], job_description: str) -> dict[str, Any]:
     """Convenience function for API endpoints"""
     return await job_matcher.match_resume_to_job(resume_skills, job_description)
 
-async def analyze_job_description(job_description: str) -> Dict[str, Any]:
+async def analyze_job_description(job_description: str) -> dict[str, Any]:
     """Convenience function for job analysis"""
     return await job_matcher.analyze_job_description(job_description)
 
-async def get_skill_recommendations(current_skills: List[str], target_role: str) -> Dict[str, Any]:
+async def get_skill_recommendations(current_skills: list[str], target_role: str) -> dict[str, Any]:
     """Convenience function for skill recommendations"""
     return await job_matcher.get_skill_recommendations(current_skills, target_role)
 
-async def analyze_market_trends(skills: List[str]) -> Dict[str, Any]:
+async def analyze_market_trends(skills: list[str]) -> dict[str, Any]:
     """Convenience function for market analysis"""
     return await job_matcher.analyze_market_trends(skills)

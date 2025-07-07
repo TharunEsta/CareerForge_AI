@@ -1,4 +1,11 @@
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, UniqueConstraint
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Integer,
+    String,
+    UniqueConstraint,
+    create_engine,
+)
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 DATABASE_URL = "sqlite:///./test.db"

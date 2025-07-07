@@ -1,0 +1,1824 @@
+auth.py:41:19: B008 Do not perform function call `Depends` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+   |
+39 | async def get_current_user(
+40 |     token: str = Depends(oauth2_scheme), 
+41 |     db: Session = Depends(SessionLocal)
+   |                   ^^^^^^^^^^^^^^^^^^^^^ B008
+42 | ):
+43 |     credentials_exception = HTTPException(
+   |
+
+auth.py:62:26: B008 Do not perform function call `Depends` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+   |
+61 | async def get_current_active_user(
+62 |     current_user: User = Depends(get_current_user)
+   |                          ^^^^^^^^^^^^^^^^^^^^^^^^^ B008
+63 | ):
+64 |     if not current_user.is_active:
+   |
+
+job_matcher.py:3:89: E501 Line too long (96 > 88)
+  |
+1 | """
+2 | Real-time Job Matching System
+3 | Handles comprehensive job matching with AI enhancement, skill analysis, and real-time processing
+  |                                                                                         ^^^^^^^^ E501
+4 | """
+  |
+
+job_matcher.py:198:89: E501 Line too long (106 > 88)
+    |
+196 |             }
+197 |     
+198 |     async def match_resume_to_job(self, resume_skills: list[str], job_description: str) -> dict[str, Any]:
+    |                                                                                         ^^^^^^^^^^^^^^^^^^ E501
+199 |         """Real-time resume to job matching with comprehensive analysis"""
+200 |         try:
+    |
+
+job_matcher.py:207:89: E501 Line too long (90 > 88)
+    |
+205 |             # Calculate match metrics
+206 |             matched_skills = [skill for skill in job_skills if skill in resume_skills]
+207 |             missing_skills = [skill for skill in job_skills if skill not in resume_skills]
+    |                                                                                         ^^ E501
+208 |             extra_skills = [skill for skill in resume_skills if skill not in job_skills]
+    |
+
+job_matcher.py:223:89: E501 Line too long (89 > 88)
+    |
+221 |                     job_embedding = self.model.encode([job_text])
+222 |                     
+223 |                     similarity = cosine_similarity(resume_embedding, job_embedding)[0][0]
+    |                                                                                         ^ E501
+224 |                     semantic_score = similarity * 100
+225 |                 except Exception as exc:
+    |
+
+job_matcher.py:289:89: E501 Line too long (103 > 88)
+    |
+288 |     @staticmethod
+289 |     async def get_skill_recommendations(current_skills: list[str], target_role: str) -> dict[str, Any]:
+    |                                                                                         ^^^^^^^^^^^^^^^ E501
+290 |         """Get personalized skill recommendations"""
+291 |         try:
+    |
+
+job_matcher.py:399:89: E501 Line too long (96 > 88)
+    |
+398 | # Convenience functions for API endpoints
+399 | async def match_resume_to_job(resume_skills: list[str], job_description: str) -> dict[str, Any]:
+    |                                                                                         ^^^^^^^^ E501
+400 |     """Convenience function for API endpoints"""
+401 |     return await job_matcher.match_resume_to_job(resume_skills, job_description)
+    |
+
+job_matcher.py:407:89: E501 Line too long (99 > 88)
+    |
+405 |     return await job_matcher.analyze_job_description(job_description)
+406 |
+407 | async def get_skill_recommendations(current_skills: list[str], target_role: str) -> dict[str, Any]:
+    |                                                                                         ^^^^^^^^^^^ E501
+408 |     """Convenience function for skill recommendations"""
+409 |     return await job_matcher.get_skill_recommendations(current_skills, target_role)
+    |
+
+main.py:23:5: F811 Redefinition of unused `Path` from line 8
+   |
+21 |     Header,
+22 |     HTTPException,
+23 |     Path,
+   |     ^^^^ F811
+24 |     Query,
+25 |     Request,
+   |
+   = help: Remove definition: `Path`
+
+main.py:44:1: E402 Module level import not at top of file
+   |
+43 | # Local imports
+44 | from models import RevokedToken, SessionLocal
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E402
+45 | from payment_router import router as payment_router
+   |
+
+main.py:45:1: E402 Module level import not at top of file
+   |
+43 | # Local imports
+44 | from models import RevokedToken, SessionLocal
+45 | from payment_router import router as payment_router
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E402
+46 |
+47 | # Routers
+   |
+
+main.py:48:1: E402 Module level import not at top of file
+   |
+47 | # Routers
+48 | from realtime_router import router as realtime_router
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E402
+49 | from schemas import User as UserModel
+50 | from skills_jobs_router import router as skills_jobs_router
+   |
+
+main.py:49:1: E402 Module level import not at top of file
+   |
+47 | # Routers
+48 | from realtime_router import router as realtime_router
+49 | from schemas import User as UserModel
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E402
+50 | from skills_jobs_router import router as skills_jobs_router
+51 | from subscription_router import router as subscription_router
+   |
+
+main.py:50:1: E402 Module level import not at top of file
+   |
+48 | from realtime_router import router as realtime_router
+49 | from schemas import User as UserModel
+50 | from skills_jobs_router import router as skills_jobs_router
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E402
+51 | from subscription_router import router as subscription_router
+52 | from utils import (
+   |
+
+main.py:51:1: E402 Module level import not at top of file
+   |
+49 | from schemas import User as UserModel
+50 | from skills_jobs_router import router as skills_jobs_router
+51 | from subscription_router import router as subscription_router
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E402
+52 | from utils import (
+53 |     allowed_file,
+   |
+
+main.py:52:1: E402 Module level import not at top of file
+   |
+50 |   from skills_jobs_router import router as skills_jobs_router
+51 |   from subscription_router import router as subscription_router
+52 | / from utils import (
+53 | |     allowed_file,
+54 | |     parse_resume,
+55 | |     parse_resume_with_job_matching,
+56 | | )
+   | |_^ E402
+57 |
+58 |   # Setup uploads directory
+   |
+
+main.py:199:89: E501 Line too long (121 > 88)
+    |
+197 |         RevokedToken.expires_at > datetime.now(UTC)
+198 |     ).first()
+199 |     revoked = db.query(RevokedToken).filter(RevokedToken.jti == jti, RevokedToken.expires_at > datetime.now(UTC)).first()
+    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+200 |     if revoked:
+201 |         db.close()
+    |
+
+main.py:213:56: B008 Do not perform function call `Depends` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+    |
+212 | @app.post("/token")
+213 | async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    |                                                        ^^^^^^^^^ B008
+214 |     user = get_user(form_data.username)
+215 |     if not user or not verify_password(form_data.password, user["hashed_password"]):
+    |
+
+main.py:300:89: E501 Line too long (93 > 88)
+    |
+298 |                         ent.label_ == "PERSON"
+299 |                         and len(name_parts := ent.text.split()) <= 3
+300 |                         and not any(header in ent.text.lower() for header in section_headers)
+    |                                                                                         ^^^^^ E501
+301 |                         and not any(word in ent.text.lower() for word in non_name_words)
+302 |                         and all(part[0].isupper() for part in name_parts)
+    |
+
+main.py:405:24: B008 Do not perform function call `File` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+    |
+403 | async def upload_resume(
+404 |     request: Request,
+405 |     file: UploadFile = File(...),
+    |                        ^^^^^^^^^ B008
+406 |     current_user: dict = Depends(get_current_user)
+407 | ):
+    |
+
+main.py:406:26: B008 Do not perform function call `Depends` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+    |
+404 |     request: Request,
+405 |     file: UploadFile = File(...),
+406 |     current_user: dict = Depends(get_current_user)
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^ B008
+407 | ):
+408 |     allowed_types = [
+    |
+
+main.py:442:11: F811 Redefinition of unused `rate_limit_handler` from line 81
+    |
+441 | @app.exception_handler(RateLimitExceeded)
+442 | async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    |           ^^^^^^^^^^^^^^^^^^ F811
+443 |     return JSONResponse(
+444 |         status_code=429,
+    |
+    = help: Remove definition: `rate_limit_handler`
+
+main.py:461:89: E501 Line too long (139 > 88)
+    |
+459 | …ault_limits=["10/minute"])
+460 | …
+461 | …a request, exc: JSONResponse(status_code=429, content={"detail": "Rate limit exceeded"}))
+    |                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+462 | …
+463 | …
+    |
+
+main.py:468:50: B008 Do not perform function call `Depends` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+    |
+467 | @app.get("/api/resume/parsed")
+468 | async def get_parsed_resume(current_user: User = Depends(get_current_user)):
+    |                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^ B008
+469 |     try:
+470 |         email = current_user.email
+    |
+
+main.py:494:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+492 |         raise e
+493 |     except Exception as e:
+494 |         raise HTTPException(status_code=500, detail=str(e))
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+495 |
+496 | @app.get("/search_subscriptions")
+    |
+
+main.py:544:89: E501 Line too long (92 > 88)
+    |
+542 | def send_email(to_email: str, subject: str, body: str):
+543 |     # Placeholder for real email sending logic
+544 |     logger.info("Sending email from %s to %s: %s\n%s", ADMIN_EMAIL, to_email, subject, body)
+    |                                                                                         ^^^^ E501
+545 |     # Integrate with SMTP or email service here
+    |
+
+main.py:552:89: E501 Line too long (97 > 88)
+    |
+550 |     if email not in users_db:
+551 |         # Don't reveal if email exists or not for security
+552 |         return {"message": "If your email is registered, you will receive a password reset link"}
+    |                                                                                         ^^^^^^^^^ E501
+553 |     token = generate_reset_token()
+554 |     password_reset_tokens[token] = {
+    |
+
+main.py:592:24: B008 Do not perform function call `File` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+    |
+590 | @app.post("/job_match")
+591 | async def job_match(
+592 |     file: UploadFile = File(...),
+    |                        ^^^^^^^^^ B008
+593 |     current_user: dict = Depends(get_current_user),
+594 |     top_n: int = 3
+    |
+
+main.py:593:26: B008 Do not perform function call `Depends` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+    |
+591 | async def job_match(
+592 |     file: UploadFile = File(...),
+593 |     current_user: dict = Depends(get_current_user),
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^ B008
+594 |     top_n: int = 3
+595 | ):
+    |
+
+main.py:623:24: B008 Do not perform function call `File` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+    |
+621 | @app.post("/api/analyze-resume")
+622 | async def analyze_resume(
+623 |     file: UploadFile = File(...),
+    |                        ^^^^^^^^^ B008
+624 |     job_description: str | None = Form(None),
+625 |     current_user: dict = Depends(get_current_user)
+    |
+
+main.py:625:26: B008 Do not perform function call `Depends` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+    |
+623 |     file: UploadFile = File(...),
+624 |     job_description: str | None = Form(None),
+625 |     current_user: dict = Depends(get_current_user)
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^ B008
+626 | ):
+627 |     try:
+    |
+
+main.py:652:11: F811 Redefinition of unused `health_check` from line 398
+    |
+651 | @app.get("/health")
+652 | async def health_check():
+    |           ^^^^^^^^^^^^ F811
+653 |     return {"status": "healthy", "message": "Service is running"}
+    |
+    = help: Remove definition: `health_check`
+
+main.py:657:24: B008 Do not perform function call `File` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+    |
+655 | @app.post("/match_resume")
+656 | async def match_resume(
+657 |     file: UploadFile = File(...),
+    |                        ^^^^^^^^^ B008
+658 |     job_description: str | None = Form(None),
+659 |     current_user: dict = Depends(get_current_user)
+    |
+
+main.py:659:26: B008 Do not perform function call `Depends` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+    |
+657 |     file: UploadFile = File(...),
+658 |     job_description: str | None = Form(None),
+659 |     current_user: dict = Depends(get_current_user)
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^ B008
+660 | ):
+661 |     # Restrict to basic or premium plans
+    |
+
+main.py:684:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+682 |     except Exception as e:
+683 |         logger.error("Error matching resume: %s", e)
+684 |         raise HTTPException(status_code=500, detail=f"Resume matching failed: {str(e)}")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+685 |
+686 | @app.post("/chat_with_resume")
+    |
+
+main.py:690:26: B008 Do not perform function call `Depends` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+    |
+688 |     prompt: str = Form(...),
+689 |     resume_text: str = Form(...),
+690 |     current_user: dict = Depends(get_current_user)
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^ B008
+691 | ):
+692 |     try:
+    |
+
+main.py:701:89: E501 Line too long (94 > 88)
+    |
+699 |         # Replace with OpenAI or other LLM call as needed
+700 |         response = (
+701 |             f"Prompt: {prompt}\nResume: {resume_text[:100]}..."  # Truncate resume for brevity
+    |                                                                                         ^^^^^^ E501
+702 |         )
+703 |         return {"response": response}
+    |
+
+main.py:710:40: B008 Do not perform function call `Depends` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+    |
+709 | @app.get("/api/user/plan")
+710 | def get_user_plan(current_user: dict = Depends(get_current_user)):
+    |                                        ^^^^^^^^^^^^^^^^^^^^^^^^^ B008
+711 |     email = current_user.get("email")
+712 |     user = users_db.get(email)
+    |
+
+main.py:720:26: B008 Do not perform function call `Depends` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+    |
+718 | def upgrade_user_plan(
+719 |     plan: str = Body(..., embed=True),
+720 |     current_user: dict = Depends(get_current_user)
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^ B008
+721 | ):
+722 |     email = current_user.get("email")
+    |
+
+main.py:733:25: B008 Do not perform function call `Body` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+    |
+731 | @app.post("/cover-letter-rewrite")
+732 | async def cover_letter_rewrite(
+733 |     resume_data: dict = Body(...),
+    |                         ^^^^^^^^^ B008
+734 |     job_description: str = Body(...),
+735 |     original_cover_letter: str = Body(...)
+    |
+
+main.py:741:89: E501 Line too long (94 > 88)
+    |
+739 |         if openai.api_key:
+740 |             prompt = (
+741 |                 f"Rewrite the following cover letter to better match the job description.\n\n"
+    |                                                                                         ^^^^^^ E501
+742 |                 f"Job Description:\n{job_description}\n\n"
+743 |                 f"Resume Data:\n{resume_data}\n\n"
+    |
+
+main.py:752:89: E501 Line too long (114 > 88)
+    |
+750 |                     {
+751 |                         "role": "system", 
+752 |                         "content": "You are a helpful assistant that rewrites cover letters for job applications."
+    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+753 |                     },
+754 |                     {"role": "user", "content": prompt}
+    |
+
+main.py:778:37: B008 Do not perform function call `Body` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+    |
+777 | @app.post("/gpt-chat")
+778 | async def gpt_chat(messages: list = Body(...)):
+    |                                     ^^^^^^^^^ B008
+779 |     try:
+780 |         if openai.api_key:
+    |
+
+main.py:832:89: E501 Line too long (90 > 88)
+    |
+830 |         resume_count = 0
+831 |     try:
+832 |         job_match_count = len([f for f in os.listdir(uploads_dir) if f.endswith('.json')])
+    |                                                                                         ^^ E501
+833 |     except Exception as e:
+834 |         logger.error("JobMatch count error: %s", e)
+    |
+
+main.py:897:89: E501 Line too long (157 > 88)
+    |
+896 | …
+897 | …s, description="ID of the user"), x_api_key: str = Header(Ellipsis, description="Admin API key")):
+    |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+898 | …
+899 | …
+    |
+
+main.py:956:89: E501 Line too long (137 > 88)
+    |
+954 | …
+955 | …
+956 | …hind HTTPS (e.g., with a reverse proxy like Nginx or on a platform that enforces HTTPS).
+    |                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+957 | …tion or encrypted file storage (e.g., AWS KMS, GCP KMS, or disk encryption).
+    |
+
+main.py:957:89: E501 Line too long (125 > 88)
+    |
+956 | …loy behind HTTPS (e.g., with a reverse proxy like Nginx or on a platform that enforces HTTPS).
+957 | …encryption or encrypted file storage (e.g., AWS KMS, GCP KMS, or disk encryption).
+    |                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+958 | …
+959 | …te Sentry or another error monitoring service for real-time alerts.
+    |
+
+main.py:959:89: E501 Line too long (110 > 88)
+    |
+957 | # For sensitive data at rest, use database encryption or encrypted file storage (e.g., AWS KMS, GCP KMS, or disk encryption).
+958 |
+959 | # ERROR MONITORING: For production, integrate Sentry or another error monitoring service for real-time alerts.
+    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^ E501
+960 | # Example:
+961 | # import sentry_sdk
+    |
+
+main.py:968:5: F821 Undefined name `uvicorn`
+    |
+967 | if __name__ == "__main__":
+968 |     uvicorn.run(
+    |     ^^^^^^^ F821
+969 |         "main:app",
+970 |         host=os.getenv("UVICORN_HOST", "127.0.0.1"),
+    |
+
+payment_gateways.py:84:89: E501 Line too long (103 > 88)
+   |
+83 |         # Default gateway order
+84 |         self.default_gateways = [PaymentGateway.STRIPE, PaymentGateway.PAYPAL, PaymentGateway.RAZORPAY]
+   |                                                                                         ^^^^^^^^^^^^^^^ E501
+85 |     
+86 |     def get_preferred_gateway(self, country: str, payment_method: PaymentMethod) -> PaymentGateway:
+   |
+
+payment_gateways.py:86:89: E501 Line too long (99 > 88)
+   |
+84 |         self.default_gateways = [PaymentGateway.STRIPE, PaymentGateway.PAYPAL, PaymentGateway.RAZORPAY]
+85 |     
+86 |     def get_preferred_gateway(self, country: str, payment_method: PaymentMethod) -> PaymentGateway:
+   |                                                                                         ^^^^^^^^^^^ E501
+87 |         """Get the best gateway for user's country and payment method"""
+88 |         try:
+   |
+
+payment_gateways.py:90:89: E501 Line too long (96 > 88)
+   |
+88 |         try:
+89 |             # Get country-specific gateways
+90 |             country_gateways = self.country_gateways.get(country.upper(), self.default_gateways)
+   |                                                                                         ^^^^^^^^ E501
+91 |             
+92 |             # For Indian users, prioritize Razorpay for UPI/Net Banking
+   |
+
+payment_gateways.py:93:89: E501 Line too long (108 > 88)
+   |
+92 |             # For Indian users, prioritize Razorpay for UPI/Net Banking
+93 |             if country.upper() == "IN" and payment_method in [PaymentMethod.UPI, PaymentMethod.NET_BANKING]:
+   |                                                                                         ^^^^^^^^^^^^^^^^^^^^ E501
+94 |                 return PaymentGateway.RAZORPAY
+   |
+
+payment_gateways.py:140:89: E501 Line too long (96 > 88)
+    |
+138 |             )
+139 |     
+140 |     async def verify_payment(self, payment_id: str, gateway: PaymentGateway) -> PaymentResponse:
+    |                                                                                         ^^^^^^^^ E501
+141 |         """Verify payment status"""
+142 |         try:
+    |
+
+payment_gateways.py:283:89: E501 Line too long (89 > 88)
+    |
+281 |                         "currency": request.currency
+282 |                     },
+283 |                     "description": f"CareerForge AI {request.billing_cycle} subscription"
+    |                                                                                         ^ E501
+284 |                 }]
+285 |             })
+    |
+
+payment_gateways.py:368:89: E501 Line too long (103 > 88)
+    |
+366 |                 "amount": int(request.amount * 100),  # Convert to paise
+367 |                 "currency": "INR" if request.currency == "USD" else request.currency,
+368 |                 "receipt": f"careerforge_{request.user_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+    |                                                                                         ^^^^^^^^^^^^^^^ E501
+369 |                 "notes": {
+370 |                     "plan_id": request.plan_id,
+    |
+
+payment_router.py:81:13: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   |
+79 |             payment_method = PaymentMethod(request.payment_method)
+80 |         except ValueError:
+81 |             raise HTTPException(status_code=400, detail="Invalid payment method")
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+82 |         
+83 |         # Get plan details from subscription system
+   |
+
+payment_router.py:90:89: E501 Line too long (95 > 88)
+   |
+89 |         # Calculate amount based on billing cycle
+90 |         amount = plan.price_yearly if request.billing_cycle == "yearly" else plan.price_monthly
+   |                                                                                         ^^^^^^^ E501
+91 |         
+92 |         # Create payment request
+   |
+
+payment_router.py:108:89: E501 Line too long (108 > 88)
+    |
+107 |         if response.status == PaymentStatus.FAILED:
+108 |             raise HTTPException(status_code=400, detail=response.error_message or "Payment creation failed")
+    |                                                                                         ^^^^^^^^^^^^^^^^^^^^ E501
+109 |         
+110 |         return response
+    |
+
+payment_router.py:114:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+112 |     except Exception as e:
+113 |         logger.error("Error creating payment: %s", e)
+114 |         raise HTTPException(status_code=500, detail="Payment creation failed")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+115 |
+116 | @router.post("/verify", response_model=PaymentStatusResponse)
+    |
+
+payment_router.py:124:13: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+122 |             gateway = PaymentGateway(request.gateway)
+123 |         except ValueError:
+124 |             raise HTTPException(status_code=400, detail="Invalid payment gateway")
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+125 |         
+126 |         # Verify payment
+    |
+
+payment_router.py:142:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+140 |     except Exception as e:
+141 |         logger.error("Error verifying payment: %s", e)
+142 |         raise HTTPException(status_code=500, detail="Payment verification failed")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+143 |
+144 | @router.get("/methods/{country}", response_model=list[PaymentMethodResponse])
+    |
+
+payment_router.py:163:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+161 |     except Exception as e:
+162 |         logger.error("Error getting payment methods: %s", e)
+163 |         raise HTTPException(status_code=500, detail="Failed to get payment methods")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+164 |
+165 | @router.post("/webhook/stripe")
+    |
+
+payment_router.py:185:13: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+183 |             )
+184 |         except ValueError as _:
+185 |             raise HTTPException(status_code=400, detail="Invalid payload")
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+186 |         except stripe.error.SignatureVerificationError as _:
+187 |             raise HTTPException(status_code=400, detail="Invalid signature")
+    |
+
+payment_router.py:187:13: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+185 |             raise HTTPException(status_code=400, detail="Invalid payload")
+186 |         except stripe.error.SignatureVerificationError as _:
+187 |             raise HTTPException(status_code=400, detail="Invalid signature")
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+188 |         
+189 |         # Handle the event
+    |
+
+payment_router.py:205:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+203 |     except Exception as e:
+204 |         logger.error("Error handling Stripe webhook: %s", e)
+205 |         raise HTTPException(status_code=500, detail="Webhook processing failed")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+206 |
+207 | @router.post("/webhook/paypal")
+    |
+
+payment_router.py:230:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+228 |     except Exception as e:
+229 |         logger.error("Error handling PayPal webhook: %s", e)
+230 |         raise HTTPException(status_code=500, detail="Webhook processing failed")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+231 |
+232 | @router.post("/webhook/razorpay")
+    |
+
+payment_router.py:275:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+273 |     except Exception as e:
+274 |         logger.error("Error handling Razorpay webhook: %s", e)
+275 |         raise HTTPException(status_code=500, detail="Webhook processing failed")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+276 |
+277 | @router.get("/gateways")
+    |
+
+payment_router.py:301:89: E501 Line too long (98 > 88)
+    |
+299 |                 "description": "Indian payment gateway",
+300 |                 "supported_countries": ["IN"],
+301 |                 "supported_methods": ["credit_card", "debit_card", "upi", "net_banking", "wallet"]
+    |                                                                                         ^^^^^^^^^^ E501
+302 |             }
+303 |         ]
+    |
+
+realtime_router.py:48:89: E501 Line too long (89 > 88)
+   |
+46 | class SkillAnalysisRequest(BaseModel):
+47 |     text: str = Field(..., description="Text to analyze for skills")
+48 |     job_description: str | None = Field(None, description="Job description for matching")
+   |                                                                                         ^ E501
+49 |     analysis_type: str = Field("comprehensive", description="Type of analysis")
+   |
+
+realtime_router.py:54:89: E501 Line too long (106 > 88)
+   |
+52 |     resume_text: str = Field(..., description="Resume text")
+53 |     job_description: str = Field(..., description="Job description")
+54 |     match_criteria: list[str] = Field(["skills", "experience", "education"], description="Match criteria")
+   |                                                                                         ^^^^^^^^^^^^^^^^^^ E501
+55 |
+56 | class ResumeOptimizationRequest(BaseModel):
+   |
+
+realtime_router.py:59:89: E501 Line too long (103 > 88)
+   |
+57 |     resume_data: dict[str, Any] = Field(..., description="Resume data")
+58 |     job_description: str = Field(..., description="Target job description")
+59 |     optimization_type: str = Field("ats", description="Optimization type: ats, linkedin, cover_letter")
+   |                                                                                         ^^^^^^^^^^^^^^^ E501
+60 |
+61 | class RealTimeAnalysisRequest(BaseModel):
+   |
+
+realtime_router.py:84:89: E501 Line too long (98 > 88)
+   |
+82 |         job_match = None
+83 |         if request.job_description:
+84 |             job_match = await match_resume_to_job_logic(result["skills"], request.job_description)
+   |                                                                                         ^^^^^^^^^^ E501
+85 |         return {
+86 |             "skills": result["skills"],
+   |
+
+realtime_router.py:94:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   |
+92 |     except Exception as e:
+93 |         logger.error("Error in real-time skills analysis: %s", e)
+94 |         raise HTTPException(status_code=500, detail=f"Skills analysis failed: {str(e)}")
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+95 |
+96 | # ============================================================================
+   |
+
+realtime_router.py:111:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+109 |     except Exception as e:
+110 |         logger.error("Error in real-time job matching: %s", e)
+111 |         raise HTTPException(status_code=500, detail=f"Job matching failed: {str(e)}")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+112 |
+113 | # ============================================================================
+    |
+
+realtime_router.py:117:89: E501 Line too long (128 > 88)
+    |
+115 | # ============================================================================
+116 |
+117 | async def optimize_resume_realtime(resume_data: dict[str, Any], job_description: str, optimization_type: str) -> dict[str, Any]:
+    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+118 |     """Real-time resume optimization with AI"""
+119 |     try:
+    |
+
+realtime_router.py:131:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+129 |     except Exception as e:
+130 |         logger.error("Error in resume optimization: %s", e)
+131 |         raise HTTPException(status_code=500, detail=f"Resume optimization failed: {str(e)}")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+132 |
+133 | async def optimize_for_ats(resume_data: dict[str, Any], job_description: str) -> dict[str, Any]:
+    |
+
+realtime_router.py:131:89: E501 Line too long (92 > 88)
+    |
+129 |     except Exception as e:
+130 |         logger.error("Error in resume optimization: %s", e)
+131 |         raise HTTPException(status_code=500, detail=f"Resume optimization failed: {str(e)}")
+    |                                                                                         ^^^^ E501
+132 |
+133 | async def optimize_for_ats(resume_data: dict[str, Any], job_description: str) -> dict[str, Any]:
+    |
+
+realtime_router.py:133:89: E501 Line too long (96 > 88)
+    |
+131 |         raise HTTPException(status_code=500, detail=f"Resume optimization failed: {str(e)}")
+132 |
+133 | async def optimize_for_ats(resume_data: dict[str, Any], job_description: str) -> dict[str, Any]:
+    |                                                                                         ^^^^^^^^ E501
+134 |     """Optimize resume for ATS systems"""
+135 |     try:
+    |
+
+realtime_router.py:176:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+174 |     except Exception as e:
+175 |         logger.error("Error in ATS optimization: %s", e)
+176 |         raise HTTPException(status_code=500, detail=f"ATS optimization failed: {str(e)}")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+177 |
+178 | async def optimize_for_linkedin_realtime(resume_data: dict[str, Any]) -> dict[str, Any]:
+    |
+
+realtime_router.py:176:89: E501 Line too long (89 > 88)
+    |
+174 |     except Exception as e:
+175 |         logger.error("Error in ATS optimization: %s", e)
+176 |         raise HTTPException(status_code=500, detail=f"ATS optimization failed: {str(e)}")
+    |                                                                                         ^ E501
+177 |
+178 | async def optimize_for_linkedin_realtime(resume_data: dict[str, Any]) -> dict[str, Any]:
+    |
+
+realtime_router.py:207:89: E501 Line too long (123 > 88)
+    |
+205 |         else:
+206 |             linkedin_profile = {
+207 |                 "headline": f"{resume_data.get('title', 'Professional')} | {', '.join(resume_data.get('skills', [])[:3])}",
+    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+208 |                 "summary": f"Experienced professional with expertise in {', '.join(resume_data.get('skills', [])[:5])}",
+209 |                 "experience": resume_data.get('experience', []),
+    |
+
+realtime_router.py:208:89: E501 Line too long (120 > 88)
+    |
+206 |             linkedin_profile = {
+207 |                 "headline": f"{resume_data.get('title', 'Professional')} | {', '.join(resume_data.get('skills', [])[:3])}",
+208 |                 "summary": f"Experienced professional with expertise in {', '.join(resume_data.get('skills', [])[:5])}",
+    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+209 |                 "experience": resume_data.get('experience', []),
+210 |                 "skills": resume_data.get('skills', []),
+    |
+
+realtime_router.py:222:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+220 |     except Exception as e:
+221 |         logger.error("Error in LinkedIn optimization: %s", e)
+222 |         raise HTTPException(status_code=500, detail=f"LinkedIn optimization failed: {str(e)}")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+223 |
+224 | async def generate_cover_letter_realtime(resume_data: dict[str, Any], job_description: str) -> dict[str, Any]:
+    |
+
+realtime_router.py:222:89: E501 Line too long (94 > 88)
+    |
+220 |     except Exception as e:
+221 |         logger.error("Error in LinkedIn optimization: %s", e)
+222 |         raise HTTPException(status_code=500, detail=f"LinkedIn optimization failed: {str(e)}")
+    |                                                                                         ^^^^^^ E501
+223 |
+224 | async def generate_cover_letter_realtime(resume_data: dict[str, Any], job_description: str) -> dict[str, Any]:
+    |
+
+realtime_router.py:224:89: E501 Line too long (110 > 88)
+    |
+222 |         raise HTTPException(status_code=500, detail=f"LinkedIn optimization failed: {str(e)}")
+223 |
+224 | async def generate_cover_letter_realtime(resume_data: dict[str, Any], job_description: str) -> dict[str, Any]:
+    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^ E501
+225 |     """Generate personalized cover letter"""
+226 |     try:
+    |
+
+realtime_router.py:253:89: E501 Line too long (246 > 88)
+    |
+251 | …
+252 | …
+253 | … this position. My background in {', '.join(resume_data.get('skills', [])[:3])} makes me a strong candidate.\n\nSincerely,\n{resume_data.get('name', 'Your Name')}"
+    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+254 | …
+    |
+
+realtime_router.py:264:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+262 |     except Exception as e:
+263 |         logger.error("Error in cover letter generation: %s", e)
+264 |         raise HTTPException(status_code=500, detail=f"Cover letter generation failed: {str(e)}")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+265 |
+266 | # ============================================================================
+    |
+
+realtime_router.py:264:89: E501 Line too long (96 > 88)
+    |
+262 |     except Exception as e:
+263 |         logger.error("Error in cover letter generation: %s", e)
+264 |         raise HTTPException(status_code=500, detail=f"Cover letter generation failed: {str(e)}")
+    |                                                                                         ^^^^^^^^ E501
+265 |
+266 | # ============================================================================
+    |
+
+realtime_router.py:272:89: E501 Line too long (94 > 88)
+    |
+270 | @router.post("/comprehensive-analysis")
+271 | async def comprehensive_analysis(request: RealTimeAnalysisRequest):
+272 |     """Comprehensive real-time analysis (skills, job match, recommendations, market trends)"""
+    |                                                                                         ^^^^^^ E501
+273 |     try:
+274 |         # Analyze job description
+    |
+
+realtime_router.py:277:89: E501 Line too long (105 > 88)
+    |
+275 |         job_analysis = await analyze_job_description_logic(request.content)
+276 |         # Skill recommendations (if user_id or target role is provided)
+277 |         skill_recs = await get_skill_recommendations_logic(job_analysis["skills"], request.analysis_type)
+    |                                                                                         ^^^^^^^^^^^^^^^^^ E501
+278 |         # Market trends
+279 |         market_trends = await analyze_market_trends_logic(job_analysis["skills"])
+    |
+
+realtime_router.py:288:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+286 |     except Exception as e:
+287 |         logger.error("Error in comprehensive analysis: %s", e)
+288 |         raise HTTPException(status_code=500, detail=f"Comprehensive analysis failed: {str(e)}")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+289 |
+290 | # ============================================================================
+    |
+
+realtime_router.py:288:89: E501 Line too long (95 > 88)
+    |
+286 |     except Exception as e:
+287 |         logger.error("Error in comprehensive analysis: %s", e)
+288 |         raise HTTPException(status_code=500, detail=f"Comprehensive analysis failed: {str(e)}")
+    |                                                                                         ^^^^^^^ E501
+289 |
+290 | # ============================================================================
+    |
+
+realtime_router.py:322:89: E501 Line too long (143 > 88)
+    |
+320 | …
+321 | …
+322 | …data": {"message": "Connected. Send your resume/job description for real-time analysis."}})
+    |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+323 | …
+324 | …
+    |
+
+realtime_router.py:330:89: E501 Line too long (127 > 88)
+    |
+328 |                 resume_text = payload.get("resume_text", "")
+329 |                 job_description = payload.get("job_description", "")
+330 |                 await websocket.send_json({"type": "progress", "data": {"message": "Analyzing resume and job description..."}})
+    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+331 |                 resume_skills_result = await analyze_job_description_logic(resume_text)
+332 |                 resume_skills = resume_skills_result["skills"]
+    |
+
+realtime_router.py:337:89: E501 Line too long (107 > 88)
+    |
+335 |             elif msg_type == "skills_analysis":
+336 |                 text = payload.get("text", "")
+337 |                 await websocket.send_json({"type": "progress", "data": {"message": "Analyzing skills..."}})
+    |                                                                                         ^^^^^^^^^^^^^^^^^^^ E501
+338 |                 result = await analyze_job_description_logic(text)
+339 |                 await websocket.send_json({"type": "skills_analysis_result", "data": result})
+    |
+
+realtime_router.py:339:89: E501 Line too long (93 > 88)
+    |
+337 |                 await websocket.send_json({"type": "progress", "data": {"message": "Analyzing skills..."}})
+338 |                 result = await analyze_job_description_logic(text)
+339 |                 await websocket.send_json({"type": "skills_analysis_result", "data": result})
+    |                                                                                         ^^^^^ E501
+340 |             elif msg_type == "skill_recommendations":
+341 |                 skills = payload.get("skills", [])
+    |
+
+realtime_router.py:343:89: E501 Line too long (123 > 88)
+    |
+341 |                 skills = payload.get("skills", [])
+342 |                 target_role = payload.get("target_role", "")
+343 |                 await websocket.send_json({"type": "progress", "data": {"message": "Generating skill recommendations..."}})
+    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+344 |                 recs = await get_skill_recommendations_logic(skills, target_role)
+345 |                 await websocket.send_json({"type": "skill_recommendations_result", "data": recs})
+    |
+
+realtime_router.py:345:89: E501 Line too long (97 > 88)
+    |
+343 |                 await websocket.send_json({"type": "progress", "data": {"message": "Generating skill recommendations..."}})
+344 |                 recs = await get_skill_recommendations_logic(skills, target_role)
+345 |                 await websocket.send_json({"type": "skill_recommendations_result", "data": recs})
+    |                                                                                         ^^^^^^^^^ E501
+346 |             elif msg_type == "market_trends":
+347 |                 skills = payload.get("skills", [])
+    |
+
+realtime_router.py:348:89: E501 Line too long (114 > 88)
+    |
+346 |             elif msg_type == "market_trends":
+347 |                 skills = payload.get("skills", [])
+348 |                 await websocket.send_json({"type": "progress", "data": {"message": "Analyzing market trends..."}})
+    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+349 |                 trends = await analyze_market_trends_logic(skills)
+350 |                 await websocket.send_json({"type": "market_trends_result", "data": trends})
+    |
+
+realtime_router.py:350:89: E501 Line too long (91 > 88)
+    |
+348 |                 await websocket.send_json({"type": "progress", "data": {"message": "Analyzing market trends..."}})
+349 |                 trends = await analyze_market_trends_logic(skills)
+350 |                 await websocket.send_json({"type": "market_trends_result", "data": trends})
+    |                                                                                         ^^^ E501
+351 |             else:
+352 |                 await websocket.send_json({"type": "error", "data": {"message": "Unknown message type."}})
+    |
+
+realtime_router.py:352:89: E501 Line too long (106 > 88)
+    |
+350 |                 await websocket.send_json({"type": "market_trends_result", "data": trends})
+351 |             else:
+352 |                 await websocket.send_json({"type": "error", "data": {"message": "Unknown message type."}})
+    |                                                                                         ^^^^^^^^^^^^^^^^^^ E501
+353 |     except WebSocketDisconnect:
+354 |         logger.info("WebSocket disconnected: %s", user_id)
+    |
+
+resume_parser_custom.py:43:89: E501 Line too long (94 > 88)
+   |
+41 |     for line in lines:
+42 |         lower = line.lower()
+43 |         degree_keywords = ['bca', 'b.tech', 'mca', 'b.sc', 'msc', 'bachelor', 'master', 'phd']
+   |                                                                                         ^^^^^^ E501
+44 |         if any(deg in lower for deg in degree_keywords):
+45 |             degrees.append(line.strip())
+   |
+
+resume_parser_custom.py:56:89: E501 Line too long (90 > 88)
+   |
+54 |     lines = text.split('\n')
+55 |     for line in lines:
+56 |         experience_keywords = ['worked', 'experience', 'company', 'engineer', 'developer']
+   |                                                                                         ^^ E501
+57 |         if any(word in line.lower() for word in experience_keywords):
+58 |             experience.append({
+   |
+
+skills_jobs_router.py:76:89: E501 Line too long (93 > 88)
+   |
+74 |     resume_skills: list[str] = Field(..., description="Skills from resume")
+75 |     job_description: str = Field(..., description="Job description")
+76 |     match_criteria: list[str] = Field(["skills", "experience"], description="Match criteria")
+   |                                                                                         ^^^^^ E501
+77 |
+78 | class MarketAnalysisRequest(BaseModel):
+   |
+
+skills_jobs_router.py:92:89: E501 Line too long (94 > 88)
+   |
+90 | # ============================================================================
+91 |
+92 | async def analyze_skill_market_demand(skill: str, location: str = "global") -> dict[str, Any]:
+   |                                                                                         ^^^^^^ E501
+93 |     """Analyze market demand for a specific skill"""
+94 |     try:
+   |
+
+skills_jobs_router.py:137:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+135 |     except Exception as e:
+136 |         logger.error("Error analyzing skill demand: %s", e)
+137 |         raise HTTPException(status_code=500, detail=f"Skill analysis failed: {str(e)}")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+138 |
+139 | async def get_skill_recommendations(current_skills: list[str], target_role: str) -> dict[str, Any]:
+    |
+
+skills_jobs_router.py:139:89: E501 Line too long (99 > 88)
+    |
+137 |         raise HTTPException(status_code=500, detail=f"Skill analysis failed: {str(e)}")
+138 |
+139 | async def get_skill_recommendations(current_skills: list[str], target_role: str) -> dict[str, Any]:
+    |                                                                                         ^^^^^^^^^^^ E501
+140 |     """Get skill recommendations based on current skills and target role"""
+141 |     try:
+    |
+
+skills_jobs_router.py:186:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+184 |     except Exception as e:
+185 |         logger.error("Error getting skill recommendations: %s", e)
+186 |         raise HTTPException(status_code=500, detail=f"Skill recommendations failed: {str(e)}")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+187 |
+188 | # ============================================================================
+    |
+
+skills_jobs_router.py:186:89: E501 Line too long (94 > 88)
+    |
+184 |     except Exception as e:
+185 |         logger.error("Error getting skill recommendations: %s", e)
+186 |         raise HTTPException(status_code=500, detail=f"Skill recommendations failed: {str(e)}")
+    |                                                                                         ^^^^^^ E501
+187 |
+188 | # ============================================================================
+    |
+
+skills_jobs_router.py:192:89: E501 Line too long (95 > 88)
+    |
+190 | # ============================================================================
+191 |
+192 | async def match_job_realtime(resume_skills: list[str], job_description: str) -> dict[str, Any]:
+    |                                                                                         ^^^^^^^ E501
+193 |     """Real-time job matching with detailed analysis"""
+194 |     try:
+    |
+
+skills_jobs_router.py:252:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+250 |     except Exception as e:
+251 |         logger.error("Error in job matching: %s", e)
+252 |         raise HTTPException(status_code=500, detail=f"Job matching failed: {str(e)}")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+253 |
+254 | def extract_skills_from_job_description(job_description: str) -> list[str]:
+    |
+
+skills_jobs_router.py:273:89: E501 Line too long (95 > 88)
+    |
+271 | # ============================================================================
+272 |
+273 | async def analyze_market_trends(skills: list[str], location: str = "global") -> dict[str, Any]:
+    |                                                                                         ^^^^^^^ E501
+274 |     """Analyze market trends for multiple skills"""
+275 |     try:
+    |
+
+skills_jobs_router.py:317:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+315 |     except Exception as e:
+316 |         logger.error("Error analyzing market trends: %s", e)
+317 |         raise HTTPException(status_code=500, detail=f"Market analysis failed: {str(e)}")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+318 |
+319 | # ============================================================================
+    |
+
+subscription_plans.py:198:89: E501 Line too long (105 > 88)
+    |
+196 |         return False
+197 |     
+198 |     def check_usage_limit(self, user_plan: PlanType, feature: str, current_usage: int) -> dict[str, any]:
+    |                                                                                         ^^^^^^^^^^^^^^^^^ E501
+199 |         """Check if user has exceeded usage limits"""
+200 |         plan = self.get_plan(user_plan)
+    |
+
+subscription_plans.py:273:89: E501 Line too long (89 > 88)
+    |
+271 |         return False
+272 |
+273 | def check_user_usage(user_plan: str, feature: str, current_usage: int) -> dict[str, any]:
+    |                                                                                         ^ E501
+274 |     """Check user usage limits"""
+275 |     try:
+    |
+
+subscription_router.py:111:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+109 |     except Exception as e:
+110 |         logger.error("Error fetching subscription plans: %s", e)
+111 |         raise HTTPException(status_code=500, detail="Failed to fetch subscription plans")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+112 |
+113 | @router.get("/plans/{plan_id}", response_model=PlanResponse)
+    |
+
+subscription_router.py:111:89: E501 Line too long (89 > 88)
+    |
+109 |     except Exception as e:
+110 |         logger.error("Error fetching subscription plans: %s", e)
+111 |         raise HTTPException(status_code=500, detail="Failed to fetch subscription plans")
+    |                                                                                         ^ E501
+112 |
+113 | @router.get("/plans/{plan_id}", response_model=PlanResponse)
+    |
+
+subscription_router.py:151:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+149 |     except Exception as e:
+150 |         logger.error("Error fetching plan %s: %s", plan_id, e)
+151 |         raise HTTPException(status_code=500, detail="Failed to fetch plan")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+152 |
+153 | @router.post("/check-usage", response_model=UsageCheckResponse)
+    |
+
+subscription_router.py:157:89: E501 Line too long (96 > 88)
+    |
+155 |     """Check if user has exceeded usage limits for a feature"""
+156 |     try:
+157 |         usage_info = check_user_usage(request.user_plan, request.feature, request.current_usage)
+    |                                                                                         ^^^^^^^^ E501
+158 |         plan = get_plan_by_id(request.user_plan)
+159 |         plan_name = plan.name if plan else "Unknown"
+    |
+
+subscription_router.py:171:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+169 |     except Exception as e:
+170 |         logger.error("Error checking usage limits: %s", e)
+171 |         raise HTTPException(status_code=500, detail="Failed to check usage limits")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+172 |
+173 | @router.post("/check-access", response_model=FeatureAccessResponse)
+    |
+
+subscription_router.py:189:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+187 |     except Exception as e:
+188 |         logger.error("Error checking feature access: %s", e)
+189 |         raise HTTPException(status_code=500, detail="Failed to check feature access")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+190 |
+191 | @router.get("/comparison", response_model=PlansComparisonResponse)
+    |
+
+subscription_router.py:202:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+200 |     except Exception as e:
+201 |         logger.error("Error generating plan comparison: %s", e)
+202 |         raise HTTPException(status_code=500, detail="Failed to generate plan comparison")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+203 |
+204 | @router.get("/features")
+    |
+
+subscription_router.py:202:89: E501 Line too long (89 > 88)
+    |
+200 |     except Exception as e:
+201 |         logger.error("Error generating plan comparison: %s", e)
+202 |         raise HTTPException(status_code=500, detail="Failed to generate plan comparison")
+    |                                                                                         ^ E501
+203 |
+204 | @router.get("/features")
+    |
+
+subscription_router.py:222:9: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    |
+220 |     except Exception as e:
+221 |         logger.error("Error fetching features: %s", e)
+222 |         raise HTTPException(status_code=500, detail="Failed to fetch features")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ B904
+223 |
+224 | @router.get("/health")
+    |
+
+utils.py:202:89: E501 Line too long (90 > 88)
+    |
+200 |         'summary': enhance_summary(resume_data, job_description),
+201 |         'skills': enhance_skills(resume_data.get('skills', []), job_skills),
+202 |         'experience': enhance_experience(resume_data.get('experience', []), job_keywords),
+    |                                                                                         ^^ E501
+203 |         'education': resume_data.get('education', []),
+204 |         'certifications': resume_data.get('certifications', []),
+    |
+
+utils.py:265:89: E501 Line too long (91 > 88)
+    |
+264 |     # Start with a strong opening
+265 |     summary = f"Results-driven professional with expertise in {', '.join(skills[:5])}.\n\n"
+    |                                                                                         ^^^ E501
+266 |     
+267 |     # Add key achievements
+    |
+
+utils.py:403:89: E501 Line too long (91 > 88)
+    |
+401 |     experience = resume_data.get('experience', [])
+402 |     
+403 |     summary = f"Results-driven professional with expertise in {', '.join(skills[:5])}.\n\n"
+    |                                                                                         ^^^ E501
+404 |     
+405 |     if experience:
+    |
+
+utils.py:472:89: E501 Line too long (198 > 88)
+    |
+470 | …
+471 | …
+472 | …, 'this professional')} and can attest to their exceptional skills in {', '.join(resume_data.get('skills', [])[:3])}."
+    |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+473 | …
+474 | …
+    |
+
+utils.py:476:89: E501 Line too long (176 > 88)
+    |
+474 | …
+475 | …
+476 | …')} is an outstanding team player with strong expertise in {', '.join(resume_data.get('skills', [])[:3])}."
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+477 | …
+478 | …
+    |
+
+utils.py:480:89: E501 Line too long (192 > 88)
+    |
+478 | …
+479 | …
+480 | …sional')} and was impressed by their ability to deliver results in {', '.join(resume_data.get('skills', [])[:3])}."
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+481 | …
+482 | …
+    |
+
+utils.py:506:89: E501 Line too long (120 > 88)
+    |
+504 | # --- Example usage ---
+505 | if __name__ == "__main__":
+506 |     # This part is for demonstration only — in Flask, you'd call parse_resume_with_job_matching from your route handler.
+    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+507 |     class DummyFileStorage:
+508 |         """Simulate Flask's FileStorage for testing with local files."""
+    |
+
+voice_assistant.py:9:1: SyntaxError: Expected a statement
+   |
+ 7 | except ImportError:
+ 8 |     detect = None
+ 9 | <<<<<<< Updated upstream
+   | ^
+10 | from typing import Optional
+11 | import openai
+   |
+
+voice_assistant.py:9:3: SyntaxError: Expected a statement
+   |
+ 7 | except ImportError:
+ 8 |     detect = None
+ 9 | <<<<<<< Updated upstream
+   |   ^
+10 | from typing import Optional
+11 | import openai
+   |
+
+voice_assistant.py:9:5: SyntaxError: Expected a statement
+   |
+ 7 | except ImportError:
+ 8 |     detect = None
+ 9 | <<<<<<< Updated upstream
+   |     ^
+10 | from typing import Optional
+11 | import openai
+   |
+
+voice_assistant.py:9:7: SyntaxError: Expected a statement
+   |
+ 7 | except ImportError:
+ 8 |     detect = None
+ 9 | <<<<<<< Updated upstream
+   |       ^
+10 | from typing import Optional
+11 | import openai
+   |
+
+voice_assistant.py:9:17: SyntaxError: Simple statements must be separated by newlines or semicolons
+   |
+ 7 | except ImportError:
+ 8 |     detect = None
+ 9 | <<<<<<< Updated upstream
+   |                 ^
+10 | from typing import Optional
+11 | import openai
+   |
+
+voice_assistant.py:12:1: SyntaxError: Expected a statement
+   |
+10 | from typing import Optional
+11 | import openai
+12 | =======
+   | ^
+13 | >>>>>>> Stashed changes
+14 | import os
+   |
+
+voice_assistant.py:12:3: SyntaxError: Expected a statement
+   |
+10 | from typing import Optional
+11 | import openai
+12 | =======
+   |   ^
+13 | >>>>>>> Stashed changes
+14 | import os
+   |
+
+voice_assistant.py:12:5: SyntaxError: Expected a statement
+   |
+10 | from typing import Optional
+11 | import openai
+12 | =======
+   |     ^
+13 | >>>>>>> Stashed changes
+14 | import os
+   |
+
+voice_assistant.py:12:7: SyntaxError: Expected a statement
+   |
+10 | from typing import Optional
+11 | import openai
+12 | =======
+   |       ^
+13 | >>>>>>> Stashed changes
+14 | import os
+   |
+
+voice_assistant.py:12:8: SyntaxError: Expected a statement
+   |
+10 | from typing import Optional
+11 | import openai
+12 | =======
+   |        ^
+13 | >>>>>>> Stashed changes
+14 | import os
+   |
+
+voice_assistant.py:13:1: SyntaxError: Expected a statement
+   |
+11 | import openai
+12 | =======
+13 | >>>>>>> Stashed changes
+   | ^
+14 | import os
+   |
+
+voice_assistant.py:13:3: SyntaxError: Expected a statement
+   |
+11 | import openai
+12 | =======
+13 | >>>>>>> Stashed changes
+   |   ^
+14 | import os
+   |
+
+voice_assistant.py:13:5: SyntaxError: Expected a statement
+   |
+11 | import openai
+12 | =======
+13 | >>>>>>> Stashed changes
+   |     ^
+14 | import os
+   |
+
+voice_assistant.py:13:7: SyntaxError: Expected a statement
+   |
+11 | import openai
+12 | =======
+13 | >>>>>>> Stashed changes
+   |       ^
+14 | import os
+   |
+
+voice_assistant.py:13:17: SyntaxError: Simple statements must be separated by newlines or semicolons
+   |
+11 | import openai
+12 | =======
+13 | >>>>>>> Stashed changes
+   |                 ^
+14 | import os
+   |
+
+voice_assistant.py:48:89: E501 Line too long (94 > 88)
+   |
+46 | ASSISTANT_PERSONALITIES = {
+47 |     "Pandu": {
+48 |         "personality": "Friendly and helpful assistant who loves to chat and help with tasks",
+   |                                                                                         ^^^^^^ E501
+49 |         "greetings": {
+50 |             "en": "Hello! I'm Pandu, your friendly AI assistant. How can I help you today?",
+   |
+
+voice_assistant.py:50:89: E501 Line too long (92 > 88)
+   |
+48 |         "personality": "Friendly and helpful assistant who loves to chat and help with tasks",
+49 |         "greetings": {
+50 |             "en": "Hello! I'm Pandu, your friendly AI assistant. How can I help you today?",
+   |                                                                                         ^^^^ E501
+51 |             "hi": "Namaste! Main Pandu hun, aapka dostana AI sahayak. Aaj main aapki kya madad kar sakta hun?",
+52 |             "te": "Namaskaram! Nenu Pandu, mee snehapoorvaka AI sahayakudu. Eeroju nenu meeku ela sahayam cheyagalanu?",
+   |
+
+voice_assistant.py:51:89: E501 Line too long (111 > 88)
+   |
+49 |         "greetings": {
+50 |             "en": "Hello! I'm Pandu, your friendly AI assistant. How can I help you today?",
+51 |             "hi": "Namaste! Main Pandu hun, aapka dostana AI sahayak. Aaj main aapki kya madad kar sakta hun?",
+   |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^ E501
+52 |             "te": "Namaskaram! Nenu Pandu, mee snehapoorvaka AI sahayakudu. Eeroju nenu meeku ela sahayam cheyagalanu?",
+53 |             "es": "¡Hola! Soy Pandu, tu asistente de IA amigable. ¿Cómo puedo ayudarte hoy?",
+   |
+
+voice_assistant.py:52:89: E501 Line too long (120 > 88)
+   |
+50 |             "en": "Hello! I'm Pandu, your friendly AI assistant. How can I help you today?",
+51 |             "hi": "Namaste! Main Pandu hun, aapka dostana AI sahayak. Aaj main aapki kya madad kar sakta hun?",
+52 |             "te": "Namaskaram! Nenu Pandu, mee snehapoorvaka AI sahayakudu. Eeroju nenu meeku ela sahayam cheyagalanu?",
+   |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+53 |             "es": "¡Hola! Soy Pandu, tu asistente de IA amigable. ¿Cómo puedo ayudarte hoy?",
+54 |             "fr": "Bonjour! Je suis Pandu, votre assistant IA amical. Comment puis-je vous aider aujourd'hui?",
+   |
+
+voice_assistant.py:53:89: E501 Line too long (93 > 88)
+   |
+51 |             "hi": "Namaste! Main Pandu hun, aapka dostana AI sahayak. Aaj main aapki kya madad kar sakta hun?",
+52 |             "te": "Namaskaram! Nenu Pandu, mee snehapoorvaka AI sahayakudu. Eeroju nenu meeku ela sahayam cheyagalanu?",
+53 |             "es": "¡Hola! Soy Pandu, tu asistente de IA amigable. ¿Cómo puedo ayudarte hoy?",
+   |                                                                                         ^^^^^ E501
+54 |             "fr": "Bonjour! Je suis Pandu, votre assistant IA amical. Comment puis-je vous aider aujourd'hui?",
+55 |             "de": "Hallo! Ich bin Pandu, Ihr freundlicher KI-Assistent. Wie kann ich Ihnen heute helfen?",
+   |
+
+voice_assistant.py:54:89: E501 Line too long (111 > 88)
+   |
+52 | …     "te": "Namaskaram! Nenu Pandu, mee snehapoorvaka AI sahayakudu. Eeroju nenu meeku ela sahayam cheyagalanu?",
+53 | …     "es": "¡Hola! Soy Pandu, tu asistente de IA amigable. ¿Cómo puedo ayudarte hoy?",
+54 | …     "fr": "Bonjour! Je suis Pandu, votre assistant IA amical. Comment puis-je vous aider aujourd'hui?",
+   |                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^ E501
+55 | …     "de": "Hallo! Ich bin Pandu, Ihr freundlicher KI-Assistent. Wie kann ich Ihnen heute helfen?",
+56 | …     "ja": "こんにちは！私はパンドゥ、あなたの親しみやすいAIアシスタントです。今日はどのようにお手伝いできますか？",
+   |
+
+voice_assistant.py:55:89: E501 Line too long (106 > 88)
+   |
+53 | …     "es": "¡Hola! Soy Pandu, tu asistente de IA amigable. ¿Cómo puedo ayudarte hoy?",
+54 | …     "fr": "Bonjour! Je suis Pandu, votre assistant IA amical. Comment puis-je vous aider aujourd'hui?",
+55 | …     "de": "Hallo! Ich bin Pandu, Ihr freundlicher KI-Assistent. Wie kann ich Ihnen heute helfen?",
+   |                                                                                   ^^^^^^^^^^^^^^^^^^ E501
+56 | …     "ja": "こんにちは！私はパンドゥ、あなたの親しみやすいAIアシスタントです。今日はどのようにお手伝いできますか？",
+57 | …     "ko": "안녕하세요! 저는 판두, 여러분의 친근한 AI 어시스턴트입니다. 오늘 어떻게 도와드릴까요?",
+   |
+
+voice_assistant.py:56:56: E501 Line too long (123 > 88)
+   |
+54 | …     "fr": "Bonjour! Je suis Pandu, votre assistant IA amical. Comment puis-je vous aider aujourd'hui?",
+55 | …     "de": "Hallo! Ich bin Pandu, Ihr freundlicher KI-Assistent. Wie kann ich Ihnen heute helfen?",
+56 | …     "ja": "こんにちは！私はパンドゥ、あなたの親しみやすいAIアシスタントです。今日はどのようにお手伝いできますか？",
+   |                                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+57 | …     "ko": "안녕하세요! 저는 판두, 여러분의 친근한 AI 어시스턴트입니다. 오늘 어떻게 도와드릴까요?",
+58 | …     "zh": "你好！我是潘杜，您友好的AI助手。今天我能为您做些什么？"
+   |
+
+voice_assistant.py:57:61: E501 Line too long (106 > 88)
+   |
+55 | …         "de": "Hallo! Ich bin Pandu, Ihr freundlicher KI-Assistent. Wie kann ich Ihnen heute helfen?",
+56 | …         "ja": "こんにちは！私はパンドゥ、あなたの親しみやすいAIアシスタントです。今日はどのようにお手伝いできますか？",
+57 | …         "ko": "안녕하세요! 저는 판두, 여러분의 친근한 AI 어시스턴트입니다. 오늘 어떻게 도와드릴까요?",
+   |                                                                                       ^^^^^^^^^^^^^^^^^^ E501
+58 | …         "zh": "你好！我是潘杜，您友好的AI助手。今天我能为您做些什么？"
+59 | …     }
+   |
+
+voice_assistant.py:64:89: E501 Line too long (98 > 88)
+   |
+62 |         "personality": "Wise and caring grandmother figure who gives thoughtful advice",
+63 |         "greetings": {
+64 |             "en": "Hello dear! I'm Gammy, and I'm here to take care of you. What's on your mind?",
+   |                                                                                         ^^^^^^^^^^ E501
+65 |             "hi": "Namaste pyare! Main Gammy hun, aur main aapki dekhbhal karne ke liye yahan hun. Aapke man mein kya hai?",
+66 |             "te": "Namaskaram priyamaina! Nenu Gammy, mariyu nenu mee jagratta teesukovadaniki ikkada unnanu. Mee manasulo emi undi?",
+   |
+
+voice_assistant.py:65:89: E501 Line too long (124 > 88)
+   |
+63 |         "greetings": {
+64 |             "en": "Hello dear! I'm Gammy, and I'm here to take care of you. What's on your mind?",
+65 |             "hi": "Namaste pyare! Main Gammy hun, aur main aapki dekhbhal karne ke liye yahan hun. Aapke man mein kya hai?",
+   |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+66 |             "te": "Namaskaram priyamaina! Nenu Gammy, mariyu nenu mee jagratta teesukovadaniki ikkada unnanu. Mee manasulo emi undi?",
+67 |             "es": "¡Hola querido! Soy Gammy, y estoy aquí para cuidarte. ¿Qué tienes en mente?",
+   |
+
+voice_assistant.py:66:89: E501 Line too long (134 > 88)
+   |
+64 |             "en": "Hello dear! I'm Gammy, and I'm here to take care of you. What's on your mind?",
+65 |             "hi": "Namaste pyare! Main Gammy hun, aur main aapki dekhbhal karne ke liye yahan hun. Aapke man mein kya hai?",
+66 |             "te": "Namaskaram priyamaina! Nenu Gammy, mariyu nenu mee jagratta teesukovadaniki ikkada unnanu. Mee manasulo emi undi?",
+   |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+67 |             "es": "¡Hola querido! Soy Gammy, y estoy aquí para cuidarte. ¿Qué tienes en mente?",
+68 |             "fr": "Bonjour mon cher! Je suis Gammy, et je suis ici pour prendre soin de vous. Qu'est-ce qui vous préoccupe?",
+   |
+
+voice_assistant.py:67:89: E501 Line too long (96 > 88)
+   |
+65 |             "hi": "Namaste pyare! Main Gammy hun, aur main aapki dekhbhal karne ke liye yahan hun. Aapke man mein kya hai?",
+66 |             "te": "Namaskaram priyamaina! Nenu Gammy, mariyu nenu mee jagratta teesukovadaniki ikkada unnanu. Mee manasulo emi undi?",
+67 |             "es": "¡Hola querido! Soy Gammy, y estoy aquí para cuidarte. ¿Qué tienes en mente?",
+   |                                                                                         ^^^^^^^^ E501
+68 |             "fr": "Bonjour mon cher! Je suis Gammy, et je suis ici pour prendre soin de vous. Qu'est-ce qui vous préoccupe?",
+69 |             "de": "Hallo Liebling! Ich bin Gammy, und ich bin hier, um mich um Sie zu kümmern. Was beschäftigt Sie?",
+   |
+
+voice_assistant.py:68:89: E501 Line too long (125 > 88)
+   |
+66 | …     "te": "Namaskaram priyamaina! Nenu Gammy, mariyu nenu mee jagratta teesukovadaniki ikkada unnanu. Mee manasulo emi undi?",
+67 | …     "es": "¡Hola querido! Soy Gammy, y estoy aquí para cuidarte. ¿Qué tienes en mente?",
+68 | …     "fr": "Bonjour mon cher! Je suis Gammy, et je suis ici pour prendre soin de vous. Qu'est-ce qui vous préoccupe?",
+   |                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+69 | …     "de": "Hallo Liebling! Ich bin Gammy, und ich bin hier, um mich um Sie zu kümmern. Was beschäftigt Sie?",
+70 | …     "ja": "こんにちは！私はガミーです。あなたのお世話をするためにここにいます。何か心配事がありますか？",
+   |
+
+voice_assistant.py:69:89: E501 Line too long (117 > 88)
+   |
+67 | …     "es": "¡Hola querido! Soy Gammy, y estoy aquí para cuidarte. ¿Qué tienes en mente?",
+68 | …     "fr": "Bonjour mon cher! Je suis Gammy, et je suis ici pour prendre soin de vous. Qu'est-ce qui vous préoccupe?",
+69 | …     "de": "Hallo Liebling! Ich bin Gammy, und ich bin hier, um mich um Sie zu kümmern. Was beschäftigt Sie?",
+   |                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+70 | …     "ja": "こんにちは！私はガミーです。あなたのお世話をするためにここにいます。何か心配事がありますか？",
+71 | …     "ko": "안녕하세요! 저는 가미입니다. 여러분을 돌보기 위해 여기 있습니다. 무엇이 마음에 걸리시나요?",
+   |
+
+voice_assistant.py:70:55: E501 Line too long (113 > 88)
+   |
+68 | …     "fr": "Bonjour mon cher! Je suis Gammy, et je suis ici pour prendre soin de vous. Qu'est-ce qui vous préoccupe?",
+69 | …     "de": "Hallo Liebling! Ich bin Gammy, und ich bin hier, um mich um Sie zu kümmern. Was beschäftigt Sie?",
+70 | …     "ja": "こんにちは！私はガミーです。あなたのお世話をするためにここにいます。何か心配事がありますか？",
+   |                                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^ E501
+71 | …     "ko": "안녕하세요! 저는 가미입니다. 여러분을 돌보기 위해 여기 있습니다. 무엇이 마음에 걸리시나요?",
+72 | …     "zh": "你好亲爱的！我是加米，我在这里照顾您。您在想什么？"
+   |
+
+voice_assistant.py:71:60: E501 Line too long (111 > 88)
+   |
+69 | …         "de": "Hallo Liebling! Ich bin Gammy, und ich bin hier, um mich um Sie zu kümmern. Was beschäftigt Sie?",
+70 | …         "ja": "こんにちは！私はガミーです。あなたのお世話をするためにここにいます。何か心配事がありますか？",
+71 | …         "ko": "안녕하세요! 저는 가미입니다. 여러분을 돌보기 위해 여기 있습니다. 무엇이 마음에 걸리시나요?",
+   |                                                                                       ^^^^^^^^^^^^^^^^^^^^^^^ E501
+72 | …         "zh": "你好亲爱的！我是加米，我在这里照顾您。您在想什么？"
+73 | …     }
+   |
+
+voice_assistant.py:76:89: E501 Line too long (96 > 88)
+   |
+74 |     },
+75 |     "Alex": {
+76 |         "personality": "Professional and efficient assistant focused on productivity and tasks",
+   |                                                                                         ^^^^^^^^ E501
+77 |         "greetings": {
+78 |             "en": "Hello! I'm Alex, your productivity assistant. How can I help you accomplish your goals today?",
+   |
+
+voice_assistant.py:78:89: E501 Line too long (114 > 88)
+   |
+76 | …     "personality": "Professional and efficient assistant focused on productivity and tasks",
+77 | …     "greetings": {
+78 | …         "en": "Hello! I'm Alex, your productivity assistant. How can I help you accomplish your goals today?",
+   |                                                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+79 | …         "hi": "Namaste! Main Alex hun, aapka utpadakta sahayak. Aaj main aapke lakshyon ko prapt karne mein kya madad kar sakta hun?…
+80 | …         "te": "Namaskaram! Nenu Alex, mee utpadakata sahayakudu. Eeroju mee lakshyalaanu saadhinchadanki nenu ela sahayam cheyagalan…
+   |
+
+voice_assistant.py:79:89: E501 Line too long (138 > 88)
+   |
+77 | …
+78 | …vity assistant. How can I help you accomplish your goals today?",
+79 | …utpadakta sahayak. Aaj main aapke lakshyon ko prapt karne mein kya madad kar sakta hun?",
+   |                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+80 | …adakata sahayakudu. Eeroju mee lakshyalaanu saadhinchadanki nenu ela sahayam cheyagalanu?",
+81 | …de productividad. ¿Cómo puedo ayudarte a alcanzar tus objetivos hoy?",
+   |
+
+voice_assistant.py:80:89: E501 Line too long (140 > 88)
+   |
+78 | …ity assistant. How can I help you accomplish your goals today?",
+79 | …tpadakta sahayak. Aaj main aapke lakshyon ko prapt karne mein kya madad kar sakta hun?",
+80 | …dakata sahayakudu. Eeroju mee lakshyalaanu saadhinchadanki nenu ela sahayam cheyagalanu?",
+   |                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+81 | …e productividad. ¿Cómo puedo ayudarte a alcanzar tus objetivos hoy?",
+82 | …sistant de productivité. Comment puis-je vous aider à atteindre vos objectifs aujourd'hui?",
+   |
+
+voice_assistant.py:81:89: E501 Line too long (119 > 88)
+   |
+79 | …     "hi": "Namaste! Main Alex hun, aapka utpadakta sahayak. Aaj main aapke lakshyon ko prapt karne mein kya madad kar sakta hun?",
+80 | …     "te": "Namaskaram! Nenu Alex, mee utpadakata sahayakudu. Eeroju mee lakshyalaanu saadhinchadanki nenu ela sahayam cheyagalanu?",
+81 | …     "es": "¡Hola! Soy Alex, tu asistente de productividad. ¿Cómo puedo ayudarte a alcanzar tus objetivos hoy?",
+   |                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+82 | …     "fr": "Bonjour! Je suis Alex, votre assistant de productivité. Comment puis-je vous aider à atteindre vos objectifs aujourd'hui?…
+83 | …     "de": "Hallo! Ich bin Alex, Ihr Produktivitätsassistent. Wie kann ich Ihnen heute dabei helfen, Ihre Ziele zu erreichen?",
+   |
+
+voice_assistant.py:82:89: E501 Line too long (142 > 88)
+   |
+80 | …akata sahayakudu. Eeroju mee lakshyalaanu saadhinchadanki nenu ela sahayam cheyagalanu?",
+81 | … productividad. ¿Cómo puedo ayudarte a alcanzar tus objetivos hoy?",
+82 | …istant de productivité. Comment puis-je vous aider à atteindre vos objectifs aujourd'hui?",
+   |                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+83 | …ivitätsassistent. Wie kann ich Ihnen heute dabei helfen, Ihre Ziele zu erreichen?",
+84 | …はどのように目標達成をお手伝いできますか？",
+   |
+
+voice_assistant.py:83:89: E501 Line too long (134 > 88)
+   |
+81 | …e de productividad. ¿Cómo puedo ayudarte a alcanzar tus objetivos hoy?",
+82 | … assistant de productivité. Comment puis-je vous aider à atteindre vos objectifs aujourd'hui?",
+83 | …duktivitätsassistent. Wie kann ich Ihnen heute dabei helfen, Ihre Ziele zu erreichen?",
+   |                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+84 | …す。今日はどのように目標達成をお手伝いできますか？",
+85 | …트입니다. 오늘 목표 달성에 어떻게 도와드릴까요?",
+   |
+
+voice_assistant.py:84:55: E501 Line too long (127 > 88)
+   |
+82 | …     "fr": "Bonjour! Je suis Alex, votre assistant de productivité. Comment puis-je vous aider à atteindre vos objectifs aujourd'hui?…
+83 | …     "de": "Hallo! Ich bin Alex, Ihr Produktivitätsassistent. Wie kann ich Ihnen heute dabei helfen, Ihre Ziele zu erreichen?",
+84 | …     "ja": "こんにちは！私はアレックス、あなたの生産性アシスタントです。今日はどのように目標達成をお手伝いできますか？",
+   |                                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+85 | …     "ko": "안녕하세요! 저는 알렉스, 여러분의 생산성 어시스턴트입니다. 오늘 목표 달성에 어떻게 도와드릴까요?",
+86 | …     "zh": "你好！我是亚历克斯，您的生产力助手。今天我能如何帮助您实现目标？"
+   |
+
+voice_assistant.py:85:60: E501 Line too long (117 > 88)
+   |
+83 | …         "de": "Hallo! Ich bin Alex, Ihr Produktivitätsassistent. Wie kann ich Ihnen heute dabei helfen, Ihre Ziele zu erreichen?",
+84 | …         "ja": "こんにちは！私はアレックス、あなたの生産性アシスタントです。今日はどのように目標達成をお手伝いできますか？",
+85 | …         "ko": "안녕하세요! 저는 알렉스, 여러분의 생산성 어시스턴트입니다. 오늘 목표 달성에 어떻게 도와드릴까요?",
+   |                                                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+86 | …         "zh": "你好！我是亚历克斯，您的生产力助手。今天我能如何帮助您实现目标？"
+87 | …     }
+   |
+
+voice_assistant.py:110:89: E501 Line too long (93 > 88)
+    |
+109 |             prompt = (
+110 |                 f"You are {assistant_name}, an AI assistant with the following personality: "
+    |                                                                                         ^^^^^ E501
+111 |                 f"{personality['personality']}\n\n"
+112 |                 f"User message: {user_input}\n\n"
+    |
+
+voice_assistant.py:113:89: E501 Line too long (91 > 88)
+    |
+111 |                 f"{personality['personality']}\n\n"
+112 |                 f"User message: {user_input}\n\n"
+113 |                 f"Please respond in a helpful, natural way that matches your personality. "
+    |                                                                                         ^^^ E501
+114 |                 f"Keep responses concise but friendly. "
+115 |                 f"If the user is greeting you, respond warmly. "
+    |
+
+voice_assistant.py:158:89: E501 Line too long (90 > 88)
+    |
+156 |     # Default response
+157 |     responses = {
+158 |         "en": f"I'm {assistant_name}, and I'm here to help! What would you like to know?",
+    |                                                                                         ^^ E501
+159 |         "hi": f"Main {assistant_name} hun, aur main madad karne ke liye yahan hun! Aap kya janna chahte hain?",
+160 |         "te": f"Nenu {assistant_name}, mariyu nenu sahayam cheyadanki ikkada unnanu! Meeru emi telusukovalani korutunnaru?",
+    |
+
+voice_assistant.py:159:89: E501 Line too long (111 > 88)
+    |
+157 |     responses = {
+158 |         "en": f"I'm {assistant_name}, and I'm here to help! What would you like to know?",
+159 |         "hi": f"Main {assistant_name} hun, aur main madad karne ke liye yahan hun! Aap kya janna chahte hain?",
+    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^ E501
+160 |         "te": f"Nenu {assistant_name}, mariyu nenu sahayam cheyadanki ikkada unnanu! Meeru emi telusukovalani korutunnaru?",
+161 |         "es": f"¡Soy {assistant_name}, y estoy aquí para ayudar! ¿Qué te gustaría saber?",
+    |
+
+voice_assistant.py:160:89: E501 Line too long (124 > 88)
+    |
+158 |         "en": f"I'm {assistant_name}, and I'm here to help! What would you like to know?",
+159 |         "hi": f"Main {assistant_name} hun, aur main madad karne ke liye yahan hun! Aap kya janna chahte hain?",
+160 |         "te": f"Nenu {assistant_name}, mariyu nenu sahayam cheyadanki ikkada unnanu! Meeru emi telusukovalani korutunnaru?",
+    |                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ E501
+161 |         "es": f"¡Soy {assistant_name}, y estoy aquí para ayudar! ¿Qué te gustaría saber?",
+162 |         "fr": f"Je suis {assistant_name}, et je suis ici pour vous aider ! Que souhaitez-vous savoir ?",
+    |
+
+voice_assistant.py:161:89: E501 Line too long (90 > 88)
+    |
+159 |         "hi": f"Main {assistant_name} hun, aur main madad karne ke liye yahan hun! Aap kya janna chahte hain?",
+160 |         "te": f"Nenu {assistant_name}, mariyu nenu sahayam cheyadanki ikkada unnanu! Meeru emi telusukovalani korutunnaru?",
+161 |         "es": f"¡Soy {assistant_name}, y estoy aquí para ayudar! ¿Qué te gustaría saber?",
+    |                                                                                         ^^ E501
+162 |         "fr": f"Je suis {assistant_name}, et je suis ici pour vous aider ! Que souhaitez-vous savoir ?",
+163 |         "de": f"Ich bin {assistant_name}, und ich bin hier, um zu helfen! Was möchten Sie wissen?",
+    |
+
+voice_assistant.py:162:89: E501 Line too long (104 > 88)
+    |
+160 |         "te": f"Nenu {assistant_name}, mariyu nenu sahayam cheyadanki ikkada unnanu! Meeru emi telusukovalani korutunnaru?",
+161 |         "es": f"¡Soy {assistant_name}, y estoy aquí para ayudar! ¿Qué te gustaría saber?",
+162 |         "fr": f"Je suis {assistant_name}, et je suis ici pour vous aider ! Que souhaitez-vous savoir ?",
+    |                                                                                         ^^^^^^^^^^^^^^^^ E501
+163 |         "de": f"Ich bin {assistant_name}, und ich bin hier, um zu helfen! Was möchten Sie wissen?",
+164 |         "ja": f"私は{assistant_name}です。お手伝いするためにここにいます！何を知りたいですか？",
+    |
+
+voice_assistant.py:163:89: E501 Line too long (99 > 88)
+    |
+161 |         "es": f"¡Soy {assistant_name}, y estoy aquí para ayudar! ¿Qué te gustaría saber?",
+162 |         "fr": f"Je suis {assistant_name}, et je suis ici pour vous aider ! Que souhaitez-vous savoir ?",
+163 |         "de": f"Ich bin {assistant_name}, und ich bin hier, um zu helfen! Was möchten Sie wissen?",
+    |                                                                                         ^^^^^^^^^^^ E501
+164 |         "ja": f"私は{assistant_name}です。お手伝いするためにここにいます！何を知りたいですか？",
+165 |         "ko": f"저는 {assistant_name}입니다. 도움을 드리기 위해 여기 있습니다! 무엇을 알고 싶으신가요?",
+    |
+
+voice_assistant.py:164:61: E501 Line too long (96 > 88)
+    |
+162 |         "fr": f"Je suis {assistant_name}, et je suis ici pour vous aider ! Que souhaitez-vous savoir ?",
+163 |         "de": f"Ich bin {assistant_name}, und ich bin hier, um zu helfen! Was möchten Sie wissen?",
+164 |         "ja": f"私は{assistant_name}です。お手伝いするためにここにいます！何を知りたいですか？",
+    |                                                                                         ^^^^^^^^ E501
+165 |         "ko": f"저는 {assistant_name}입니다. 도움을 드리기 위해 여기 있습니다! 무엇을 알고 싶으신가요?",
+166 |         "zh": f"我是{assistant_name}，我在这里帮助您！您想了解什么？"
+    |
+
+voice_assistant.py:165:66: E501 Line too long (104 > 88)
+    |
+163 |         "de": f"Ich bin {assistant_name}, und ich bin hier, um zu helfen! Was möchten Sie wissen?",
+164 |         "ja": f"私は{assistant_name}です。お手伝いするためにここにいます！何を知りたいですか？",
+165 |         "ko": f"저는 {assistant_name}입니다. 도움을 드리기 위해 여기 있습니다! 무엇을 알고 싶으신가요?",
+    |                                                                                         ^^^^^^^^^^^^^^^^ E501
+166 |         "zh": f"我是{assistant_name}，我在这里帮助您！您想了解什么？"
+167 |     }
+    |
+
+voice_assistant.py:253:89: E501 Line too long (89 > 88)
+    |
+251 |         }
+252 |     except Exception as e:
+253 |         raise HTTPException(status_code=500, detail=f"Error generating speech: {str(e)}")
+    |                                                                                         ^ E501
+254 |
+255 | # Include the router in main.py
+    |
+
+Found 185 errors.

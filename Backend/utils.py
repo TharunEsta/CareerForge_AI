@@ -1,11 +1,11 @@
-import re
-import docx2txt
-import spacy
-import pdfplumber
-from spacy.matcher import Matcher
-import tempfile
 import os
-from typing import Dict, List
+import re
+import tempfile
+
+import docx2txt
+import pdfplumber
+import spacy
+from spacy.matcher import Matcher
 
 # Load spaCy model once
 nlp = spacy.load("en_core_web_sm")
@@ -131,7 +131,7 @@ def extract_total_experience(text):
 
 # --- Job Matching Functions ---
 
-def extract_skills_from_job_description(job_description: str) -> List[str]:
+def extract_skills_from_job_description(job_description: str) -> list[str]:
     """Extract relevant skills from job description."""
     # Common technical skills to look for
     technical_skills = [
@@ -207,7 +207,7 @@ def rewrite_resume(resume_data: dict, job_description: str) -> dict:
     
     return enhanced_resume
 
-def extract_keywords(text: str) -> List[str]:
+def extract_keywords(text: str) -> list[str]:
     """Extract important keywords from text."""
     doc = nlp(text)
     keywords = []
@@ -278,7 +278,7 @@ def enhance_summary(resume_data: dict, job_description: str) -> str:
     
     return summary
 
-def enhance_skills(skills: List[str], job_skills: List[str]) -> List[str]:
+def enhance_skills(skills: list[str], job_skills: list[str]) -> list[str]:
     """Enhance skills section for better ATS score."""
     enhanced_skills = []
     
@@ -294,7 +294,7 @@ def enhance_skills(skills: List[str], job_skills: List[str]) -> List[str]:
     
     return enhanced_skills
 
-def enhance_experience(experience: List[Dict], job_keywords: List[str]) -> List[Dict]:
+def enhance_experience(experience: list[dict], job_keywords: list[str]) -> list[dict]:
     """Enhance experience section for better ATS score."""
     enhanced_experience = []
     
@@ -316,7 +316,7 @@ def enhance_experience(experience: List[Dict], job_keywords: List[str]) -> List[
     
     return enhanced_experience
 
-def enhance_role_description(role: str, job_keywords: List[str]) -> str:
+def enhance_role_description(role: str, job_keywords: list[str]) -> str:
     """Enhance role description with relevant keywords."""
     enhanced_role = role
     
@@ -327,7 +327,7 @@ def enhance_role_description(role: str, job_keywords: List[str]) -> str:
     
     return enhanced_role
 
-def enhance_achievement(achievement: str, job_keywords: List[str]) -> str:
+def enhance_achievement(achievement: str, job_keywords: list[str]) -> str:
     """Enhance achievement description with relevant keywords."""
     enhanced_achievement = achievement
     
@@ -410,7 +410,7 @@ def generate_linkedin_summary(resume_data: dict) -> str:
     
     return summary
 
-def format_linkedin_experience(experience: List[Dict]) -> List[Dict]:
+def format_linkedin_experience(experience: list[dict]) -> list[dict]:
     """Format experience for LinkedIn profile."""
     formatted_experience = []
     
@@ -427,11 +427,11 @@ def format_linkedin_experience(experience: List[Dict]) -> List[Dict]:
     
     return formatted_experience
 
-def optimize_linkedin_skills(skills: List[str]) -> List[Dict]:
+def optimize_linkedin_skills(skills: list[str]) -> list[dict]:
     """Optimize skills for LinkedIn profile."""
     return [{'name': skill, 'endorsements': 0} for skill in skills]
 
-def format_linkedin_education(education: List[str]) -> List[Dict]:
+def format_linkedin_education(education: list[str]) -> list[dict]:
     """Format education for LinkedIn profile."""
     formatted_education = []
     
@@ -447,7 +447,7 @@ def format_linkedin_education(education: List[str]) -> List[Dict]:
     
     return formatted_education
 
-def extract_certifications(resume_data: dict) -> List[Dict]:
+def extract_certifications(resume_data: dict) -> list[dict]:
     """Extract certifications from resume data."""
     certifications = resume_data.get('certifications', [])
     formatted_certs = []
@@ -464,7 +464,7 @@ def extract_certifications(resume_data: dict) -> List[Dict]:
     
     return formatted_certs
 
-def generate_linkedin_recommendations(resume_data: dict) -> List[Dict]:
+def generate_linkedin_recommendations(resume_data: dict) -> list[dict]:
     """Generate LinkedIn recommendation templates."""
     recommendations = [
         {

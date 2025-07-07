@@ -1,0 +1,11 @@
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+exclude = ["venv", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "C4", "TID"]
+ignore = ["E501", "B008", "B904"]
+
+[tool.ruff.format]
+quote-style = "double"

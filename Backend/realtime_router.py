@@ -5,19 +5,27 @@ Handles skills analysis, job matching, resume optimization, and real-time proces
 
 import json
 import logging
+import os
 import re
 from datetime import datetime
-from typing import Dict, List, Optional, Any
+from typing import Any
+
+import openai
+from dotenv import load_dotenv
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel, Field
-import openai
-import os
-from dotenv import load_dotenv
-from Backend.job_matcher import (
-    match_resume_to_job as match_resume_to_job_logic,
+
+from job_matcher import (
     analyze_job_description as analyze_job_description_logic,
-    get_skill_recommendations as get_skill_recommendations_logic,
+)
+from job_matcher import (
     analyze_market_trends as analyze_market_trends_logic,
+)
+from job_matcher import (
+    get_skill_recommendations as get_skill_recommendations_logic,
+)
+from job_matcher import (
+    match_resume_to_job as match_resume_to_job_logic,
 )
 
 # Load environment variables
@@ -31,22 +39,20 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/realtime", tags=["realtime"])
 
-# ============================================================================
 # PYDANTIC MODELS
-# ============================================================================
 
 class SkillAnalysisRequest(BaseModel):
     text: str = Field(..., description="Text to analyze for skills")
-    job_description: Optional[str] = Field(None, description="Job description for matching")
+    job_description: str | None = Field(None, description="Job description for matching")
     analysis_type: str = Field("comprehensive", description="Type of analysis")
 
 class JobMatchRequest(BaseModel):
     resume_text: str = Field(..., description="Resume text")
     job_description: str = Field(..., description="Job description")
-    match_criteria: List[str] = Field(["skills", "experience", "education"], description="Match criteria")
+    match_criteria: list[str] = Field(["skills", "experience", "education"], description="Match criteria")
 
 class ResumeOptimizationRequest(BaseModel):
-    resume_data: Dict[str, Any] = Field(..., description="Resume data")
+    resume_data: dict[str, Any] = Field(..., description="Resume data")
     job_description: str = Field(..., description="Target job description")
     optimization_type: str = Field("ats", description="Optimization type: ats, linkedin, cover_letter")
 
@@ -57,12 +63,10 @@ class RealTimeAnalysisRequest(BaseModel):
 
 class WebSocketMessage(BaseModel):
     type: str = Field(..., description="Message type")
-    data: Dict[str, Any] = Field(..., description="Message data")
+    data: dict[str, Any] = Field(..., description="Message data")
     user_id: str = Field(..., description="User ID")
 
-# ============================================================================
 # REAL-TIME SKILLS ANALYSIS
-# ============================================================================
 
 @router.post("/skills-analysis")
 async def realtime_skills_analysis(request: SkillAnalysisRequest):
@@ -85,9 +89,7 @@ async def realtime_skills_analysis(request: SkillAnalysisRequest):
         logger.error("Error in real-time skills analysis: %s", e)
         raise HTTPException(status_code=500, detail=f"Skills analysis failed: {str(e)}")
 
-# ============================================================================
 # REAL-TIME JOB MATCHING
-# ============================================================================
 
 @router.post("/job-matching")
 async def realtime_job_matching(request: JobMatchRequest):
@@ -102,11 +104,9 @@ async def realtime_job_matching(request: JobMatchRequest):
         logger.error("Error in real-time job matching: %s", e)
         raise HTTPException(status_code=500, detail=f"Job matching failed: {str(e)}")
 
-# ============================================================================
 # REAL-TIME RESUME OPTIMIZATION
-# ============================================================================
 
-async def optimize_resume_realtime(resume_data: Dict[str, Any], job_description: str, optimization_type: str) -> Dict[str, Any]:
+async def optimize_resume_realtime(resume_data: dict[str, Any], job_description: str, optimization_type: str) -> dict[str, Any]:
     """Real-time resume optimization with AI"""
     try:
         if optimization_type == "ats":
@@ -122,7 +122,7 @@ async def optimize_resume_realtime(resume_data: Dict[str, Any], job_description:
         logger.error("Error in resume optimization: %s", e)
         raise HTTPException(status_code=500, detail=f"Resume optimization failed: {str(e)}")
 
-async def optimize_for_ats(resume_data: Dict[str, Any], job_description: str) -> Dict[str, Any]:
+async def optimize_for_ats(resume_data: dict[str, Any], job_description: str) -> dict[str, Any]:
     """Optimize resume for ATS systems"""
     try:
         if openai.api_key:
@@ -167,7 +167,7 @@ async def optimize_for_ats(resume_data: Dict[str, Any], job_description: str) ->
         logger.error("Error in ATS optimization: %s", e)
         raise HTTPException(status_code=500, detail=f"ATS optimization failed: {str(e)}")
 
-async def optimize_for_linkedin_realtime(resume_data: Dict[str, Any]) -> Dict[str, Any]:
+async def optimize_for_linkedin_realtime(resume_data: dict[str, Any]) -> dict[str, Any]:
     """Optimize resume for LinkedIn profile"""
     try:
         if openai.api_key:
@@ -213,7 +213,7 @@ async def optimize_for_linkedin_realtime(resume_data: Dict[str, Any]) -> Dict[st
         logger.error("Error in LinkedIn optimization: %s", e)
         raise HTTPException(status_code=500, detail=f"LinkedIn optimization failed: {str(e)}")
 
-async def generate_cover_letter_realtime(resume_data: Dict[str, Any], job_description: str) -> Dict[str, Any]:
+async def generate_cover_letter_realtime(resume_data: dict[str, Any], job_description: str) -> dict[str, Any]:
     """Generate personalized cover letter"""
     try:
         if openai.api_key:
@@ -255,9 +255,7 @@ async def generate_cover_letter_realtime(resume_data: Dict[str, Any], job_descri
         logger.error("Error in cover letter generation: %s", e)
         raise HTTPException(status_code=500, detail=f"Cover letter generation failed: {str(e)}")
 
-# ============================================================================
 # REAL-TIME ANALYSIS ENDPOINTS
-# ============================================================================
 
 @router.post("/comprehensive-analysis")
 async def comprehensive_analysis(request: RealTimeAnalysisRequest):
@@ -279,13 +277,11 @@ async def comprehensive_analysis(request: RealTimeAnalysisRequest):
         logger.error("Error in comprehensive analysis: %s", e)
         raise HTTPException(status_code=500, detail=f"Comprehensive analysis failed: {str(e)}")
 
-# ============================================================================
 # WEBSOCKET REAL-TIME COMMUNICATION
-# ============================================================================
 
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: List[WebSocket] = []
+        self.active_connections: list[WebSocket] = []
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
@@ -348,11 +344,9 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
         await websocket.send_json({"type": "error", "data": {"message": str(e)}})
         logger.error("WebSocket error: %s", e)
 
-# ============================================================================
 # UTILITY FUNCTIONS
-# ============================================================================
 
-def extract_keywords_from_job(job_description: str) -> List[str]:
+def extract_keywords_from_job(job_description: str) -> list[str]:
     """Extract keywords from job description"""
     keywords = []
     
@@ -379,9 +373,7 @@ def extract_keywords_from_job(job_description: str) -> List[str]:
     # Remove duplicates and return
     return list(set(keywords))
 
-# ============================================================================
 # HEALTH CHECK AND STATUS
-# ============================================================================
 
 @router.get("/health")
 async def realtime_health_check():

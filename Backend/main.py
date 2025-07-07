@@ -1,45 +1,59 @@
-from fastapi import (
-    FastAPI, File, UploadFile, Form, Depends, HTTPException, 
-    Request, status, Body, Header, Path, Query
-)
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, EmailStr
-from typing import List, Optional, Dict
-import fitz  # PyMuPDF
-from datetime import datetime, timedelta, timezone
+# Standard library imports
+import hashlib
+import logging
 import os
 import re
-import tempfile
-import docx2txt
-import uvicorn
-import spacy
-import openai
-from jose import jwt
-from sentence_transformers import SentenceTransformer
-from dotenv import load_dotenv
-import hashlib
 import secrets
-import logging
+import tempfile
+from datetime import UTC, datetime, timedelta
+from pathlib import Path as FilePath
+
+import docx2txt
+import fitz  # PyMuPDF
+import openai
+import spacy
+
+# Third-party imports
+import uvicorn
+from dotenv import load_dotenv
+from fastapi import (
+    Body,
+    Depends,
+    FastAPI,
+    File,
+    Form,
+    Path,
+    Header,
+    HTTPException,
+    Query,
+    Request,
+    UploadFile,
+    status,
+)
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jose import jwt
+from pydantic import BaseModel, EmailStr
+from sentence_transformers import SentenceTransformer
 from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
-# Local imports
-from utils import (
-    parse_resume, parse_resume_with_job_matching, allowed_file
-)
-from models import SessionLocal, RevokedToken
-from schemas import User as UserModel
-
-# Import new routers
+# Local application imports
+from models import RevokedToken, SessionLocal
+from payment_router import router as payment_router
 from realtime_router import router as realtime_router
+from schemas import User as UserModel
 from skills_jobs_router import router as skills_jobs_router
 from subscription_router import router as subscription_router
-from payment_router import router as payment_router
+from utils import (
+    allowed_file,
+    parse_resume,
+    parse_resume_with_job_matching,
+)
 
-# Load environment variables
+# Load environment variables (must come *after* all imports)
 load_dotenv("key.env")
 load_dotenv(".env")
 
@@ -47,8 +61,9 @@ load_dotenv(".env")
 uploads_dir = "uploads"
 os.makedirs(uploads_dir, exist_ok=True)
 
-# Setup logging
+# Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
+
 logger = logging.getLogger(__name__)
 file_handler = logging.FileHandler("backend.log")
 file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
@@ -56,9 +71,14 @@ logger.addHandler(file_handler)
 
 # Rate limiter
 rate_limiter = Limiter(key_func=get_remote_address)
+limiter = Limiter(key_func=get_remote_address)
 
 # FastAPI Setup
 app = FastAPI(title="CareerForge API")
+
+
+app.state.limiter = limiter
+
 
 # CORS
 app.add_middleware(
@@ -115,13 +135,13 @@ class Token(BaseModel):
     token_type: str
 
 class TokenData(BaseModel):
-    username: Optional[str] = None
+    username: str | None = None
 
 class User(BaseModel):
     username: str
-    email: Optional[str] = None
-    full_name: Optional[str] = None
-    disabled: Optional[bool] = None
+    email: str | None = None
+    full_name: str | None = None
+    disabled: bool | None = None
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -129,13 +149,13 @@ class UserCreate(BaseModel):
     full_name: str
 
 class ParsedResume(BaseModel):
-    full_name: Optional[str]
-    email: Optional[str]
-    phone: Optional[str]
-    skills: List[str]
-    experience: List[Dict]
-    location: Optional[str]
-    education: List[str]
+    full_name: str | None
+    email: str | None
+    phone: str | None
+    skills: list[str]
+    experience: list[dict]
+    location: str | None
+    education: list[str]
 
 # Utilities
 def get_user(username: str):
@@ -173,8 +193,9 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     # Check if token is revoked
     revoked = db.query(RevokedToken).filter(
         RevokedToken.jti == jti, 
-        RevokedToken.expires_at > datetime.now(timezone.utc)
+        RevokedToken.expires_at > datetime.now(UTC)
     ).first()
+    revoked = db.query(RevokedToken).filter(RevokedToken.jti == jti, RevokedToken.expires_at > datetime.now(UTC)).first()
     if revoked:
         db.close()
         raise HTTPException(
@@ -371,6 +392,7 @@ def extract_education(text: str):
 
 
 # Routes
+
 @app.post("/api/resume/upload")
 @rate_limiter.limit("3/minute")
 async def upload_resume(
@@ -517,6 +539,7 @@ def send_email(to_email: str, subject: str, body: str):
     logger.info("Sending email from %s to %s: %s\n%s", ADMIN_EMAIL, to_email, subject, body)
     # Integrate with SMTP or email service here
 
+
 @app.post("/forgot-password")
 async def forgot_password(email: str = Form(...)):
     if email not in users_db:
@@ -593,7 +616,7 @@ async def test_endpoint():
 @app.post("/api/analyze-resume")
 async def analyze_resume(
     file: UploadFile = File(...),
-    job_description: Optional[str] = Form(None),
+    job_description: str | None = Form(None),
     current_user: dict = Depends(get_current_user)
 ):
     try:
@@ -620,14 +643,14 @@ async def analyze_resume(
         logger.error("Error analyzing resume: %s", e)
         raise HTTPException(status_code=500, detail=str(e)) from e
 
-@app.get("/health")
+@app.get("/api/health")
 async def health_check():
-    return {"status": "healthy", "message": "Service is running"}
+    return {"status": "ok"}
 
 @app.post("/match_resume")
 async def match_resume(
     file: UploadFile = File(...),
-    job_description: Optional[str] = Form(None),
+    job_description: str | None = Form(None),
     current_user: dict = Depends(get_current_user)
 ):
     # Restrict to basic or premium plans
@@ -772,7 +795,7 @@ async def logout(token: str = Header(...)):
     if not jti or not exp:
         return {"error": "Invalid token"}
     db = SessionLocal()
-    expires_at = datetime.fromtimestamp(exp, tz=timezone.utc)
+    expires_at = datetime.fromtimestamp(exp, tz=UTC)
     revoked = RevokedToken(jti=jti, expires_at=expires_at)
     db.add(revoked)
     db.commit()
@@ -837,14 +860,20 @@ async def admin_list_users(x_api_key: str = Header(...)):
     return {"users": user_list}
 
 @app.get("/admin/users/{user_id}")
-async def admin_get_user(user_id: int = Path(...), x_api_key: str = Header(...)):
+async def admin_get_user(
+    user_id: int = Path( description="ID of the user to retrieve"),
+    x_api_key: str = Header( description="Admin API key")
+):
     if x_api_key != ADMIN_API_KEY:
         return {"error": "Unauthorized"}
+    
     db = SessionLocal()
     user = db.query(UserModel).filter(UserModel.id == user_id).first()
+    
     if not user:
         db.close()
         return {"error": "User not found"}
+    
     user_data = {
         "id": user.id,
         "email": user.email,
@@ -854,11 +883,13 @@ async def admin_get_user(user_id: int = Path(...), x_api_key: str = Header(...))
         "is_active": user.is_active,
         "created_at": user.created_at
     }
+    
     db.close()
     return user_data
 
+
 @app.post("/admin/users/{user_id}/deactivate")
-async def admin_deactivate_user(user_id: int = Path(...), x_api_key: str = Header(...)):
+async def admin_deactivate_user(user_id: int = Path(..., description="ID of the user"), x_api_key: str = Header(..., description="Admin API key")):
     if x_api_key != ADMIN_API_KEY:
         return {"error": "Unauthorized"}
     db = SessionLocal()
@@ -905,7 +936,7 @@ async def admin_logs(x_api_key: str = Header(...), lines: int = 100):
         return {"error": "Unauthorized"}
     if not os.path.exists(LOG_FILE):
         return {"logs": []}
-    with open(LOG_FILE, "r", encoding="utf-8") as f:
+    with open(LOG_FILE, encoding="utf-8") as f:
         all_lines = f.readlines()
     last_lines = all_lines[-lines:]
     return {"logs": last_lines}

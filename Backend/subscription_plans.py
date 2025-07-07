@@ -4,8 +4,9 @@ Startup-friendly pricing model with freemium tier
 """
 
 from enum import Enum
-from typing import Dict, List, Optional
+
 from pydantic import BaseModel
+
 
 class PlanType(str, Enum):
     FREE = "free"
@@ -24,8 +25,8 @@ class SubscriptionPlan(BaseModel):
     price_monthly: float
     price_yearly: float
     description: str
-    features: List[Feature]
-    limits: Dict[str, int]
+    features: list[Feature]
+    limits: dict[str, int]
     popular: bool = False
 
 # Feature definitions
@@ -182,7 +183,7 @@ class SubscriptionManager:
         """Get subscription plan by type"""
         return self.plans[plan_type]
     
-    def get_all_plans(self) -> List[SubscriptionPlan]:
+    def get_all_plans(self) -> list[SubscriptionPlan]:
         """Get all available plans"""
         return list(self.plans.values())
     
@@ -194,7 +195,7 @@ class SubscriptionManager:
                 return plan_feature.available
         return False
     
-    def check_usage_limit(self, user_plan: PlanType, feature: str, current_usage: int) -> Dict[str, any]:
+    def check_usage_limit(self, user_plan: PlanType, feature: str, current_usage: int) -> dict[str, any]:
         """Check if user has exceeded usage limits"""
         plan = self.get_plan(user_plan)
         limit = plan.limits.get(f"{feature}_per_month", 0)
@@ -217,7 +218,7 @@ class SubscriptionManager:
             "remaining": remaining
         }
     
-    def get_plan_comparison(self) -> Dict[str, any]:
+    def get_plan_comparison(self) -> dict[str, any]:
         """Get plan comparison for pricing page"""
         comparison = {
             "plans": [],
@@ -250,11 +251,11 @@ class SubscriptionManager:
 subscription_manager = SubscriptionManager()
 
 # Convenience functions for API endpoints
-def get_plans() -> List[SubscriptionPlan]:
+def get_plans() -> list[SubscriptionPlan]:
     """Get all subscription plans"""
     return subscription_manager.get_all_plans()
 
-def get_plan_by_id(plan_id: str) -> Optional[SubscriptionPlan]:
+def get_plan_by_id(plan_id: str) -> SubscriptionPlan | None:
     """Get plan by ID"""
     for plan in get_plans():
         if plan.id == plan_id:
@@ -269,7 +270,7 @@ def check_user_access(user_plan: str, feature: str) -> bool:
     except ValueError:
         return False
 
-def check_user_usage(user_plan: str, feature: str, current_usage: int) -> Dict[str, any]:
+def check_user_usage(user_plan: str, feature: str, current_usage: int) -> dict[str, any]:
     """Check user usage limits"""
     try:
         plan_type = PlanType(user_plan)

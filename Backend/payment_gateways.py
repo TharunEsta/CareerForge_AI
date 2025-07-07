@@ -3,13 +3,14 @@ Payment Gateway Integration for CareerForge AI
 Supports PayPal, Stripe, Razorpay, and credit/debit cards
 """
 
-import os
 import logging
-from typing import Dict, List, Optional, Any
+import os
 from datetime import datetime
 from enum import Enum
-from pydantic import BaseModel
+from typing import Any
+
 from dotenv import load_dotenv
+from pydantic import BaseModel
 
 # Load environment variables
 load_dotenv()
@@ -46,7 +47,7 @@ class PaymentRequest(BaseModel):
     user_email: str
     user_country: str = "US"
     payment_method: PaymentMethod
-    gateway: Optional[PaymentGateway] = None
+    gateway: PaymentGateway | None = None
 
 class PaymentResponse(BaseModel):
     payment_id: str
@@ -54,9 +55,9 @@ class PaymentResponse(BaseModel):
     gateway: PaymentGateway
     amount: float
     currency: str
-    payment_url: Optional[str] = None
-    transaction_id: Optional[str] = None
-    error_message: Optional[str] = None
+    payment_url: str | None = None
+    transaction_id: str | None = None
+    error_message: str | None = None
 
 class PaymentGatewayManager:
     """Manages multiple payment gateways with automatic selection"""
@@ -443,7 +444,7 @@ async def verify_payment(payment_id: str, gateway: PaymentGateway) -> PaymentRes
     """Verify payment status"""
     return await payment_manager.verify_payment(payment_id, gateway)
 
-def get_supported_payment_methods(country: str) -> List[Dict[str, Any]]:
+def get_supported_payment_methods(country: str) -> list[dict[str, Any]]:
     """Get supported payment methods for a country"""
     methods = []
     

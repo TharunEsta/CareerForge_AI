@@ -6,9 +6,9 @@ try:
     from langdetect import detect
 except ImportError:
     detect = None
-from typing import Optional
-import openai
 import os
+
+import openai
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
@@ -28,14 +28,14 @@ class VoiceMessage(BaseModel):
 class VoiceResponse(BaseModel):
     text: str
     language: str
-    audio_url: Optional[str] = None
+    audio_url: str | None = None
     confidence: float
 
 class AssistantConfig(BaseModel):
     name: str
     personality: str
     language: str
-    voice_id: Optional[str] = None
+    voice_id: str | None = None
 
 # Assistant personalities
 ASSISTANT_PERSONALITIES = {

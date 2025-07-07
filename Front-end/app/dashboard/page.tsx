@@ -45,7 +45,11 @@ export default function DashboardPage() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Welcome back!</h1>
+<<<<<<< Updated upstream
             <p className="text-gray-600 mt-2">Here&apos;s what&apos;s happening with your career tools today.</p>
+=======
+            <p className="text-gray-600 mt-2">Here'apos;s what'apos;apos;s happening with your career tools today.</p>
+>>>>>>> Stashed changes
           </div>
 
           {/* Stats Cards */}
