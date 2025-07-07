@@ -30,8 +30,12 @@ import { useTheme } from "@/components/theme-provider"
 import {
   Sidebar,
   SidebarFooter,
-  SidebarHeader
-} from "@/components/ui/sidebar"
+  SidebarHeader,
+  SidebarNav,
+  SidebarNavItem,
+  SidebarNavItemIcon,
+  SidebarNavItemText
+} from '@/components/ui/sidebar'
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Image from 'next/image'
 import { Loader2, Send } from "lucide-react"
@@ -44,6 +48,7 @@ import LinkedInOptimizationCard from "@/components/LinkedInOptimizationCard";
 import JobMatchCard from "@/components/JobMatchCard";
 import { cn } from "@/lib/utils"
 import { Logo } from "@/components/ui/logo"
+import * as React from 'react';
 
 // Types
 type Message = {
@@ -115,7 +120,7 @@ function AppContent() {
   const [messages, setMessages] = useState<Message[]>(initialMessages)
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState("chat")
+  const [activeTab, setActiveTab] = React.useState<string>("chat")
   const [messageCount, setMessageCount] = useState(0)
   const [chatSessions, setChatSessions] = useState<ChatSession[]>(sampleChatSessions)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -312,6 +317,10 @@ function AppContent() {
     // Add job matching logic
   };
 
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+  };
+
   if (!mounted) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -324,39 +333,51 @@ function AppContent() {
     <div className="flex h-screen bg-gradient-to-br from-background via-background to-primary-50/30">
       {/* Sidebar */}
       <Sidebar className="hidden md:flex">
-        <SidebarHeader>
-          <Logo size="lg" className="mx-auto" />
-        </SidebarHeader>
-        
-        <div className="flex-1 space-y-4">
-          <div className="space-y-2">
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => setActiveTab("chat")}
-            >
-              <MessageSquare className="mr-2 h-4 w-4" />
-              Chat
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => setActiveTab("resume")}
-            >
-              <FileText className="mr-2 h-4 w-4" />
-              Resume
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => setActiveTab("jobs")}
-            >
-              <Briefcase className="mr-2 h-4 w-4" />
-              Job Match
-            </Button>
-          </div>
-        </div>
-
+        <SidebarHeader />
+        <SidebarNav>
+          <SidebarNavItem>
+            <SidebarNavItemIcon>
+              <MessageSquare className="h-4 w-4" />
+            </SidebarNavItemIcon>
+            <SidebarNavItemText>
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={() => handleTabChange("chat")}
+              >
+                Chat
+              </Button>
+            </SidebarNavItemText>
+          </SidebarNavItem>
+          <SidebarNavItem>
+            <SidebarNavItemIcon>
+              <FileText className="h-4 w-4" />
+            </SidebarNavItemIcon>
+            <SidebarNavItemText>
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={() => handleTabChange("resume")}
+              >
+                Resume
+              </Button>
+            </SidebarNavItemText>
+          </SidebarNavItem>
+          <SidebarNavItem>
+            <SidebarNavItemIcon>
+              <Briefcase className="h-4 w-4" />
+            </SidebarNavItemIcon>
+            <SidebarNavItemText>
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={() => handleTabChange("jobs")}
+              >
+                Job Match
+              </Button>
+            </SidebarNavItemText>
+          </SidebarNavItem>
+        </SidebarNav>
         <SidebarFooter>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -411,7 +432,7 @@ function AppContent() {
 
         {/* Content Area */}
         <main className="flex-1 overflow-hidden">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="chat">Chat</TabsTrigger>
               <TabsTrigger value="resume">Resume</TabsTrigger>
@@ -453,14 +474,14 @@ function AppContent() {
               {activeTab === "resume" && (
                 <div className="grid gap-6 md:grid-cols-2">
                   <ResumeUploadCard onAnalysis={() => {}} />
-                  <ResumeRewriteCard />
+                  <ResumeRewriteCard onRewrite={() => {}} />
                 </div>
               )}
               
               {activeTab === "jobs" && (
                 <div className="grid gap-6 md:grid-cols-2">
-                  <JobMatchCard />
-                  <CoverLetterCard />
+                  <JobMatchCard onMatch={() => {}} />
+                  <CoverLetterCard onGenerate={() => {}} />
                 </div>
               )}
             </div>

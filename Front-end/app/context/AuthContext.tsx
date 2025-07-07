@@ -8,6 +8,7 @@ interface User {
   name: string;
   plan: 'free' | 'premium' | 'enterprise';
   avatar?: string;
+  avatarUrl?: string;
 }
 
 interface AuthContextType {

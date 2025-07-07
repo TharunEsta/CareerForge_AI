@@ -7,6 +7,7 @@ interface User {
   email: string;
   name: string;
   role: 'user' | 'admin';
+  avatarUrl?: string;
   subscription?: {
     plan: 'free' | 'premium' | 'enterprise';
     expiresAt: string;
@@ -52,6 +53,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             email: 'user@example.com',
             name: 'John Doe',
             role: 'user',
+            avatarUrl: '/placeholder-user.jpg',
             subscription: {
               plan: 'premium',
               expiresAt: '2024-12-31'
@@ -83,6 +85,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           email,
           name: email.split('@')[0],
           role: 'user',
+          avatarUrl: '/placeholder-user.jpg',
           subscription: {
             plan: 'premium',
             expiresAt: '2024-12-31'
@@ -133,6 +136,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           email,
           name,
           role: 'user',
+          avatarUrl: '/placeholder-user.jpg',
           subscription: {
             plan: 'free',
             expiresAt: '2024-06-30'
