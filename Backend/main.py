@@ -16,8 +16,8 @@ import spacy
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import (
+    APIRouter,
     Body,
-    Depends,
     FastAPI,
     File,
     Form,
@@ -26,6 +26,7 @@ from fastapi import (
     Path,
     Query,
     Request,
+    Response,
     UploadFile,
     status,
 )
@@ -176,7 +177,6 @@ def get_jti_from_token(token: str):
 
 async def get_current_user(token: str = None):
     if token is None:
-        from fastapi import Depends
         token = Depends(oauth2_scheme)
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -213,7 +213,6 @@ async def get_current_user(token: str = None):
 @app.post("/token")
 async def login(form_data = None):
     if form_data is None:
-        from fastapi import Depends
         form_data = Depends(OAuth2PasswordRequestForm)
     user = get_user(form_data.username)
     if not user or not verify_password(form_data.password, user["hashed_password"]):
@@ -228,17 +227,6 @@ async def login(form_data = None):
 # NLP Models
 nlp = spacy.load("en_core_web_sm")
 model = SentenceTransformer("all-MiniLM-L6-v2")
-
-# Define 'client' before use at line 167
-# client = None
-
-# async def openai_chat(messages: List[Dict]):
-#     res = client.chat.completions.create(
-#         model="gpt-3.5-turbo",
-#         messages=messages,
-#         max_tokens=800
-#     )
-#     return res.choices[0].message.content.strip()
 
 def extract_text_from_content(contents: bytes, filename: str) -> str:
     suffix = os.path.splitext(filename)[1].lower()
@@ -264,49 +252,47 @@ def extract_text_from_content(contents: bytes, filename: str) -> str:
 def extract_email(text: str):
     return next(iter(re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+', text)), None)
 
-def extract_name(text: str, email: str, nlp_model):
-    name = None
-    # Try to extract name from email first
-    if email:
-        email_name = email.split('@')[0]
-        email_name = re.sub(r'[._0-9]', ' ', email_name)
-        name_parts = [word.capitalize() for word in email_name.split() if word]
-        if name_parts:
-            name = ' '.join(name_parts)
-    if name:
-        return name
-    section_headers = [
-        'key skills', 'experience', 'education', 'summary', 'objective',
-        'performance', 'dashboards', 'projects', 'achievements', 'certifications',
-        'technical skills', 'professional experience', 'work experience'
-    ]
-    non_name_words = [
-        'resume', 'cv', 'curriculum vitae', 'llama', 'gpt', 'chat', 'ai',
-        'machine learning', 'artificial intelligence', 'data science'
-    ]
-    # Try to find name near the email
-    if email:
-        email_lines = [line for line in text.split('\n') if email in line]
-        for line in email_lines:
-            line_index = text.split('\n').index(line)
-            context_lines = []
-            if line_index > 0:
-                context_lines.append(text.split('\n')[line_index - 1])
-            context_lines.append(line)
-            if line_index < len(text.split('\n')) - 1:
-                context_lines.append(text.split('\n')[line_index + 1])
-            for context_line in context_lines:
-                doc_line = nlp_model(context_line)
-                for ent in doc_line.ents:
-                    if (
-                        ent.label_ == "PERSON"
-                        and len(name_parts := ent.text.split()) <= 3
-                        and not any(header in ent.text.lower() for header in section_headers)
-                        and not any(word in ent.text.lower() for word in non_name_words)
-                        and all(part[0].isupper() for part in name_parts)
-                    ):
-                        return ent.text
-    # Try the first few lines
+def _extract_name_from_email(email):
+    if not email:
+        return None
+    email_name = email.split('@')[0]
+    email_name = re.sub(r'[._0-9]', ' ', email_name)
+    name_parts = [word.capitalize() for word in email_name.split() if word]
+    if name_parts:
+        return ' '.join(name_parts)
+    return None
+
+def _is_valid_name_entity(ent, section_headers, non_name_words):
+    name_parts = ent.text.split()
+    return (
+        ent.label_ == "PERSON"
+        and len(name_parts) <= 3
+        and not any(header in ent.text.lower() for header in section_headers)
+        and not any(word in ent.text.lower() for word in non_name_words)
+        and all(part and part[0].isupper() for part in name_parts)
+    )
+
+def _extract_name_near_email(text, email, nlp_model, section_headers, non_name_words):
+    if not email:
+        return None
+    lines = text.split('\n')
+    email_lines = [line for line in lines if email in line]
+    for line in email_lines:
+        line_index = lines.index(line)
+        context_lines = []
+        if line_index > 0:
+            context_lines.append(lines[line_index - 1])
+        context_lines.append(line)
+        if line_index < len(lines) - 1:
+            context_lines.append(lines[line_index + 1])
+        for context_line in context_lines:
+            doc_line = nlp_model(context_line)
+            for ent in doc_line.ents:
+                if _is_valid_name_entity(ent, section_headers, non_name_words):
+                    return ent.text
+    return None
+
+def _extract_name_from_first_lines(text, nlp_model, section_headers, non_name_words):
     first_lines = text.split('\n')[:10]
     for line in first_lines:
         line = line.strip()
@@ -321,14 +307,27 @@ def extract_name(text: str, email: str, nlp_model):
             continue
         doc_line = nlp_model(line)
         for ent in doc_line.ents:
-            if (
-                ent.label_ == "PERSON"
-                and len(name_parts := ent.text.split()) <= 3
-                and not any(header in ent.text.lower() for header in section_headers)
-                and not any(word in ent.text.lower() for word in non_name_words)
-                and all(part[0].isupper() for part in name_parts)
-            ):
+            if _is_valid_name_entity(ent, section_headers, non_name_words):
                 return ent.text
+    return None
+
+def extract_name(text: str, email: str, nlp_model):
+    section_headers = [
+        'key skills', 'experience', 'education', 'summary', 'objective',
+        'performance', 'dashboards', 'projects', 'achievements', 'certifications',
+        'technical skills', 'professional experience', 'work experience'
+    ]
+    non_name_words = [
+        'resume', 'cv', 'curriculum vitae', 'llama', 'gpt', 'chat', 'ai',
+        'machine learning', 'artificial intelligence', 'data science'
+    ]
+    name = _extract_name_from_email(email)
+    if name:
+        return name
+    name = _extract_name_near_email(text, email, nlp_model, section_headers, non_name_words)
+    if name:
+        return name
+    name = _extract_name_from_first_lines(text, nlp_model, section_headers, non_name_words)
     return name
 
 def extract_phone(text: str):
@@ -401,7 +400,6 @@ def extract_education(text: str):
 @app.post("/api/resume/upload")
 @rate_limiter.limit("3/minute")
 async def upload_resume(request: Request, file: UploadFile = None, current_user: dict = None):
-    from fastapi import Depends
     if file is None:
         file = File(...)
     if current_user is None:
@@ -508,7 +506,6 @@ def search_subscriptions(query: str = Query(...)):
 
 @app.post("/signup", response_model=User)
 async def signup(email: str = None, password: str = None, full_name: str = None):
-    from fastapi import Form
     if email is None:
         email = Form(...)
     if password is None:
@@ -585,8 +582,7 @@ async def reset_password(
     return {"message": "Password has been reset successfully"}
 
 @app.post("/job_match")
-async def job_match(file: UploadFile = None, current_user: dict = None, top_n: int = 3):
-    from fastapi import Depends
+async def job_match(file: UploadFile = None, current_user: dict = None, _top_n: int = 3):
     if file is None:
         file = File(...)
     if current_user is None:
@@ -614,7 +610,6 @@ async def test_endpoint():
 
 @app.post("/api/analyze-resume")
 async def analyze_resume(file: UploadFile = None, job_description: str = None, current_user: dict = None):
-    from fastapi import Depends, Form
     if file is None:
         file = File(...)
     if job_description is None:
@@ -647,7 +642,6 @@ async def health_check():
 
 @app.post("/match_resume")
 async def match_resume(file: UploadFile = None, job_description: str = None, current_user: dict = None):
-    from fastapi import Depends, Form
     if file is None:
         file = File(...)
     if job_description is None:
@@ -681,7 +675,6 @@ async def match_resume(file: UploadFile = None, job_description: str = None, cur
 
 @app.post("/chat_with_resume")
 async def chat_with_resume(prompt: str = None, resume_text: str = None, current_user: dict = None):
-    from fastapi import Depends, Form
     if prompt is None:
         prompt = Form(...)
     if resume_text is None:
@@ -705,7 +698,6 @@ async def chat_with_resume(prompt: str = None, resume_text: str = None, current_
 
 @app.get("/api/user/plan")
 def get_user_plan(current_user: dict = None):
-    from fastapi import Depends
     if current_user is None:
         current_user = Depends(get_current_user)
     email = current_user.get("email")
@@ -716,7 +708,6 @@ def get_user_plan(current_user: dict = None):
 
 @app.post("/api/user/upgrade")
 def upgrade_user_plan(plan: str = None, current_user: dict = None):
-    from fastapi import Depends
     if plan is None:
         plan = Body(..., embed=True)
     if current_user is None:
@@ -923,7 +914,6 @@ async def admin_deactivate_user(user_id: int = None, x_api_key: str = None):
 
 @app.post("/admin/users/{user_id}/activate")
 async def admin_activate_user(user_id: int = None, x_api_key: str = None):
-    from fastapi import Path
     if user_id is None:
         user_id = Path(...)
     if x_api_key is None:
@@ -942,7 +932,6 @@ async def admin_activate_user(user_id: int = None, x_api_key: str = None):
 
 @app.delete("/admin/users/{user_id}")
 async def admin_delete_user(user_id: int = None, x_api_key: str = None):
-    from fastapi import Path
     if user_id is None:
         user_id = Path(...)
     if x_api_key is None:

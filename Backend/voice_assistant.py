@@ -274,7 +274,7 @@ class PaymentHistoryResponse(BaseModel):
     payments: list
 
 @router.post("/voice-assistant/subscribe", response_model=SubscribeResponse)
-async def subscribe_voice_assistant(request: SubscribeRequest, user_id: int = Query(...)):
+async def subscribe_voice_assistant(request: SubscribeRequest, _user_id: int = Query(...)):
     """Initiate payment for voice assistant subscription"""
     # Payment integration logic goes here (return payment_url)
     # For now, return a placeholder
