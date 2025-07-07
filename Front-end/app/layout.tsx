@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-import React from "react";
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return <html><body>{children}</body></html>;
-=======
 'use client';
 
 import type { Metadata } from "next"
@@ -121,5 +116,4 @@ export default function RootLayout({
       </body>
     </html>
   )
->>>>>>> 1c4ffefbc6ca642e2df418cea7ff8ee496510ce0
 }

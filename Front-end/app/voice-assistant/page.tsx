@@ -85,27 +85,15 @@ export default function VoiceAssistantPage() {
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-center gap-2">
                       <Badge variant="outline" className="text-xs">Try saying:</Badge>
-<<<<<<< Updated upstream
-                      &quot;Hello Pandu&quot; or &quot;Hello Gammy&quot;
+                      "Hello Pandu" or "Hello Gammy"
                     </li>
                     <li className="flex items-center gap-2">
                       <Badge variant="outline" className="text-xs">Ask questions:</Badge>
-                      &quot;What&apos;s the weather like?&quot;
+                      "What's the weather like?"
                     </li>
                     <li className="flex items-center gap-2">
                       <Badge variant="outline" className="text-xs">Get help:</Badge>
-                      &quot;Can you help me with my resume?&quot;
-=======
-                      "quot;quot;quot;quot;Hello Pandu"quot;quot;quot;quot; or "quot;quot;quot;quot;Hello Gammy"quot;quot;quot;quot;
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs">Ask questions:</Badge>
-                      "quot;quot;quot;quot;What'apos;apos;apos;apos;s the weather like?"quot;quot;quot;quot;
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs">Get help:</Badge>
-                      "quot;quot;quot;quot;Can you help me with my resume?"quot;quot;quot;quot;
->>>>>>> Stashed changes
+                      "Can you help me with my resume?"
                     </li>
                   </ul>
                 </div>
