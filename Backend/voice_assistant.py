@@ -8,11 +8,10 @@ except ImportError:
     detect = None
 from typing import Optional
 import openai
-import os
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
-from Backend.models import SessionLocal, Subscription, VoiceAssistantLicense, PaymentHistory, User
-from datetime import datetime, timedelta
+from Backend.models import SessionLocal, VoiceAssistantLicense, PaymentHistory
+from datetime import datetime
 
 router = APIRouter()
 
@@ -283,17 +282,17 @@ async def subscribe_voice_assistant(request: SubscribeRequest, user_id: int = Qu
 async def get_voice_assistant_license(user_id: int = Query(...)):
     """Get or issue license for paid user"""
     db = SessionLocal()
-    license = db.query(VoiceAssistantLicense).filter_by(user_id=user_id, status="active").first()
-    if not license:
+    user_license = db.query(VoiceAssistantLicense).filter_by(user_id=user_id, status="active").first()
+    if not user_license:
         db.close()
         raise HTTPException(status_code=404, detail="No active license found. Please subscribe.")
     resp = LicenseResponse(
-        license_key=license.license_key,
-        plan_id=license.plan_id,
-        status=license.status,
-        start_date=license.start_date,
-        end_date=license.end_date,
-        wake_name=license.wake_name
+        license_key=user_license.license_key,
+        plan_id=user_license.plan_id,
+        status=user_license.status,
+        start_date=user_license.start_date,
+        end_date=user_license.end_date,
+        wake_name=user_license.wake_name
     )
     db.close()
     return resp
@@ -302,9 +301,9 @@ async def get_voice_assistant_license(user_id: int = Query(...)):
 async def get_voice_assistant_download_link(user_id: int = Query(...)):
     """Provide download/setup link if user has active license"""
     db = SessionLocal()
-    license = db.query(VoiceAssistantLicense).filter_by(user_id=user_id, status="active").first()
+    user_license = db.query(VoiceAssistantLicense).filter_by(user_id=user_id, status="active").first()
     db.close()
-    if not license:
+    if not user_license:
         raise HTTPException(status_code=403, detail="No active license. Please subscribe.")
     return {"download_url": "https://yourdomain.com/download/voice-assistant-app"}
 
@@ -312,11 +311,11 @@ async def get_voice_assistant_download_link(user_id: int = Query(...)):
 async def set_wake_name(request: WakeNameRequest, user_id: int = Query(...)):
     """Set custom wake name for the assistant"""
     db = SessionLocal()
-    license = db.query(VoiceAssistantLicense).filter_by(user_id=user_id, status="active").first()
-    if not license:
+    user_license = db.query(VoiceAssistantLicense).filter_by(user_id=user_id, status="active").first()
+    if not user_license:
         db.close()
         raise HTTPException(status_code=404, detail="No active license found.")
-    license.wake_name = request.wake_name
+    user_license.wake_name = request.wake_name
     db.commit()
     db.close()
     return {"message": f"Wake name set to {request.wake_name}"}
@@ -325,11 +324,11 @@ async def set_wake_name(request: WakeNameRequest, user_id: int = Query(...)):
 async def get_wake_name(user_id: int = Query(...)):
     """Get current wake name for the assistant"""
     db = SessionLocal()
-    license = db.query(VoiceAssistantLicense).filter_by(user_id=user_id, status="active").first()
+    user_license = db.query(VoiceAssistantLicense).filter_by(user_id=user_id, status="active").first()
     db.close()
-    if not license:
+    if not user_license:
         raise HTTPException(status_code=404, detail="No active license found.")
-    return {"wake_name": license.wake_name}
+    return {"wake_name": user_license.wake_name}
 
 @router.get("/voice-assistant/payment-history", response_model=PaymentHistoryResponse)
 async def get_payment_history(user_id: int = Query(...)):
