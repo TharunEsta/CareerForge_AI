@@ -43,6 +43,7 @@ import CoverLetterCard from "@/components/CoverLetterCard";
 import LinkedInOptimizationCard from "@/components/LinkedInOptimizationCard";
 import JobMatchCard from "@/components/JobMatchCard";
 import { cn } from "@/lib/utils"
+import { Logo } from "@/components/ui/logo"
 
 // Types
 type Message = {
@@ -197,32 +198,27 @@ function AppContent() {
       unmatchedSkills,
       suggestions: ["Add more keywords from job description", "Improve formatting"],
       keywordDensity,
-      formatScore: 80,
+      formatScore: 90,
       contentScore: 85
     };
   };
 
   const rewriteResume = (originalResume: string, jobDescription: string): { newResume: string; changes: string[] } => {
+    // Simple resume rewriting logic
+    const changes = ["Enhanced bullet points", "Added quantifiable achievements", "Improved keyword optimization"];
     return {
-      newResume: "Enhanced resume content...",
-      changes: ["Added keywords", "Improved formatting", "Enhanced descriptions"]
+      newResume: originalResume + "\n\nEnhanced with AI optimization",
+      changes
     };
   };
 
   const handleFileUpload = async (file: File, type: "resume" | "job-description") => {
-    setIsUploading(true);
-    try {
+    if (type === "resume") {
+      setUploadedResume(file);
       const content = await readFileContent(file);
-      if (type === "resume") {
-        setResumeContent(content);
-        setUploadedResume(file);
-      } else {
-        setUploadedJobDescription(file);
-      }
-    } catch (error) {
-      console.error("Error reading file:", error);
-    } finally {
-      setIsUploading(false);
+      setResumeContent(content);
+    } else {
+      setUploadedJobDescription(file);
     }
   };
 
@@ -239,6 +235,7 @@ function AppContent() {
       content: input,
       sender: "user",
       timestamp: new Date(),
+      type: "text"
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -250,9 +247,10 @@ function AppContent() {
     setTimeout(() => {
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: "Thank you for your message. I'm here to help with your career needs!",
+        content: "I'm here to help you with your career journey! How can I assist you today?",
         sender: "ai",
         timestamp: new Date(),
+        type: "text"
       };
       setMessages(prev => [...prev, aiMessage]);
       setIsLoading(false);
@@ -260,227 +258,214 @@ function AppContent() {
   };
 
   const renderMessage = (message: Message) => {
-    return <div>{message.content}</div>;
+    return (
+      <div key={message.id} className={cn(
+        "flex gap-3 p-4 rounded-lg",
+        message.sender === "user" ? "justify-end" : "justify-start"
+      )}>
+        {message.sender === "ai" && (
+          <Avatar className="h-8 w-8">
+            <AvatarImage src="/placeholder-user.jpg" />
+            <AvatarFallback>AI</AvatarFallback>
+          </Avatar>
+        )}
+        <div className={cn(
+          "max-w-[80%] rounded-lg p-3",
+          message.sender === "user" 
+            ? "bg-primary text-primary-foreground" 
+            : "bg-muted"
+        )}>
+          <p className="text-sm">{message.content}</p>
+        </div>
+        {message.sender === "user" && (
+          <Avatar className="h-8 w-8">
+            <AvatarImage src="/placeholder-user.jpg" />
+            <AvatarFallback>U</AvatarFallback>
+          </Avatar>
+        )}
+      </div>
+    );
   };
 
   const handleShowResumeUpload = () => {
-    const card = <ResumeUploadCard onAnalysis={(result) => console.log(result)} />;
-    setChatCards(prev => [...prev, card]);
+    setShowFeatureMenu(false);
+    // Add resume upload logic
   };
 
   const handleShowResumeRewrite = () => {
-    const card = <ResumeRewriteCard onRewrite={(result) => console.log(result)} />;
-    setChatCards(prev => [...prev, card]);
+    setShowFeatureMenu(false);
+    // Add resume rewrite logic
   };
 
   const handleShowCoverLetter = () => {
-    const card = <CoverLetterCard onGenerate={() => {}} />;
-    setChatCards(prev => [...prev, card]);
+    setShowFeatureMenu(false);
+    // Add cover letter logic
   };
 
   const handleShowLinkedInOptimization = () => {
-    const card = <LinkedInOptimizationCard onOptimize={() => {}} />;
-    setChatCards(prev => [...prev, card]);
+    setShowFeatureMenu(false);
+    // Add LinkedIn optimization logic
   };
 
   const handleShowJobMatch = () => {
-    const card = <JobMatchCard onMatch={() => {}} />;
-    setChatCards(prev => [...prev, card]);
+    setShowFeatureMenu(false);
+    // Add job matching logic
   };
 
   if (!mounted) {
-    return null;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
   }
 
   return (
-    <div className="flex h-screen bg-background">
-      <Sidebar>
+    <div className="flex h-screen bg-gradient-to-br from-background via-background to-primary-50/30">
+      {/* Sidebar */}
+      <Sidebar className="hidden md:flex">
         <SidebarHeader>
-          <div className="flex items-center gap-2 px-4 py-2">
-            <Image src="/placeholder-logo.svg" alt="Logo" width={32} height={32} />
-            <span className="font-bold">CareerForge.AI</span>
-          </div>
+          <Logo size="lg" className="mx-auto" />
         </SidebarHeader>
-        <div className="space-y-2 p-4">
-          <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-muted">
-            <MessageSquare className="w-4 h-4 mr-2" />
-            New Chat
-          </button>
-          <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-muted">
-            <FileText className="w-4 h-4 mr-2" />
-            Resume Tools
-          </button>
-          <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-muted">
-            <Briefcase className="w-4 h-4 mr-2" />
-            Job Search
-          </button>
-        </div>
-        <SidebarFooter>
-          <div className="p-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="w-full justify-start">
-                  <User className="w-4 h-4 mr-2" />
-                  Account
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem>
-                  <Settings className="w-4 h-4 mr-2" />
-                  Settings
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+        
+        <div className="flex-1 space-y-4">
+          <div className="space-y-2">
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => setActiveTab("chat")}
+            >
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Chat
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => setActiveTab("resume")}
+            >
+              <FileText className="mr-2 h-4 w-4" />
+              Resume
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => setActiveTab("jobs")}
+            >
+              <Briefcase className="mr-2 h-4 w-4" />
+              Job Match
+            </Button>
           </div>
+        </div>
+
+        <SidebarFooter>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="w-full justify-start">
+                <User className="mr-2 h-4 w-4" />
+                Account
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </SidebarFooter>
       </Sidebar>
 
+      {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        <header className="border-b bg-background p-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-xl font-semibold">CareerForge.AI</h1>
+        {/* Header */}
+        <header className="border-b bg-card/50 backdrop-blur-xl">
+          <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-4">
-              <Button variant="outline" size="sm">
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                <Menu className="h-4 w-4" />
+              </Button>
+              <Logo size="md" />
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              >
+                <Globe className="h-4 w-4" />
               </Button>
             </div>
           </div>
         </header>
 
-        <main className="flex-1 overflow-auto">
-          <div className="container max-w-4xl mx-auto p-4">
-            <div className="space-y-4">
-              <div className="flex gap-2 flex-wrap">
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowResumeUpload}>Resume Analysis</button>
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowResumeRewrite}>Resume Rewrite</button>
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowCoverLetter}>Cover Letter</button>
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowLinkedInOptimization}>LinkedIn Optimization</button>
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition" onClick={handleShowJobMatch}>Job Match</button>
-              </div>
-              <div>
-              {messages.map((message, index) => (
-                  <div
-                  key={index}
-                  className={cn(
-                    "flex gap-3 p-4 rounded-lg",
-                    message.sender === "user"
-                      ? "bg-muted"
-                      : "bg-background border"
-                  )}
-                >
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage
-                      src={message.sender === "user" ? "/user-avatar.png" : "/bot-avatar.png"}
+        {/* Content Area */}
+        <main className="flex-1 overflow-hidden">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="chat">Chat</TabsTrigger>
+              <TabsTrigger value="resume">Resume</TabsTrigger>
+              <TabsTrigger value="jobs">Job Match</TabsTrigger>
+            </TabsList>
+            
+            <div className="flex-1 overflow-auto p-4">
+              {activeTab === "chat" && (
+                <div className="space-y-4">
+                  <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+                    {messages.map(renderMessage)}
+                    {isLoading && (
+                      <div className="flex gap-3 p-4">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src="/placeholder-user.jpg" />
+                          <AvatarFallback>AI</AvatarFallback>
+                        </Avatar>
+                        <div className="bg-muted rounded-lg p-3">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <form onSubmit={handleSubmit} className="flex gap-2">
+                    <Input
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      placeholder="Type your message..."
+                      className="flex-1"
                     />
-                    <AvatarFallback>
-                      {message.sender === "user" ? "U" : "AI"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold">
-                        {message.sender === "user" ? "You" : "CareerForge.AI"}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(message.timestamp).toLocaleTimeString()}
-                      </span>
-                    </div>
-                    <div className="prose prose-sm max-w-none dark:prose-invert">
-                      {renderMessage(message)}
-                    </div>
-                  </div>
-                  </div>
-              ))}
-              </div>
-            </div>
-          </div>
-        </main>
-
-        {/* Input area */}
-        <div className="sticky bottom-0 border-t bg-background p-4">
-          <div className="container max-w-4xl">
-            <form onSubmit={handleSubmit} className="flex gap-4 items-center">
-              <button
-                type="button"
-                aria-label="Start voice input"
-                className={`rounded-full p-2 border border-blue-200 dark:border-zinc-700 bg-blue-50 dark:bg-zinc-800 hover:bg-blue-100 dark:hover:bg-zinc-700 transition-colors`}
-              >
-                <Mic className={`h-6 w-6`} />
-              </button>
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Type your message or use the mic..."
-                className="flex-1"
-                disabled={isLoading}
-              />
-              <Button type="submit" disabled={isLoading || !input.trim()}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Thinking...
-                  </>
-                ) : (
-                  <>
-                    <Send className="mr-2 h-4 w-4" />
-                    Send
-                  </>
-                )}
-              </Button>
-            </form>
-          </div>
-        </div>
-
-        {/* Voice Assistant Section */}
-        <div className="mb-8">
-          <Card className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-0">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full">
-                    <Mic className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-purple-900 dark:text-purple-100">
-                      AI Voice Assistant
-                    </h3>
-                    <p className="text-purple-700 dark:text-purple-300">
-                      Speak naturally in multiple languages with our intelligent voice assistant
-                    </p>
-                  </div>
+                    <Button type="submit" disabled={isLoading}>
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </form>
                 </div>
-                <Link href="/voice-assistant">
-                  <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white">
-                    <Mic className="w-4 h-4 mr-2" />
-                    Try Voice Assistant
-                  </Button>
-                </Link>
-              </div>
+              )}
               
-              {/* Features */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                <div className="flex items-center space-x-2">
-                  <Globe className="w-4 h-4 text-green-600" />
-                  <span className="text-sm">9+ Languages</span>
+              {activeTab === "resume" && (
+                <div className="grid gap-6 md:grid-cols-2">
+                  <ResumeUploadCard onAnalysis={() => {}} />
+                  <ResumeRewriteCard />
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Brain className="w-4 h-4 text-purple-600" />
-                  <span className="text-sm">Smart Responses</span>
+              )}
+              
+              {activeTab === "jobs" && (
+                <div className="grid gap-6 md:grid-cols-2">
+                  <JobMatchCard />
+                  <CoverLetterCard />
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Zap className="w-4 h-4 text-orange-600" />
-                  <span className="text-sm">Real-time</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              )}
+            </div>
+          </Tabs>
+        </main>
       </div>
     </div>
   );

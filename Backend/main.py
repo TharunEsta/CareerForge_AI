@@ -175,7 +175,10 @@ def get_jti_from_token(token: str):
     except Exception:
         return None, None
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+async def get_current_user(token: str = None):
+    if token is None:
+        from fastapi import Depends
+        token = Depends(oauth2_scheme)
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -209,7 +212,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     return user
 
 @app.post("/token")
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login(form_data = None):
+    if form_data is None:
+        from fastapi import Depends
+        form_data = Depends(OAuth2PasswordRequestForm)
     user = get_user(form_data.username)
     if not user or not verify_password(form_data.password, user["hashed_password"]):
         raise HTTPException(
@@ -395,11 +401,12 @@ def extract_education(text: str):
 
 @app.post("/api/resume/upload")
 @rate_limiter.limit("3/minute")
-async def upload_resume(
-    request: Request,
-    file: UploadFile = File(...),
-    current_user: dict = Depends(get_current_user)
-):
+async def upload_resume(request: Request, file: UploadFile = None, current_user: dict = None):
+    from fastapi import Depends
+    if file is None:
+        file = File(...)
+    if current_user is None:
+        current_user = Depends(get_current_user)
     allowed_types = [
         "application/pdf",
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -410,18 +417,13 @@ async def upload_resume(
             status_code=400, 
             detail="Only PDF, DOCX, or TXT files are allowed."
         )
-    
     if file.filename == "":
         raise HTTPException(status_code=400, detail="No file uploaded")
-    
     contents = await file.read()
-    
     if not contents:
         raise HTTPException(status_code=400, detail="Empty file uploaded")
-    
     if len(contents) > 5 * 1024 * 1024:  # 5MB limit
         raise HTTPException(status_code=400, detail="File size must be less than 5MB.")
-    
     try:
         text = extract_text_from_content(contents, file.filename)
         parsed_data = parse_resume(text)
@@ -506,14 +508,16 @@ def search_subscriptions(query: str = Query(...)):
     return results
 
 @app.post("/signup", response_model=User)
-async def signup(
-    email: str = Form(...),
-    password: str = Form(...),
-    full_name: str = Form(...)
-):
+async def signup(email: str = None, password: str = None, full_name: str = None):
+    from fastapi import Form
+    if email is None:
+        email = Form(...)
+    if password is None:
+        password = Form(...)
+    if full_name is None:
+        full_name = Form(...)
     if email in users_db:
         raise HTTPException(status_code=400, detail="Email already registered")
-    
     users_db[email] = {
         "username": email,
         "email": email,
@@ -521,7 +525,6 @@ async def signup(
         "disabled": False,
         "hashed_password": hash_password(password),
     }
-    
     return User(username=email, email=email, full_name=full_name)
 
 @app.get("/get_user_info")
@@ -583,26 +586,23 @@ async def reset_password(
     return {"message": "Password has been reset successfully"}
 
 @app.post("/job_match")
-async def job_match(
-    file: UploadFile = File(...),
-    current_user: dict = Depends(get_current_user),
-    top_n: int = 3
-):
+async def job_match(file: UploadFile = None, current_user: dict = None, top_n: int = 3):
+    from fastapi import Depends
+    if file is None:
+        file = File(...)
+    if current_user is None:
+        current_user = Depends(get_current_user)
     try:
         if not file.filename:
             raise HTTPException(status_code=400, detail="No file uploaded")
-        
         if not allowed_file(file.filename):
             raise HTTPException(status_code=400, detail="File type not allowed")
-        
         contents = await file.read()
         if not contents:
             raise HTTPException(status_code=400, detail="Empty file uploaded")
-        
         text = extract_text_from_content(contents, file.filename)
         resume_data = parse_resume(text)
         return resume_data
-            
     except HTTPException as e:
         raise e
     except Exception as e:
@@ -614,29 +614,36 @@ async def test_endpoint():
     return {"message": "Backend is working!"}
 
 @app.post("/api/analyze-resume")
+<<<<<<< HEAD
 async def analyze_resume(
     file: UploadFile = File(...),
     job_description: str | None = Form(None),
     current_user: dict = Depends(get_current_user)
 ):
+=======
+async def analyze_resume(file: UploadFile = None, job_description: str = None, current_user: dict = None):
+    from fastapi import Form, Depends
+    if file is None:
+        file = File(...)
+    if job_description is None:
+        job_description = Form(None)
+    if current_user is None:
+        current_user = Depends(get_current_user)
+>>>>>>> 1c4ffefbc6ca642e2df418cea7ff8ee496510ce0
     try:
         if not file.filename:
             raise HTTPException(status_code=400, detail="No file uploaded")
-        
         if not allowed_file(file.filename):
             raise HTTPException(status_code=400, detail="File type not allowed")
-        
         contents = await file.read()
         if not contents:
             raise HTTPException(status_code=400, detail="Empty file uploaded")
-        
         text = extract_text_from_content(contents, file.filename)
         if job_description:
             resume_data = parse_resume_with_job_matching(text, job_description)
         else:
             resume_data = parse_resume(text)
         return resume_data
-            
     except HTTPException as e:
         raise e
     except Exception as e:
@@ -648,11 +655,22 @@ async def health_check():
     return {"status": "ok"}
 
 @app.post("/match_resume")
+<<<<<<< HEAD
 async def match_resume(
     file: UploadFile = File(...),
     job_description: str | None = Form(None),
     current_user: dict = Depends(get_current_user)
 ):
+=======
+async def match_resume(file: UploadFile = None, job_description: str = None, current_user: dict = None):
+    from fastapi import Form, Depends
+    if file is None:
+        file = File(...)
+    if job_description is None:
+        job_description = Form(None)
+    if current_user is None:
+        current_user = Depends(get_current_user)
+>>>>>>> 1c4ffefbc6ca642e2df418cea7ff8ee496510ce0
     # Restrict to basic or premium plans
     if current_user.get("plan", "free") == "free":
         raise HTTPException(
@@ -679,19 +697,20 @@ async def match_resume(
         raise HTTPException(status_code=500, detail=f"Resume matching failed: {str(e)}")
 
 @app.post("/chat_with_resume")
-async def chat_with_resume(
-    prompt: str = Form(...),
-    resume_text: str = Form(...),
-    current_user: dict = Depends(get_current_user)
-):
+async def chat_with_resume(prompt: str = None, resume_text: str = None, current_user: dict = None):
+    from fastapi import Form, Depends
+    if prompt is None:
+        prompt = Form(...)
+    if resume_text is None:
+        resume_text = Form(...)
+    if current_user is None:
+        current_user = Depends(get_current_user)
     try:
         if not prompt or not resume_text:
             raise HTTPException(
                 status_code=400, 
                 detail="Prompt and resume text are required"
             )
-        # For demonstration, echo the prompt and resume_text
-        # Replace with OpenAI or other LLM call as needed
         response = (
             f"Prompt: {prompt}\nResume: {resume_text[:100]}..."  # Truncate resume for brevity
         )
@@ -702,7 +721,10 @@ async def chat_with_resume(
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 @app.get("/api/user/plan")
-def get_user_plan(current_user: dict = Depends(get_current_user)):
+def get_user_plan(current_user: dict = None):
+    from fastapi import Depends
+    if current_user is None:
+        current_user = Depends(get_current_user)
     email = current_user.get("email")
     user = users_db.get(email)
     if not user:
@@ -710,10 +732,12 @@ def get_user_plan(current_user: dict = Depends(get_current_user)):
     return {"plan": user.get("plan", "free")}
 
 @app.post("/api/user/upgrade")
-def upgrade_user_plan(
-    plan: str = Body(..., embed=True),
-    current_user: dict = Depends(get_current_user)
-):
+def upgrade_user_plan(plan: str = None, current_user: dict = None):
+    from fastapi import Depends
+    if plan is None:
+        plan = Body(..., embed=True)
+    if current_user is None:
+        current_user = Depends(get_current_user)
     email = current_user.get("email")
     user = users_db.get(email)
     if not user:
@@ -724,11 +748,13 @@ def upgrade_user_plan(
     return {"message": f"Plan upgraded to {plan}"}
 
 @app.post("/cover-letter-rewrite")
-async def cover_letter_rewrite(
-    resume_data: dict = Body(...),
-    job_description: str = Body(...),
-    original_cover_letter: str = Body(...)
-):
+async def cover_letter_rewrite(resume_data: dict = None, job_description: str = None, original_cover_letter: str = None):
+    if resume_data is None:
+        resume_data = Body(...)
+    if job_description is None:
+        job_description = Body(...)
+    if original_cover_letter is None:
+        original_cover_letter = Body(...)
     # Try OpenAI if available
     try:
         if openai.api_key:
@@ -755,7 +781,6 @@ async def cover_letter_rewrite(
             return {"rewritten_cover_letter": rewritten}
     except Exception as e:
         print(f"OpenAI error: {e}")
-    # Fallback: simple template
     skills = ', '.join(resume_data.get('skills', []))
     full_name = resume_data.get('full_name', 'Your Name')
     rewritten = (
@@ -767,10 +792,10 @@ async def cover_letter_rewrite(
     )
     return {"rewritten_cover_letter": rewritten}
 
-
-
 @app.post("/gpt-chat")
-async def gpt_chat(messages: list = Body(...)):
+async def gpt_chat(messages: list = None):
+    if messages is None:
+        messages = Body(...)
     try:
         if openai.api_key:
             response = openai.ChatCompletion.create(
@@ -789,8 +814,10 @@ async def gpt_chat(messages: list = Body(...)):
 
 # User Logout Endpoint
 @app.post("/logout")
-async def logout(token: str = Header(...)):
+async def logout(token: str = None):
     """Logout endpoint (JWT logout is client-side; this is for UI flow)"""
+    if token is None:
+        token = Header(...)
     jti, exp = get_jti_from_token(token)
     if not jti or not exp:
         return {"error": "Invalid token"}
@@ -807,8 +834,10 @@ async def logout(token: str = Header(...)):
 ADMIN_API_KEY = "supersecretadminkey"  # Change this in production!
 
 @app.get("/admin/analytics")
-async def admin_analytics(x_api_key: str = Header(...)):
+async def admin_analytics(x_api_key: str = None):
     """Admin analytics endpoint (requires X-API-KEY header)"""
+    if x_api_key is None:
+        x_api_key = Header(...)
     if x_api_key != ADMIN_API_KEY:
         logger.warning("Unauthorized analytics access attempt.")
         return {"error": "Unauthorized"}
@@ -840,7 +869,9 @@ async def admin_analytics(x_api_key: str = Header(...)):
 
 # Admin User Management Endpoints
 @app.get("/admin/users")
-async def admin_list_users(x_api_key: str = Header(...)):
+async def admin_list_users(x_api_key: str = None):
+    if x_api_key is None:
+        x_api_key = Header(...)
     if x_api_key != ADMIN_API_KEY:
         return {"error": "Unauthorized"}
     db = SessionLocal()
@@ -860,10 +891,19 @@ async def admin_list_users(x_api_key: str = Header(...)):
     return {"users": user_list}
 
 @app.get("/admin/users/{user_id}")
+<<<<<<< HEAD
 async def admin_get_user(
     user_id: int = Path( description="ID of the user to retrieve"),
     x_api_key: str = Header( description="Admin API key")
 ):
+=======
+async def admin_get_user(user_id: int = None, x_api_key: str = None):
+    from fastapi import Path
+    if user_id is None:
+        user_id = Path(...)
+    if x_api_key is None:
+        x_api_key = Header(...)
+>>>>>>> 1c4ffefbc6ca642e2df418cea7ff8ee496510ce0
     if x_api_key != ADMIN_API_KEY:
         return {"error": "Unauthorized"}
     
@@ -889,7 +929,16 @@ async def admin_get_user(
 
 
 @app.post("/admin/users/{user_id}/deactivate")
+<<<<<<< HEAD
 async def admin_deactivate_user(user_id: int = Path(..., description="ID of the user"), x_api_key: str = Header(..., description="Admin API key")):
+=======
+async def admin_deactivate_user(user_id: int = None, x_api_key: str = None):
+    from fastapi import Path
+    if user_id is None:
+        user_id = Path(...)
+    if x_api_key is None:
+        x_api_key = Header(...)
+>>>>>>> 1c4ffefbc6ca642e2df418cea7ff8ee496510ce0
     if x_api_key != ADMIN_API_KEY:
         return {"error": "Unauthorized"}
     db = SessionLocal()
@@ -903,7 +952,12 @@ async def admin_deactivate_user(user_id: int = Path(..., description="ID of the 
     return {"message": "User deactivated"}
 
 @app.post("/admin/users/{user_id}/activate")
-async def admin_activate_user(user_id: int = Path(...), x_api_key: str = Header(...)):
+async def admin_activate_user(user_id: int = None, x_api_key: str = None):
+    from fastapi import Path
+    if user_id is None:
+        user_id = Path(...)
+    if x_api_key is None:
+        x_api_key = Header(...)
     if x_api_key != ADMIN_API_KEY:
         return {"error": "Unauthorized"}
     db = SessionLocal()
@@ -917,7 +971,12 @@ async def admin_activate_user(user_id: int = Path(...), x_api_key: str = Header(
     return {"message": "User activated"}
 
 @app.delete("/admin/users/{user_id}")
-async def admin_delete_user(user_id: int = Path(...), x_api_key: str = Header(...)):
+async def admin_delete_user(user_id: int = None, x_api_key: str = None):
+    from fastapi import Path
+    if user_id is None:
+        user_id = Path(...)
+    if x_api_key is None:
+        x_api_key = Header(...)
     if x_api_key != ADMIN_API_KEY:
         return {"error": "Unauthorized"}
     db = SessionLocal()
@@ -931,7 +990,9 @@ async def admin_delete_user(user_id: int = Path(...), x_api_key: str = Header(..
     return {"message": "User deleted"}
 
 @app.get("/admin/logs")
-async def admin_logs(x_api_key: str = Header(...), lines: int = 100):
+async def admin_logs(x_api_key: str = None, lines: int = 100):
+    if x_api_key is None:
+        x_api_key = Header(...)
     if x_api_key != ADMIN_API_KEY:
         return {"error": "Unauthorized"}
     if not os.path.exists(LOG_FILE):

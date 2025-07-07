@@ -9,7 +9,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-lg border bg-card text-card-foreground shadow-sm",
+      "rounded-xl border bg-card text-card-foreground shadow-soft hover:shadow-lg transition-all duration-300 backdrop-blur-sm",
       className
     )}
     {...props}
@@ -35,10 +35,7 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn(
-      "text-2xl font-semibold leading-none tracking-tight",
-      className
-    )}
+    className={cn("font-semibold leading-none tracking-tight text-lg", className)}
     {...props}
   />
 ))
@@ -76,4 +73,57 @@ const CardFooter = React.forwardRef<
 ))
 CardFooter.displayName = "CardFooter"
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+// Enhanced Card Variants
+const CardGlass = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "rounded-xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/20 dark:border-gray-800/20 shadow-xl hover:shadow-2xl transition-all duration-300",
+      className
+    )}
+    {...props}
+  />
+))
+CardGlass.displayName = "CardGlass"
+
+const CardGradient = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { gradient?: "primary" | "secondary" | "success" | "warning" | "danger" }
+>(({ className, gradient = "primary", ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "rounded-xl border-0 text-white shadow-xl hover:shadow-2xl transition-all duration-300",
+      {
+        "bg-gradient-primary": gradient === "primary",
+        "bg-gradient-secondary": gradient === "secondary",
+        "bg-gradient-success": gradient === "success",
+        "bg-gradient-warning": gradient === "warning",
+        "bg-gradient-danger": gradient === "danger",
+      },
+      className
+    )}
+    {...props}
+  />
+))
+CardGradient.displayName = "CardGradient"
+
+const CardInteractive = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "rounded-xl border bg-card text-card-foreground shadow-soft hover:shadow-glow hover:scale-105 transform transition-all duration-300 cursor-pointer",
+      className
+    )}
+    {...props}
+  />
+))
+CardInteractive.displayName = "CardInteractive"
+
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent, CardGlass, CardGradient, CardInteractive }
