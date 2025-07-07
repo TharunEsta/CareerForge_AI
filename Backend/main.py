@@ -6,7 +6,6 @@ import re
 import secrets
 import tempfile
 from datetime import UTC, datetime, timedelta
-from pathlib import Path as FilePath
 
 import docx2txt
 import fitz  # PyMuPDF
@@ -22,9 +21,9 @@ from fastapi import (
     FastAPI,
     File,
     Form,
-    Path,
     Header,
     HTTPException,
+    Path,
     Query,
     Request,
     UploadFile,
@@ -614,22 +613,14 @@ async def test_endpoint():
     return {"message": "Backend is working!"}
 
 @app.post("/api/analyze-resume")
-<<<<<<< HEAD
-async def analyze_resume(
-    file: UploadFile = File(...),
-    job_description: str | None = Form(None),
-    current_user: dict = Depends(get_current_user)
-):
-=======
 async def analyze_resume(file: UploadFile = None, job_description: str = None, current_user: dict = None):
-    from fastapi import Form, Depends
+    from fastapi import Depends, Form
     if file is None:
         file = File(...)
     if job_description is None:
         job_description = Form(None)
     if current_user is None:
         current_user = Depends(get_current_user)
->>>>>>> 1c4ffefbc6ca642e2df418cea7ff8ee496510ce0
     try:
         if not file.filename:
             raise HTTPException(status_code=400, detail="No file uploaded")
@@ -655,22 +646,14 @@ async def health_check():
     return {"status": "ok"}
 
 @app.post("/match_resume")
-<<<<<<< HEAD
-async def match_resume(
-    file: UploadFile = File(...),
-    job_description: str | None = Form(None),
-    current_user: dict = Depends(get_current_user)
-):
-=======
 async def match_resume(file: UploadFile = None, job_description: str = None, current_user: dict = None):
-    from fastapi import Form, Depends
+    from fastapi import Depends, Form
     if file is None:
         file = File(...)
     if job_description is None:
         job_description = Form(None)
     if current_user is None:
         current_user = Depends(get_current_user)
->>>>>>> 1c4ffefbc6ca642e2df418cea7ff8ee496510ce0
     # Restrict to basic or premium plans
     if current_user.get("plan", "free") == "free":
         raise HTTPException(
@@ -698,7 +681,7 @@ async def match_resume(file: UploadFile = None, job_description: str = None, cur
 
 @app.post("/chat_with_resume")
 async def chat_with_resume(prompt: str = None, resume_text: str = None, current_user: dict = None):
-    from fastapi import Form, Depends
+    from fastapi import Depends, Form
     if prompt is None:
         prompt = Form(...)
     if resume_text is None:
@@ -891,19 +874,11 @@ async def admin_list_users(x_api_key: str = None):
     return {"users": user_list}
 
 @app.get("/admin/users/{user_id}")
-<<<<<<< HEAD
-async def admin_get_user(
-    user_id: int = Path( description="ID of the user to retrieve"),
-    x_api_key: str = Header( description="Admin API key")
-):
-=======
 async def admin_get_user(user_id: int = None, x_api_key: str = None):
-    from fastapi import Path
     if user_id is None:
         user_id = Path(...)
     if x_api_key is None:
         x_api_key = Header(...)
->>>>>>> 1c4ffefbc6ca642e2df418cea7ff8ee496510ce0
     if x_api_key != ADMIN_API_KEY:
         return {"error": "Unauthorized"}
     
@@ -929,16 +904,11 @@ async def admin_get_user(user_id: int = None, x_api_key: str = None):
 
 
 @app.post("/admin/users/{user_id}/deactivate")
-<<<<<<< HEAD
-async def admin_deactivate_user(user_id: int = Path(..., description="ID of the user"), x_api_key: str = Header(..., description="Admin API key")):
-=======
 async def admin_deactivate_user(user_id: int = None, x_api_key: str = None):
-    from fastapi import Path
     if user_id is None:
         user_id = Path(...)
     if x_api_key is None:
         x_api_key = Header(...)
->>>>>>> 1c4ffefbc6ca642e2df418cea7ff8ee496510ce0
     if x_api_key != ADMIN_API_KEY:
         return {"error": "Unauthorized"}
     db = SessionLocal()

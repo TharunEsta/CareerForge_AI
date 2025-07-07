@@ -2,13 +2,6 @@
 Subscription Router for CareerForge AI
 Handles subscription plans, pricing, and usage tracking
 """
-
-<<<<<<< HEAD
-=======
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from typing import Dict, List, Any
->>>>>>> 1c4ffefbc6ca642e2df418cea7ff8ee496510ce0
 import logging
 from datetime import datetime
 from typing import Any

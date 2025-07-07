@@ -1,18 +1,7 @@
-<<<<<<< HEAD
-from sqlalchemy import (
-    Column,
-    DateTime,
-    Integer,
-    String,
-    UniqueConstraint,
-    create_engine,
-)
-from sqlalchemy.orm import declarative_base, sessionmaker
-=======
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, UniqueConstraint, ForeignKey, Float, Boolean
-from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 import uuid
->>>>>>> 1c4ffefbc6ca642e2df418cea7ff8ee496510ce0
+
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String, UniqueConstraint, create_engine
+from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 
 DATABASE_URL = "sqlite:///./test.db"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})

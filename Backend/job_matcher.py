@@ -6,14 +6,10 @@ Handles comprehensive job matching with AI enhancement, skill analysis, and real
 
 import json
 import logging
-from datetime import datetime
-from typing import Dict, List, Any
-import openai
 import os
 import re
 from datetime import datetime
 from typing import Any
-
 import openai
 from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer

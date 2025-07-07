@@ -1,4 +1,5 @@
 import os
+
 try:
     import speech_recognition as sr
 except ImportError:
@@ -7,19 +8,12 @@ try:
     from langdetect import detect
 except ImportError:
     detect = None
-<<<<<<< HEAD
-import os
+from datetime import datetime
 
 import openai
-from fastapi import APIRouter, HTTPException
-=======
-from typing import Optional
-import openai
+from Backend.models import PaymentHistory, SessionLocal, VoiceAssistantLicense
 from fastapi import APIRouter, HTTPException, Query
->>>>>>> 1c4ffefbc6ca642e2df418cea7ff8ee496510ce0
 from pydantic import BaseModel
-from Backend.models import SessionLocal, VoiceAssistantLicense, PaymentHistory
-from datetime import datetime
 
 router = APIRouter()
 

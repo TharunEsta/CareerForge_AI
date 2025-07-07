@@ -2,14 +2,6 @@
 Payment Router for CareerForge AI
 Handles payment creation, verification, and webhooks for multiple gateways
 """
-
-<<<<<<< HEAD
-=======
-from fastapi import APIRouter, HTTPException, Request
-from pydantic import BaseModel
-from typing import List, Optional
-from datetime import datetime
->>>>>>> 1c4ffefbc6ca642e2df418cea7ff8ee496510ce0
 import logging
 import os
 from datetime import datetime
@@ -198,14 +190,11 @@ async def stripe_webhook(request: Request):
             # await update_user_subscription(payment_intent['metadata'])
             
         elif event["type"] == "payment_intent.payment_failed":
-            payment_intent = event["data"]["object"]
-            logger.info("Payment failed: %s", payment_intent['id'])
-        
-        return {"status": "success"}
-        
+            pass
+        return {"status": "ok"}
     except Exception as e:
-        logger.error("Error handling Stripe webhook: %s", e)
-        raise HTTPException(status_code=500, detail="Webhook processing failed")
+        logger.error("Stripe webhook error: %s", e)
+        raise HTTPException(status_code=500, detail="Stripe webhook failed")
 
 @router.post("/webhook/paypal")
 async def paypal_webhook(request: Request):

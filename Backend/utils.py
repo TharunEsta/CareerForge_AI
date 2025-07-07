@@ -507,7 +507,6 @@ if __name__ == "__main__":
     class DummyFileStorage:
         """Simulate Flask's FileStorage for testing with local files."""
         def __init__(self, filepath):
-            import os
             # Only allow files from a specific safe directory, e.g., 'uploads/'
             safe_dir = os.path.abspath('uploads')
             abs_path = os.path.abspath(filepath)
