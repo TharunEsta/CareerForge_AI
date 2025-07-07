@@ -15,18 +15,15 @@ import spacy
 # Third-party imports
 import uvicorn
 from dotenv import load_dotenv
+from fastapi import Depends, Form, File
 from fastapi import (
-    APIRouter,
     Body,
     FastAPI,
-    File,
-    Form,
     Header,
     HTTPException,
     Path,
     Query,
     Request,
-    Response,
     UploadFile,
     status,
 )
