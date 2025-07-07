@@ -14,7 +14,7 @@ export default function AppPage() {
   const [showSubWarning, setShowSubWarning] = React.useState(false);
 
   // TODO: Replace with real subscription check
-  const hasVoiceSubscription = user?.subscription?.plan === "premium" || user?.subscription?.plan === "pro";
+  const hasVoiceSubscription = user?.subscription?.plan === "premium" || user?.subscription?.plan === "enterprise";
 
   const handleVoiceClick = () => {
     if (!hasVoiceSubscription) {

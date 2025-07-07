@@ -138,7 +138,7 @@ export default function PaymentPage() {
           window.location.href = paymentData.payment_url;
         } else {
           // Handle client-side payment (Stripe)
-          handleClientSidePayment(paymentData);
+          // handleClientSidePayment(paymentData);
         }
       } else {
         toast({
@@ -161,31 +161,6 @@ export default function PaymentPage() {
     }
   };
 
-  const handleClientSidePayment = async (paymentData: PaymentResponse) => {
-    // Handle Stripe client-side payment
-    if (paymentData.gateway === 'stripe') {
-      // Load Stripe and handle payment
-      const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-      if (stripe) {
-        const { error } = await stripe.confirmCardPayment(paymentData.transaction_id!);
-        if (error) {
-          toast({
-            title: "Payment Failed",
-            description: error.message,
-            variant: "destructive"
-          });
-          setPaymentStatus('failed');
-        } else {
-          toast({
-            title: "Payment Successful",
-            description: "Your subscription has been activated!",
-          });
-          setPaymentStatus('success');
-        }
-      }
-    }
-  };
-
   const getPaymentMethodIcon = (methodId: string) => {
     switch (methodId) {
       case 'credit_card':
@@ -194,7 +169,7 @@ export default function PaymentPage() {
       case 'paypal':
         return <Paypal className="h-5 w-5" />;
       default:
-        return <CreditCard className="h-5 w-5" />;
+        return <span>PayPal</span>;
     }
   };
 
@@ -427,11 +402,4 @@ export default function PaymentPage() {
       </div>
     </div>
   );
-}
-
-// Mock Stripe loader - replace with actual Stripe integration
-const loadStripe = async (publishableKey: string) => {
-  // This would load the actual Stripe library
-  console.log('Loading Stripe with key:', publishableKey);
-  return null;
-}; 
+} 
