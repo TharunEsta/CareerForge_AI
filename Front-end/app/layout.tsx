@@ -1,7 +1,12 @@
+'use client';
+
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { Providers } from "@/components/Providers"
+import SplashScreen from "@/components/ui/SplashScreen"
+import * as React from "react"
+import MicroDashboardMenu from "@/components/ui/MicroDashboardMenu"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -65,6 +70,30 @@ export const metadata: Metadata = {
   themeColor: "#3B82F6",
 }
 
+function ClientRootLayout({ children }: { children: React.ReactNode }) {
+  const [showSplash, setShowSplash] = React.useState(true);
+
+  React.useEffect(() => {
+    const splashShown = sessionStorage.getItem("splash_shown");
+    if (!splashShown) {
+      setShowSplash(true);
+      setTimeout(() => {
+        setShowSplash(false);
+        sessionStorage.setItem("splash_shown", "true");
+      }, 2000);
+    } else {
+      setShowSplash(false);
+    }
+  }, []);
+
+  return (
+    <>
+      <SplashScreen show={showSplash} />
+      <div style={{ display: showSplash ? "none" : "block" }}>{children}</div>
+    </>
+  );
+}
+
 export default function RootLayout({
   children,
 }: {
@@ -81,7 +110,8 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <Providers>
-          {children}
+          <MicroDashboardMenu />
+          <ClientRootLayout>{children}</ClientRootLayout>
         </Providers>
       </body>
     </html>

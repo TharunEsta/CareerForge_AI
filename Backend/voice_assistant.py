@@ -9,8 +9,10 @@ except ImportError:
 from typing import Optional
 import openai
 import os
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
+from Backend.models import SessionLocal, Subscription, VoiceAssistantLicense, PaymentHistory, User
+from datetime import datetime, timedelta
 
 router = APIRouter()
 
@@ -246,6 +248,108 @@ async def text_to_speech(text: str, language: str = "en"):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating speech: {str(e)}")
+
+class SubscribeRequest(BaseModel):
+    plan_id: str
+    payment_gateway: str  # 'paypal', 'razorpay', 'stripe'
+    auto_renew: bool = True
+
+class SubscribeResponse(BaseModel):
+    payment_url: str
+    message: str
+
+class LicenseResponse(BaseModel):
+    license_key: str
+    plan_id: str
+    status: str
+    start_date: datetime
+    end_date: datetime
+    wake_name: str
+
+class WakeNameRequest(BaseModel):
+    wake_name: str
+
+class PaymentHistoryResponse(BaseModel):
+    payments: list
+
+@router.post("/voice-assistant/subscribe", response_model=SubscribeResponse)
+async def subscribe_voice_assistant(request: SubscribeRequest, user_id: int = Query(...)):
+    """Initiate payment for voice assistant subscription"""
+    # Payment integration logic goes here (return payment_url)
+    # For now, return a placeholder
+    return SubscribeResponse(payment_url="https://payment-gateway.com/pay", message="Payment initiated.")
+
+@router.get("/voice-assistant/license", response_model=LicenseResponse)
+async def get_voice_assistant_license(user_id: int = Query(...)):
+    """Get or issue license for paid user"""
+    db = SessionLocal()
+    license = db.query(VoiceAssistantLicense).filter_by(user_id=user_id, status="active").first()
+    if not license:
+        db.close()
+        raise HTTPException(status_code=404, detail="No active license found. Please subscribe.")
+    resp = LicenseResponse(
+        license_key=license.license_key,
+        plan_id=license.plan_id,
+        status=license.status,
+        start_date=license.start_date,
+        end_date=license.end_date,
+        wake_name=license.wake_name
+    )
+    db.close()
+    return resp
+
+@router.get("/voice-assistant/download-link")
+async def get_voice_assistant_download_link(user_id: int = Query(...)):
+    """Provide download/setup link if user has active license"""
+    db = SessionLocal()
+    license = db.query(VoiceAssistantLicense).filter_by(user_id=user_id, status="active").first()
+    db.close()
+    if not license:
+        raise HTTPException(status_code=403, detail="No active license. Please subscribe.")
+    return {"download_url": "https://yourdomain.com/download/voice-assistant-app"}
+
+@router.post("/voice-assistant/wake-name")
+async def set_wake_name(request: WakeNameRequest, user_id: int = Query(...)):
+    """Set custom wake name for the assistant"""
+    db = SessionLocal()
+    license = db.query(VoiceAssistantLicense).filter_by(user_id=user_id, status="active").first()
+    if not license:
+        db.close()
+        raise HTTPException(status_code=404, detail="No active license found.")
+    license.wake_name = request.wake_name
+    db.commit()
+    db.close()
+    return {"message": f"Wake name set to {request.wake_name}"}
+
+@router.get("/voice-assistant/wake-name")
+async def get_wake_name(user_id: int = Query(...)):
+    """Get current wake name for the assistant"""
+    db = SessionLocal()
+    license = db.query(VoiceAssistantLicense).filter_by(user_id=user_id, status="active").first()
+    db.close()
+    if not license:
+        raise HTTPException(status_code=404, detail="No active license found.")
+    return {"wake_name": license.wake_name}
+
+@router.get("/voice-assistant/payment-history", response_model=PaymentHistoryResponse)
+async def get_payment_history(user_id: int = Query(...)):
+    """List payment history for the user"""
+    db = SessionLocal()
+    payments = db.query(PaymentHistory).filter_by(user_id=user_id).order_by(PaymentHistory.created_at.desc()).all()
+    db.close()
+    payment_list = [
+        {
+            "amount": p.amount,
+            "currency": p.currency,
+            "payment_method": p.payment_method,
+            "payment_gateway": p.payment_gateway,
+            "transaction_id": p.transaction_id,
+            "status": p.status,
+            "created_at": p.created_at,
+            "invoice_url": p.invoice_url
+        } for p in payments
+    ]
+    return PaymentHistoryResponse(payments=payment_list)
 
 # Include the router in main.py
 # from voice_assistant import router as voice_router
