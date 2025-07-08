@@ -10,7 +10,6 @@ export default function LinkedInOptimizationPage() {
     summary: '',
     experience: '',
     skills: '',
-    keywords: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   const [optimizationResults, setOptimizationResults] = useState<any>(null);
@@ -216,7 +215,6 @@ export default function LinkedInOptimizationPage() {
                         summary: '',
                         experience: '',
                         skills: '',
-                        keywords: ''
                       });
                     }}
                     className="text-blue-600 hover:text-blue-700 font-medium"
