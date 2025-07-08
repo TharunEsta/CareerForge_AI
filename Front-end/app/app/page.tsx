@@ -49,7 +49,7 @@ export default function AppPage() {
           <Button variant="ghost" size="icon" className="text-white/80 hover:bg-[#23242A]" aria-label="Account">
             <Avatar>
               <AvatarImage src={user?.avatarUrl || "/placeholder-user.jpg"} alt={user?.name || "U"} />
-              <AvatarFallback>{user?.name?.[0] || "U"}</AvatarFallback>
+              <AvatarFallback>{user?.name?.[0] || 'U'}</AvatarFallback>
             </Avatar>
           </Button>
           <Button variant="ghost" size="icon" className="text-blue-400 hover:bg-[#23242A]" aria-label="Upgrade">

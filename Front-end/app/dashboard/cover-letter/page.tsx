@@ -8,7 +8,7 @@ import dynamic from "next/dynamic";
 const CoverLetterPage = () => {
   const router = useRouter();
   const [userPlan, setUserPlan] = useState("free");
-  const [jobDescription, setJobDescription] = useState("");
+  const [jobDescription, setJobDescription] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [coverLetter, setCoverLetter] = useState<string | null>(null);

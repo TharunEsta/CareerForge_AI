@@ -6,12 +6,12 @@ import { useRouter } from 'next/navigation';
 export default function ResumeRewritePage() {
   const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [rewriteOptions, setRewriteOptions] = useState({
+  const [form, setForm] = useState({
     style: 'professional',
     focus: 'achievements',
     length: 'standard',
     targetRole: '',
-    industry: 'technology'
+    industry: 'technology',
   });
   const [isLoading, setIsLoading] = useState(false);
   const [rewrittenResume, setRewrittenResume] = useState<any>(null);
@@ -25,7 +25,7 @@ export default function ResumeRewritePage() {
   };
 
   const handleOptionChange = (option: string, value: string) => {
-    setRewriteOptions(prev => ({
+    setForm(prev => ({
       ...prev,
       [option]: value
     }));
@@ -187,7 +187,7 @@ Tools & Methodologies: Agile, Scrum, JIRA, Postman`,
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Writing Style</label>
                     <select
-                      value={rewriteOptions.style}
+                      value={form.style}
                       onChange={(e) => handleOptionChange('style', e.target.value)}
                       className="w-full p-3 border border-gray-300 rounded-md"
                     >
@@ -202,7 +202,7 @@ Tools & Methodologies: Agile, Scrum, JIRA, Postman`,
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Focus Area</label>
                     <select
-                      value={rewriteOptions.focus}
+                      value={form.focus}
                       onChange={(e) => handleOptionChange('focus', e.target.value)}
                       className="w-full p-3 border border-gray-300 rounded-md"
                     >
@@ -217,7 +217,7 @@ Tools & Methodologies: Agile, Scrum, JIRA, Postman`,
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Length</label>
                     <select
-                      value={rewriteOptions.length}
+                      value={form.length}
                       onChange={(e) => handleOptionChange('length', e.target.value)}
                       className="w-full p-3 border border-gray-300 rounded-md"
                     >
@@ -231,7 +231,7 @@ Tools & Methodologies: Agile, Scrum, JIRA, Postman`,
                     <label className="block text-sm font-medium text-gray-700 mb-2">Target Role (Optional)</label>
                     <input
                       type="text"
-                      value={rewriteOptions.targetRole}
+                      value={form.targetRole}
                       onChange={(e) => handleOptionChange('targetRole', e.target.value)}
                       placeholder="e.g., Senior Software Engineer"
                       className="w-full p-3 border border-gray-300 rounded-md"
@@ -241,7 +241,7 @@ Tools & Methodologies: Agile, Scrum, JIRA, Postman`,
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
                     <select
-                      value={rewriteOptions.industry}
+                      value={form.industry}
                       onChange={(e) => handleOptionChange('industry', e.target.value)}
                       className="w-full p-3 border border-gray-300 rounded-md"
                     >

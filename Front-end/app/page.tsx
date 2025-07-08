@@ -118,7 +118,7 @@ const initialMessages: Message[] = []
 // Create a new component that will be wrapped by both providers
 function AppContent() {
   const [messages, setMessages] = useState<Message[]>(initialMessages)
-  const [input, setInput] = useState("")
+  const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = React.useState<string>("chat")
   const [messageCount, setMessageCount] = useState(0)

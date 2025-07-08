@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('overview');
-  const [users, setUsers] = useState([
+  const [users] = useState([
     { id: 1, name: 'John Doe', email: 'john@example.com', plan: 'premium', status: 'active', lastLogin: '2024-01-15' },
     { id: 2, name: 'Jane Smith', email: 'jane@example.com', plan: 'free', status: 'active', lastLogin: '2024-01-14' },
     { id: 3, name: 'Bob Johnson', email: 'bob@example.com', plan: 'premium', status: 'inactive', lastLogin: '2024-01-10' }
