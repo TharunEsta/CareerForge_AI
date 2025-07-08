@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function DashboardPage() {
     <div className="min-h-screen flex bg-gray-50">
       <aside className="hidden md:block w-64 bg-white border-r shadow-sm flex flex-col py-8 px-4">
         <div className="flex items-center gap-2 mb-8">
-                  <img src="/placeholder-logo.svg" alt="CareerForge AI Logo" className="h-8 w-8" />
+                  <Image src="/placeholder-logo.svg" alt="CareerForge AI Logo" className="h-8 w-8" width={32} height={32} />
         <span className="font-bold text-lg text-blue-700">CareerForge AI</span>
         </div>
         <nav className="flex-1 space-y-2">

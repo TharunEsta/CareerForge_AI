@@ -89,7 +89,7 @@ export default function VoiceAssistantPage() {
                     </li>
                     <li className="flex items-center gap-2">
                       <Badge variant="outline" className="text-xs">Ask questions:</Badge>
-                      "What's the weather like?"
+                      "What&rsquo;s the weather like?"
                     </li>
                     <li className="flex items-center gap-2">
                       <Badge variant="outline" className="text-xs">Get help:</Badge>

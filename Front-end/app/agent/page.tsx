@@ -14,7 +14,7 @@ export default function AgentPage() {
     {
       id: '1',
       type: 'assistant',
-      content: "Hello! I'm your AI career assistant. I can help you with resume optimization, job matching, interview preparation, and much more. What would you like to work on today?",
+      content: "Hello! I&rsquo;m your AI career assistant. I can help you with resume optimization, job matching, interview preparation, and much more. What would you like to work on today?",
       timestamp: new Date()
     }
   ]);
@@ -47,13 +47,13 @@ export default function AgentPage() {
     // Simulate AI response
     setTimeout(() => {
       const responses = [
-        "I'd be happy to help you with that! Let me analyze your request and provide some personalized suggestions.",
-        "That's a great question! Based on your situation, I recommend focusing on highlighting your most relevant achievements.",
+        "I&rsquo;d be happy to help you with that! Let me analyze your request and provide some personalized suggestions.",
+        "That&rsquo;s a great question! Based on your situation, I recommend focusing on highlighting your most relevant achievements.",
         "I can help you optimize your resume for that specific role. Would you like me to analyze your current resume first?",
         "For interview preparation, I suggest practicing common questions and preparing specific examples from your experience.",
         "Let me help you identify the key skills and keywords that would make your application stand out for this position.",
         "I can assist you with creating a compelling cover letter that matches the job requirements and your background.",
-        "Based on your experience, I'd recommend emphasizing your technical skills and quantifiable achievements.",
+        "Based on your experience, I&rsquo;d recommend emphasizing your technical skills and quantifiable achievements.",
         "For networking, I suggest reaching out to professionals in your target companies and attending industry events."
       ];
 
@@ -224,7 +224,7 @@ export default function AgentPage() {
               </div>
               <h3 className="text-lg font-semibold mb-2">Resume Optimization</h3>
               <p className="text-gray-600 text-sm">
-                Get personalized feedback and suggestions to improve your resume's effectiveness.
+                Get personalized feedback and suggestions to improve your resume&rsquo;s effectiveness.
               </p>
             </div>
 

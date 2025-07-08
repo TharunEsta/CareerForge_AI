@@ -87,7 +87,7 @@ const VoiceAssistant: React.FC = () => {
     {
       id: '1',
       type: 'assistant',
-      content: 'Hello! I\'m your multilingual AI career assistant. I can help you in multiple languages with resume analysis, job matching, interview preparation, and much more. What would you like to know?',
+      content: 'Hello! I&rsquo;m your multilingual AI career assistant. I can help you in multiple languages with resume analysis, job matching, interview preparation, and much more. What would you like to know?',
       timestamp: new Date(),
       language: 'en-US'
     }
@@ -396,7 +396,7 @@ const VoiceAssistant: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        handleUserMessage(`I've uploaded a file: ${file.name}. Please analyze it.`);
+        handleUserMessage(`I&rsquo;ve uploaded a file: ${file.name}. Please analyze it.`);
       }
     } catch (error) {
       console.error('Error uploading file:', error);
@@ -562,7 +562,7 @@ const VoiceAssistant: React.FC = () => {
               )}
             </CardTitle>
             <CardDescription>
-              Speak naturally in your preferred language. I'll understand and respond accordingly.
+              Speak naturally in your preferred language. I&rsquo;ll understand and respond accordingly.
             </CardDescription>
           </CardHeader>
           <CardContent>
