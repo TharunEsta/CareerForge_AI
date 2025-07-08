@@ -47,15 +47,55 @@ export default function PaymentPage() {
   const [paymentStatus, setPaymentStatus] = useState<string>('');
   const { toast } = useToast();
 
+  // Mock payment methods - replace with actual API call
+  const mockPaymentMethods: PaymentMethod[] = [
+    { id: 'credit_card', name: 'Credit Card', gateway: 'stripe', description: 'Visa, Mastercard, American Express' },
+    { id: 'paypal', name: 'PayPal', gateway: 'paypal', description: 'Pay with your PayPal account' },
+    { id: 'bank_transfer', name: 'Bank Transfer', gateway: 'bank', description: 'Direct bank transfer' }
+  ];
+
+  // Mock plans - replace with actual API call
+  const mockPlans = {
+    free: { id: 'free', name: 'Free', price_monthly: 0, price_yearly: 0, description: 'Perfect for trying out CareerForge AI' },
+    starter: { id: 'starter', name: 'Starter', price_monthly: 9.99, price_yearly: 99, description: 'Great for individual job seekers' },
+    pro: { id: 'pro', name: 'Pro', price_monthly: 24.99, price_yearly: 249, description: 'Perfect for serious career development' },
+    growth: { id: 'growth', name: 'Growth', price_monthly: 49.99, price_yearly: 499, description: 'For power users and small teams' }
+  };
+
   useEffect(() => {
-    // Get user's country (you can use IP geolocation or user preference)
-    detectUserCountry();
-    fetchPaymentMethods();
-  }, [userCountry]);
+    initializePaymentPage();
+  }, []);
+
+  const initializePaymentPage = async () => {
+    try {
+      // Get plan from URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const planId = urlParams.get('plan') || 'starter';
+      
+      // Set selected plan
+      const plan = mockPlans[planId as keyof typeof mockPlans] || mockPlans.starter;
+      setSelectedPlan(plan);
+
+      // Set payment methods
+      setPaymentMethods(mockPaymentMethods);
+      if (mockPaymentMethods.length > 0) {
+        setSelectedPaymentMethod(mockPaymentMethods[0].id);
+      }
+
+      // Detect user country
+      await detectUserCountry();
+    } catch (error) {
+      console.error('Error initializing payment page:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load payment options",
+        variant: "destructive"
+      });
+    }
+  };
 
   const detectUserCountry = async () => {
     try {
-      // You can use a geolocation service or get from user preferences
       const response = await fetch('https://ipapi.co/json/');
       const data = await response.json();
       setUserCountry(data.country_code || 'US');
@@ -64,42 +104,6 @@ export default function PaymentPage() {
       setUserCountry('US');
     }
   };
-
-  const fetchPaymentMethods = async () => {
-    try {
-      const response = await fetch(`/api/payment/methods/${userCountry}`);
-      if (response.ok) {
-        const methods = await response.json();
-        setPaymentMethods(methods);
-        if (methods.length > 0) {
-          setSelectedPaymentMethod(methods[0].id);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching payment methods:', error);
-    }
-  };
-
-  const getPlanFromUrl = () => {
-    // Get plan from URL parameters or localStorage
-    const urlParams = new URLSearchParams(window.location.search);
-    const planId = urlParams.get('plan') || 'starter';
-    
-    // Mock plan data - replace with actual API call
-    const plans = {
-      free: { id: 'free', name: 'Free', price_monthly: 0, price_yearly: 0, description: 'Perfect for trying out CareerForge AI' },
-      starter: { id: 'starter', name: 'Starter', price_monthly: 9.99, price_yearly: 99, description: 'Great for individual job seekers' },
-      pro: { id: 'pro', name: 'Pro', price_monthly: 24.99, price_yearly: 249, description: 'Perfect for serious career development' },
-      growth: { id: 'growth', name: 'Growth', price_monthly: 49.99, price_yearly: 499, description: 'For power users and small teams' }
-    };
-    
-    return plans[planId as keyof typeof plans] || plans.starter;
-  };
-
-  useEffect(() => {
-    const plan = getPlanFromUrl();
-    setSelectedPlan(plan);
-  }, []);
 
   const handlePayment = async () => {
     if (!selectedPlan || !selectedPaymentMethod) {
@@ -115,43 +119,25 @@ export default function PaymentPage() {
     setPaymentStatus('processing');
 
     try {
-      const response = await fetch('/api/payment/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          plan_id: selectedPlan.id,
-          billing_cycle: billingCycle,
-          payment_method: selectedPaymentMethod,
-          user_country: userCountry,
-          user_email: 'user@example.com', // Get from auth context
-          user_id: 'user123' // Get from auth context
-        })
+      // Simulate payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Mock successful payment
+      toast({
+        title: "Payment Successful",
+        description: "Your subscription has been activated!",
       });
+      setPaymentStatus('success');
 
-      const paymentData: PaymentResponse = await response.json();
+      // Redirect to dashboard after successful payment
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 2000);
 
-      if (paymentData.status === 'pending') {
-        if (paymentData.payment_url) {
-          // Redirect to payment gateway
-          window.location.href = paymentData.payment_url;
-        } else {
-          // Handle client-side payment (Stripe)
-          // handleClientSidePayment(paymentData);
-        }
-      } else {
-        toast({
-          title: "Payment Failed",
-          description: paymentData.error_message || "Payment creation failed",
-          variant: "destructive"
-        });
-        setPaymentStatus('failed');
-      }
     } catch (error) {
       console.error('Payment error:', error);
       toast({
-        title: "Payment Error",
+        title: "Payment Failed",
         description: "An error occurred while processing your payment",
         variant: "destructive"
       });
@@ -168,8 +154,10 @@ export default function PaymentPage() {
         return <CreditCard className="h-5 w-5" />;
       case 'paypal':
         return <Paypal className="h-5 w-5" />;
+      case 'bank_transfer':
+        return <Globe className="h-5 w-5" />;
       default:
-        return <span>PayPal</span>;
+        return <CreditCard className="h-5 w-5" />;
     }
   };
 
@@ -182,11 +170,19 @@ export default function PaymentPage() {
     return userCountry === 'IN' ? 'INR' : 'USD';
   };
 
+  const getSavingsPercentage = () => {
+    if (!selectedPlan || billingCycle === 'monthly') return 0;
+    const monthlyTotal = selectedPlan.price_monthly * 12;
+    const yearlyPrice = selectedPlan.price_yearly;
+    return Math.round(((monthlyTotal - yearlyPrice) / monthlyTotal) * 100);
+  };
+
   if (!selectedPlan) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Loading...</h1>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <h1 className="text-2xl font-bold text-gray-900 mt-4 mb-2">Loading...</h1>
           <p className="text-gray-600">Please wait while we load your plan details.</p>
         </div>
       </div>
@@ -227,10 +223,14 @@ export default function PaymentPage() {
                     {getCurrency()} {getAmount()}/{billingCycle === 'monthly' ? 'month' : 'year'}
                   </span>
                 </div>
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-gray-600">Billing Cycle</span>
-                  <span className="text-sm text-gray-500 capitalize">{billingCycle}</span>
-                </div>
+                {billingCycle === 'yearly' && getSavingsPercentage() > 0 && (
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-gray-600">Savings</span>
+                    <Badge variant="secondary" className="text-green-600">
+                      Save {getSavingsPercentage()}%
+                    </Badge>
+                  </div>
+                )}
               </div>
 
               {/* Billing Cycle Toggle */}
@@ -243,7 +243,7 @@ export default function PaymentPage() {
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="yearly" id="yearly" />
-                    <Label htmlFor="yearly">Yearly (Save 17%)</Label>
+                    <Label htmlFor="yearly">Yearly (Save {getSavingsPercentage()}%)</Label>
                   </div>
                 </RadioGroup>
               </div>
