@@ -161,9 +161,13 @@ export default function PaymentPage() {
     }
   };
 
-  const getAmount = () => {
+  const getPrice = (): number => {
     if (!selectedPlan) return 0;
     return billingCycle === 'monthly' ? selectedPlan.price_monthly : selectedPlan.price_yearly;
+  };
+
+  const getAmount = (): number => {
+    return getPrice();
   };
 
   const getCurrency = () => {
@@ -176,6 +180,22 @@ export default function PaymentPage() {
     const yearlyPrice = selectedPlan.price_yearly;
     return Math.round(((monthlyTotal - yearlyPrice) / monthlyTotal) * 100);
   };
+
+  function renderPaymentUI() {
+    if (!selectedPlan) {
+      return (
+        <div className="text-center text-sm text-muted-foreground">
+          Please select a plan to continue.
+        </div>
+      );
+    }
+
+    return (
+      <div>
+        {/* Payment form UI here */}
+      </div>
+    );
+  }
 
   if (!selectedPlan) {
     return (
