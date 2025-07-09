@@ -1,10 +1,4 @@
 'use client';
-<<<<<<< Updated upstream
-import * as React from "react";
-import { Avatar, AvatarImage, AvatarFallback } from "./avatar";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator } from "./dropdown-menu";
-import { useAuth } from "../AuthContext";
-=======
 import * as React from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from './avatar';
 import {
@@ -16,7 +10,6 @@ import {
   DropdownMenuSeparator,
 } from './dropdown-menu';
 import { useAuth } from '@/components/AuthContext';
->>>>>>> Stashed changes
 
 export default function MicroDashboardMenu() {
   const { user, logout } = useAuth();

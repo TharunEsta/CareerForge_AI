@@ -1,9 +1,13 @@
+<<<<<<< HEAD
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import * as React from 'react'
 import ClientAppWrapper from '@/components/ClientAppWrapper'
 import ClientRootLayout from '@/components/ClientRootLayout'
+=======
+"use client";
+>>>>>>> dabb9f7 (Perplexity-style UI: sidebar, centered chat, build fixes, and dependency updates)
 
 <<<<<<< Updated upstream
 import type { Metadata } from "next"
@@ -93,15 +97,30 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="theme-color" content="#3B82F6" />
         <meta name="msapplication-TileColor" content="#3B82F6" />
       </head>
+<<<<<<< HEAD
 <<<<<<< Updated upstream
       <body className={inter.className + " bg-gradient-to-br from-gray-900 via-gray-950 to-gray-900 min-h-screen flex flex-col items-center justify-center"}>
+=======
+      <body className={inter.className + " bg-gradient-to-br from-gray-900 via-gray-950 to-gray-900 min-h-screen flex flex-row"}>
+>>>>>>> dabb9f7 (Perplexity-style UI: sidebar, centered chat, build fixes, and dependency updates)
         <Providers>
           <MicroDashboardMenu />
-          <div className="w-full max-w-2xl mx-auto flex flex-col items-center justify-center min-h-screen px-4">
-            <header className="w-full flex flex-col items-center py-8">
+          <aside className="hidden md:flex flex-col w-64 h-screen bg-black/80 border-r border-gray-800 p-6 fixed left-0 top-0 z-40">
+            <div className="flex flex-col items-center mb-8">
               <Logo size="lg" />
-            </header>
-            <main className="w-full flex-1 flex flex-col items-center justify-center bg-black/60 rounded-2xl shadow-xl p-8 mb-8">
+              <span className="text-white font-bold text-xl mt-2">CareerForge AI</span>
+            </div>
+            <nav className="flex-1 flex flex-col gap-4 text-gray-300">
+              <a href="/" className="hover:bg-gray-800 rounded-lg px-4 py-2">Home</a>
+              <a href="/dashboard" className="hover:bg-gray-800 rounded-lg px-4 py-2">Dashboard</a>
+              <a href="/job_match" className="hover:bg-gray-800 rounded-lg px-4 py-2">Job Match</a>
+              <a href="/resume" className="hover:bg-gray-800 rounded-lg px-4 py-2">Resume</a>
+              <a href="/pricing" className="hover:bg-gray-800 rounded-lg px-4 py-2">Pricing</a>
+            </nav>
+            <div className="mt-auto text-xs text-gray-500 text-center">© 2024 CareerForge</div>
+          </aside>
+          <div className="flex-1 flex flex-col items-center justify-center min-h-screen ml-0 md:ml-64 transition-all duration-300">
+            <main className="w-full max-w-2xl flex flex-col items-center justify-center bg-black/60 rounded-2xl shadow-xl p-8 my-8 mx-auto">
               <ClientRootLayout>{children}</ClientRootLayout>
             </main>
           </div>
