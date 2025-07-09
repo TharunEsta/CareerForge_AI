@@ -21,6 +21,15 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [showGetPlus, setShowGetPlus] = useState(false);
+  const [usageCount, setUsageCount] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return parseInt(localStorage.getItem('resume_usage') || '0', 10);
+    }
+    return 0;
+  });
+
+  const FREE_LIMIT = 5;
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -58,13 +67,13 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
   };
 
   const handleAnalyze = async () => {
+    if (usageCount >= FREE_LIMIT) {
+      setShowGetPlus(true);
+      return;
+    }
     if (!uploadedFile) return;
-
     setIsAnalyzing(true);
-    
-    // Simulate analysis delay
     await new Promise(resolve => setTimeout(resolve, 2000));
-    
     const mockResult: ResumeAnalysisResult = {
       skills: ['React', 'TypeScript', 'Node.js', 'Python', 'AWS'],
       experience: '5+ years in software development',
@@ -75,13 +84,38 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
         'Highlight leadership experience'
       ]
     };
-    
     onAnalysis(mockResult);
     setIsAnalyzing(false);
+    const newCount = usageCount + 1;
+    setUsageCount(newCount);
+    localStorage.setItem('resume_usage', newCount.toString());
+    if (newCount >= FREE_LIMIT) {
+      setShowGetPlus(true);
+    }
   };
 
   return (
     <Card className="w-full max-w-md group hover:shadow-xl transition-all duration-500 animate-fade-in">
+      {showGetPlus && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+            <h2 className="text-2xl font-bold mb-4 text-blue-700">Get Plus to Unlock More Analyses</h2>
+            <p className="mb-4 text-gray-700">You have reached your free limit of {FREE_LIMIT} resume analyses. Upgrade to Plus for unlimited access and premium features!</p>
+            <button
+              onClick={() => window.location.href = '/pricing'}
+              className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg transition mb-2"
+            >
+              Upgrade to Plus
+            </button>
+            <button
+              onClick={() => setShowGetPlus(false)}
+              className="w-full py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium transition"
+            >
+              Maybe Later
+            </button>
+          </div>
+        </div>
+      )}
       <CardHeader className="text-center pb-4">
         <div className="mx-auto mb-4 w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center">
           <FileText className="h-8 w-8 text-white" />

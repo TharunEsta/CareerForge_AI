@@ -7,6 +7,7 @@ import { Providers } from "@/components/Providers"
 import SplashScreen from "@/components/ui/SplashScreen"
 import * as React from "react"
 import MicroDashboardMenu from "@/components/ui/MicroDashboardMenu"
+import { Logo } from "@/components/ui/logo"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -108,10 +109,17 @@ export default function RootLayout({
         <meta name="theme-color" content="#3B82F6" />
         <meta name="msapplication-TileColor" content="#3B82F6" />
       </head>
-      <body className={inter.className}>
+      <body className={inter.className + " bg-gradient-to-br from-gray-900 via-gray-950 to-gray-900 min-h-screen flex flex-col items-center justify-center"}>
         <Providers>
           <MicroDashboardMenu />
-          <ClientRootLayout>{children}</ClientRootLayout>
+          <div className="w-full max-w-2xl mx-auto flex flex-col items-center justify-center min-h-screen px-4">
+            <header className="w-full flex flex-col items-center py-8">
+              <Logo size="lg" />
+            </header>
+            <main className="w-full flex-1 flex flex-col items-center justify-center bg-black/60 rounded-2xl shadow-xl p-8 mb-8">
+              <ClientRootLayout>{children}</ClientRootLayout>
+            </main>
+          </div>
         </Providers>
       </body>
     </html>

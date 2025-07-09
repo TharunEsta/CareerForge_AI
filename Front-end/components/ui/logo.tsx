@@ -3,32 +3,23 @@ import { cn } from '@/lib/utils';
 
 export interface LogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
-  variant?: 'full' | 'icon-only' | 'minimal';
   className?: string;
 }
 
 const sizeMap: Record<NonNullable<LogoProps['size']>, string> = {
-  sm: 'h-6 w-6',
-  md: 'h-10 w-10',
-  lg: 'h-16 w-16',
-  xl: 'h-24 w-24',
+  sm: 'h-6 w-auto',
+  md: 'h-10 w-auto',
+  lg: 'h-16 w-auto',
+  xl: 'h-24 w-auto',
 };
 
-export const Logo: React.FC<LogoProps> = ({ size = 'md', variant = 'full', className = '' }) => {
+export const Logo: React.FC<LogoProps> = ({ size = 'md', className = '' }) => {
   return (
-    <div className={cn('flex items-center font-bold', sizeMap[size as keyof typeof sizeMap], className)}>
-      <span className="text-primary">CF</span>
-      {variant !== 'icon-only' && (
-        <span className="ml-2 text-muted-foreground">CareerForge</span>
-      )}
-    </div>
-  );
-};
-
-export const LogoAnimated: React.FC<LogoProps> = ({ size = 'md', variant = 'full', className = '' }) => {
-  return (
-    <div className={cn('animate-pulse', className)}>
-      <Logo size={size} variant={variant} />
-    </div>
+    <img
+      src="/placeholder-logo.svg"
+      alt="CareerForge Logo"
+      className={cn(sizeMap[size as keyof typeof sizeMap], className)}
+      draggable={false}
+    />
   );
 };

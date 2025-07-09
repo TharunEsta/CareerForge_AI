@@ -47,58 +47,47 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         const token = localStorage.getItem('auth_token');
         if (token) {
-          // In a real app, validate token with backend
-          const mockUser: User = {
-            id: '1',
-            email: 'user@example.com',
-            name: 'John Doe',
-            role: 'user',
-            avatarUrl: '/placeholder-user.jpg',
-            subscription: {
-              plan: 'premium',
-              expiresAt: '2024-12-31'
-            }
-          };
-          setUser(mockUser);
+          const res = await fetch('/api/auth/validate', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (res.ok) {
+            const userData = await res.json();
+            setUser(userData);
+          } else {
+            setUser(null);
+            localStorage.removeItem('auth_token');
+          }
         }
       } catch (error) {
+        setUser(null);
+        localStorage.removeItem('auth_token');
         console.error('Auth check failed:', error);
       } finally {
         setLoading(false);
       }
     };
-
     checkAuth();
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setLoading(true);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock authentication logic
-      if (email && password) {
-        const mockUser: User = {
-          id: '1',
-          email,
-          name: email.split('@')[0],
-          role: 'user',
-          avatarUrl: '/placeholder-user.jpg',
-          subscription: {
-            plan: 'premium',
-            expiresAt: '2024-12-31'
-          }
-        };
-        
-        setUser(mockUser);
-        localStorage.setItem('auth_token', 'mock_token');
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+        localStorage.setItem('auth_token', data.token);
         return true;
+      } else {
+        setUser(null);
+        return false;
       }
-      
-      return false;
     } catch (error) {
+      setUser(null);
       console.error('Login failed:', error);
       return false;
     } finally {
@@ -109,10 +98,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async (): Promise<void> => {
     try {
       setLoading(true);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
       setUser(null);
       localStorage.removeItem('auth_token');
     } catch (error) {
@@ -125,31 +110,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = async (email: string, password: string, name: string): Promise<boolean> => {
     try {
       setLoading(true);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mock registration logic
-      if (email && password && name) {
-        const mockUser: User = {
-          id: '1',
-          email,
-          name,
-          role: 'user',
-          avatarUrl: '/placeholder-user.jpg',
-          subscription: {
-            plan: 'free',
-            expiresAt: '2024-06-30'
-          }
-        };
-        
-        setUser(mockUser);
-        localStorage.setItem('auth_token', 'mock_token');
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, name })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+        localStorage.setItem('auth_token', data.token);
         return true;
+      } else {
+        setUser(null);
+        return false;
       }
-      
-      return false;
     } catch (error) {
+      setUser(null);
       console.error('Registration failed:', error);
       return false;
     } finally {
@@ -160,12 +136,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const updateProfile = async (data: Partial<User>): Promise<void> => {
     try {
       setLoading(true);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (user) {
-        setUser({ ...user, ...data });
+      const token = localStorage.getItem('auth_token');
+      if (!token) return;
+      const res = await fetch('/api/auth/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        const updatedUser = await res.json();
+        setUser(updatedUser);
       }
     } catch (error) {
       console.error('Profile update failed:', error);

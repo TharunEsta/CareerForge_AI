@@ -54,6 +54,14 @@ export default function MatchPage() {
       posted: '3 days ago'
     }
   ]);
+  const FREE_LIMIT = 5;
+  const [showGetPlus, setShowGetPlus] = useState(false);
+  const [usageCount, setUsageCount] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return parseInt(localStorage.getItem('match_usage') || '0', 10);
+    }
+    return 0;
+  });
 
   const handleFilterChange = (filter: string, value: string | boolean) => {
     setSelectedFilters(prev => ({
@@ -63,11 +71,41 @@ export default function MatchPage() {
   };
 
   const handleJobClick = (jobId: number) => {
+    if (usageCount >= FREE_LIMIT) {
+      setShowGetPlus(true);
+      return;
+    }
+    const newCount = usageCount + 1;
+    setUsageCount(newCount);
+    localStorage.setItem('match_usage', newCount.toString());
+    if (newCount >= FREE_LIMIT) {
+      setShowGetPlus(true);
+    }
     router.push(`/dashboard/job-matching?job=${jobId}`);
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {showGetPlus && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+            <h2 className="text-2xl font-bold mb-4 text-blue-700">Get Plus to Unlock More Matches</h2>
+            <p className="mb-4 text-gray-700">You have reached your free limit of {FREE_LIMIT} job matches. Upgrade to Plus for unlimited access and premium features!</p>
+            <button
+              onClick={() => router.push('/pricing')}
+              className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg transition mb-2"
+            >
+              Upgrade to Plus
+            </button>
+            <button
+              onClick={() => setShowGetPlus(false)}
+              className="w-full py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium transition"
+            >
+              Maybe Later
+            </button>
+          </div>
+        </div>
+      )}
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
