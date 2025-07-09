@@ -12,14 +12,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await AIService.generateCoverLetter(resumeText, jobDescription, companyName, position);
-    
+    const result = await AIService.generateCoverLetter(
+      resumeText,
+      jobDescription,
+      companyName,
+      position
+    );
+
     return NextResponse.json(result);
   } catch (error) {
     console.error('Cover Letter API Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to generate cover letter' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to generate cover letter' }, { status: 500 });
   }
-} 
+}

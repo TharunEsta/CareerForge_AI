@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -58,7 +58,7 @@ export default function JobMatchPage() {
             'Include Kubernetes knowledge',
             'Highlight cloud platform experience',
             'Consider adding microservices experience',
-            'Include CI/CD pipeline experience'
+            'Include CI/CD pipeline experience',
           ],
           jobDetails: {
             title: 'Senior Software Engineer',
@@ -71,15 +71,15 @@ export default function JobMatchPage() {
               'Experience with Node.js and TypeScript',
               'Familiarity with cloud platforms (AWS preferred)',
               'Experience with Docker and containerization',
-              'Knowledge of CI/CD pipelines'
-            ]
+              'Knowledge of CI/CD pipelines',
+            ],
           },
           recommendations: [
             'Your React and JavaScript skills are highly valued',
             'Consider highlighting your project management experience',
             'Add specific metrics and achievements to your resume',
-            'Include any cloud platform experience you may have'
-          ]
+            'Include any cloud platform experience you may have',
+          ],
         };
         setMatchResults(mockResults);
         setIsLoading(false);
@@ -130,7 +130,7 @@ export default function JobMatchPage() {
             Job Match Analysis
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Compare your resume with job descriptions and get detailed insights on your match score, 
+            Compare your resume with job descriptions and get detailed insights on your match score,
             skill gaps, and personalized recommendations to improve your application.
           </p>
         </div>
@@ -162,8 +162,18 @@ export default function JobMatchPage() {
                   />
                   <label htmlFor="resume-upload" className="cursor-pointer">
                     <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      <svg
+                        className="w-6 h-6 text-blue-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                        />
                       </svg>
                     </div>
                     <p className="text-lg font-medium text-gray-900 mb-2">Choose a file</p>
@@ -174,10 +184,22 @@ export default function JobMatchPage() {
                 {resumeContent && (
                   <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                     <div className="flex items-center">
-                      <svg className="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <svg
+                        className="w-5 h-5 text-green-600 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
-                      <span className="text-green-800 font-medium">Resume content loaded successfully</span>
+                      <span className="text-green-800 font-medium">
+                        Resume content loaded successfully
+                      </span>
                     </div>
                   </div>
                 )}
@@ -197,9 +219,25 @@ export default function JobMatchPage() {
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     Analyzing...
                   </div>
@@ -228,20 +266,24 @@ export default function JobMatchPage() {
                   Analyze Another Job
                 </button>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div className="text-center p-4 bg-blue-50 rounded-lg">
                   <div className="text-3xl font-bold text-blue-600">{matchResults.matchScore}%</div>
                   <div className="text-sm text-gray-600">Match Score</div>
                 </div>
-                
+
                 <div className="text-center p-4 bg-green-50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">{matchResults.matchedSkills.length}</div>
+                  <div className="text-2xl font-bold text-green-600">
+                    {matchResults.matchedSkills.length}
+                  </div>
                   <div className="text-sm text-gray-600">Matched Skills</div>
                 </div>
-                
+
                 <div className="text-center p-4 bg-yellow-50 rounded-lg">
-                  <div className="text-2xl font-bold text-yellow-600">{matchResults.missingSkills.length}</div>
+                  <div className="text-2xl font-bold text-yellow-600">
+                    {matchResults.missingSkills.length}
+                  </div>
                   <div className="text-sm text-gray-600">Missing Skills</div>
                 </div>
               </div>
@@ -269,7 +311,7 @@ export default function JobMatchPage() {
                     <span className="ml-2 text-gray-900">{matchResults.jobDetails.salary}</span>
                   </div>
                 </div>
-                
+
                 <div className="mt-4">
                   <h4 className="font-medium text-gray-700 mb-2">Requirements:</h4>
                   <ul className="space-y-1">
@@ -286,12 +328,15 @@ export default function JobMatchPage() {
               {/* Skills Analysis */}
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Skills Analysis</h3>
-                
+
                 <div className="mb-4">
                   <h4 className="text-sm font-medium text-green-700 mb-2">✅ Matched Skills</h4>
                   <div className="flex flex-wrap gap-2">
                     {matchResults.matchedSkills.map((skill: string, index: number) => (
-                      <span key={index} className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                      <span
+                        key={index}
+                        className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full"
+                      >
                         {skill}
                       </span>
                     ))}
@@ -302,7 +347,10 @@ export default function JobMatchPage() {
                   <h4 className="text-sm font-medium text-red-700 mb-2">❌ Missing Skills</h4>
                   <div className="flex flex-wrap gap-2">
                     {matchResults.missingSkills.map((skill: string, index: number) => (
-                      <span key={index} className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
+                      <span
+                        key={index}
+                        className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full"
+                      >
                         {skill}
                       </span>
                     ))}
@@ -320,22 +368,42 @@ export default function JobMatchPage() {
                   <ul className="space-y-2">
                     {matchResults.suggestions.map((suggestion: string, index: number) => (
                       <li key={index} className="flex items-start">
-                        <svg className="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        <svg
+                          className="w-5 h-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                          />
                         </svg>
                         <span className="text-sm text-gray-700">{suggestion}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
-                
+
                 <div>
                   <h4 className="font-medium text-gray-700 mb-2">Career Advice:</h4>
                   <ul className="space-y-2">
                     {matchResults.recommendations.map((rec: string, index: number) => (
                       <li key={index} className="flex items-start">
-                        <svg className="w-5 h-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        <svg
+                          className="w-5 h-5 text-green-600 mr-2 mt-0.5 flex-shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
                         <span className="text-sm text-gray-700">{rec}</span>
                       </li>

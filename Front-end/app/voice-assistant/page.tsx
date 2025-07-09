@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import React from 'react';
 import VoiceAssistant from '@/components/VoiceAssistant';
@@ -16,8 +16,8 @@ export default function VoiceAssistantPage() {
             AI Voice Assistant
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Experience the future of AI communication with our multi-language voice assistant. 
-            Speak naturally in any language and get intelligent responses.
+            Experience the future of AI communication with our multi-language voice assistant. Speak
+            naturally in any language and get intelligent responses.
           </p>
         </div>
 
@@ -84,15 +84,21 @@ export default function VoiceAssistantPage() {
                   <h4 className="font-semibold mb-2 text-blue-600">Voice Commands</h4>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs">Try saying:</Badge>
+                      <Badge variant="outline" className="text-xs">
+                        Try saying:
+                      </Badge>
                       "Hello Pandu" or "Hello Gammy"
                     </li>
                     <li className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs">Ask questions:</Badge>
+                      <Badge variant="outline" className="text-xs">
+                        Ask questions:
+                      </Badge>
                       "What&rsquo;s the weather like?"
                     </li>
                     <li className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs">Get help:</Badge>
+                      <Badge variant="outline" className="text-xs">
+                        Get help:
+                      </Badge>
                       "Can you help me with my resume?"
                     </li>
                   </ul>
@@ -118,4 +124,4 @@ export default function VoiceAssistantPage() {
       </div>
     </div>
   );
-} 
+}

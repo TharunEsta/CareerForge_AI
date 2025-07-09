@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,10 +30,10 @@ const LinkedInOptimizationCard: React.FC<LinkedInOptimizationCardProps> = ({ onO
     if (!currentProfile.trim() || !targetRole.trim()) return;
 
     setIsOptimizing(true);
-    
+
     // Simulate AI optimization delay
-    await new Promise(resolve => setTimeout(resolve, 3500));
-    
+    await new Promise((resolve) => setTimeout(resolve, 3500));
+
     const mockResult: LinkedInOptimizationResult = {
       currentProfile,
       optimizedProfile: `Results-driven Software Engineer with 5+ years of experience in full-stack development, specializing in React, Node.js, and cloud technologies. Proven track record of delivering scalable solutions that drive business growth and user engagement.
@@ -51,12 +51,12 @@ Passionate about clean code, agile methodologies, and staying current with emerg
         'Added quantifiable achievements',
         'Incorporated industry keywords',
         'Enhanced professional summary',
-        'Structured skills section'
+        'Structured skills section',
       ],
       score: 88,
-      keywords: ['software engineer', 'full-stack', 'react', 'node.js', 'aws', 'microservices']
+      keywords: ['software engineer', 'full-stack', 'react', 'node.js', 'aws', 'microservices'],
     };
-    
+
     setOptimizedProfile(mockResult.optimizedProfile);
     setShowResult(true);
     onOptimize(mockResult);
@@ -93,12 +93,14 @@ Passionate about clean code, agile methodologies, and staying current with emerg
           <Textarea
             placeholder="Paste your current LinkedIn profile text here..."
             value={currentProfile}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCurrentProfile(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              setCurrentProfile(e.target.value)
+            }
             className="min-h-[200px]"
           />
         </div>
 
-        <Button 
+        <Button
           onClick={handleOptimize}
           disabled={!currentProfile.trim() || !targetRole.trim() || isOptimizing}
           className="w-full"
@@ -111,7 +113,9 @@ Passionate about clean code, agile methodologies, and staying current with emerg
             <div className="space-y-2">
               <label className="text-sm font-medium">Optimized Profile</label>
               <div className="p-4 bg-muted rounded-md min-h-[300px]">
-                <pre className="text-sm leading-relaxed whitespace-pre-wrap font-sans">{optimizedProfile}</pre>
+                <pre className="text-sm leading-relaxed whitespace-pre-wrap font-sans">
+                  {optimizedProfile}
+                </pre>
               </div>
             </div>
 
@@ -119,7 +123,12 @@ Passionate about clean code, agile methodologies, and staying current with emerg
               <div className="space-y-2">
                 <label className="text-sm font-medium">Key Improvements</label>
                 <ul className="text-sm space-y-1">
-                  {['Added quantifiable achievements', 'Incorporated industry keywords', 'Enhanced professional summary', 'Structured skills section'].map((improvement, index) => (
+                  {[
+                    'Added quantifiable achievements',
+                    'Incorporated industry keywords',
+                    'Enhanced professional summary',
+                    'Structured skills section',
+                  ].map((improvement, index) => (
                     <li key={index} className="flex items-center gap-2">
                       <CheckCircle className="h-3 w-3 text-green-600" />
                       {improvement}
@@ -130,8 +139,18 @@ Passionate about clean code, agile methodologies, and staying current with emerg
               <div className="space-y-2">
                 <label className="text-sm font-medium">Target Keywords</label>
                 <div className="flex flex-wrap gap-1">
-                  {['software engineer', 'full-stack', 'react', 'node.js', 'aws', 'microservices'].map((keyword, index) => (
-                    <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                  {[
+                    'software engineer',
+                    'full-stack',
+                    'react',
+                    'node.js',
+                    'aws',
+                    'microservices',
+                  ].map((keyword, index) => (
+                    <span
+                      key={index}
+                      className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded"
+                    >
                       {keyword}
                     </span>
                   ))}

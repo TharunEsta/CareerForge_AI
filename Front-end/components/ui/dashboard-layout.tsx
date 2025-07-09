@@ -1,19 +1,25 @@
+"use client";
+
+"use client";
+
+"use client";
+
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from './button';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
-import { 
-  Home, 
-  FileText, 
-  Briefcase, 
-  MessageSquare, 
-  Settings, 
-  User, 
+import {
+  Home,
+  FileText,
+  Briefcase,
+  MessageSquare,
+  Settings,
+  User,
   LogOut,
   Bell,
   Search,
   Menu,
-  X
+  X,
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -38,16 +44,16 @@ interface DashboardLayoutProps {
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   children,
   sidebarItems = [
-    { icon: <Home className="h-4 w-4" />, label: 'Dashboard', href: '/dashboard' },
-    { icon: <FileText className="h-4 w-4" />, label: 'Resume', href: '/resume' },
-    { icon: <Briefcase className="h-4 w-4" />, label: 'Job Match', href: '/job-match' },
-    { icon: <MessageSquare className="h-4 w-4" />, label: 'Chat', href: '/chat' },
-    { icon: <Settings className="h-4 w-4" />, label: 'Settings', href: '/settings' },
+    { icon: <Home className="h-4 w-4" />, label: 'Dashboard', href: '/dashboard' , active: false, badge: undefined},
+    { icon: <FileText className="h-4 w-4" />, label: 'Resume', href: '/resume' , active: false, badge: undefined},
+    { icon: <Briefcase className="h-4 w-4" />, label: 'Job Match', href: '/job-match' , active: false, badge: undefined},
+    { icon: <MessageSquare className="h-4 w-4" />, label: 'Chat', href: '/chat' , active: false, badge: undefined},
+    { icon: <Settings className="h-4 w-4" />, label: 'Settings', href: '/settings' , active: false, badge: undefined},
   ],
   user,
   onLogout,
   title,
-  subtitle
+  subtitle,
 }) => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
@@ -55,17 +61,19 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary-50/20 dark:to-primary-950/20">
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-card/80 backdrop-blur-xl border-r border-border/50 transform transition-transform duration-300 ease-in-out",
-        sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-      )}>
+      <aside
+        className={cn(
+          'fixed inset-y-0 left-0 z-50 w-64 bg-card/80 backdrop-blur-xl border-r border-border/50 transform transition-transform duration-300 ease-in-out',
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        )}
+      >
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-border/50">
@@ -94,16 +102,20 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 key={index}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 group",
+                  'flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 group',
                   item.active
-                    ? "bg-primary text-primary-foreground shadow-soft"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                    ? 'bg-primary text-primary-foreground shadow-soft'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                 )}
               >
-                <div className={cn(
-                  "transition-colors",
-                  item.active ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground"
-                )}>
+                <div
+                  className={cn(
+                    'transition-colors',
+                    item.active
+                      ? 'text-primary-foreground'
+                      : 'text-muted-foreground group-hover:text-foreground'
+                  )}
+                >
                   {item.icon}
                 </div>
                 <span className="flex-1">{item.label}</span>
@@ -157,14 +169,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               >
                 <Menu className="h-4 w-4" />
               </Button>
-              
+
               <div>
-                {title && (
-                  <h1 className="text-xl font-semibold">{title}</h1>
-                )}
-                {subtitle && (
-                  <p className="text-sm text-muted-foreground">{subtitle}</p>
-                )}
+                {title && <h1 className="text-xl font-semibold">{title}</h1>}
+                {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
               </div>
             </div>
 
@@ -196,9 +204,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         </header>
 
         {/* Page Content */}
-        <main className="p-6">
-          {children}
-        </main>
+        <main className="p-6">{children}</main>
       </div>
     </div>
   );
@@ -223,14 +229,12 @@ export const DashboardCard: React.FC<DashboardCardProps> = ({
   description,
   icon,
   trend,
-  className
+  className,
 }) => {
   return (
-    <Card className={cn("hover:shadow-lg transition-all duration-300", className)}>
+    <Card className={cn('hover:shadow-lg transition-all duration-300', className)}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
-          {title}
-        </CardTitle>
+        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
         {icon && (
           <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
             {icon}
@@ -239,16 +243,17 @@ export const DashboardCard: React.FC<DashboardCardProps> = ({
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{value}</div>
-        {description && (
-          <p className="text-xs text-muted-foreground mt-1">{description}</p>
-        )}
+        {description && <p className="text-xs text-muted-foreground mt-1">{description}</p>}
         {trend && (
           <div className="flex items-center gap-1 mt-2">
-            <span className={cn(
-              "text-xs font-medium",
-              trend.isPositive ? "text-success-600" : "text-destructive"
-            )}>
-              {trend.isPositive ? "+" : "-"}{Math.abs(trend.value)}%
+            <span
+              className={cn(
+                'text-xs font-medium',
+                trend.isPositive ? 'text-success-600' : 'text-destructive'
+              )}
+            >
+              {trend.isPositive ? '+' : '-'}
+              {Math.abs(trend.value)}%
             </span>
             <span className="text-xs text-muted-foreground">from last month</span>
           </div>
@@ -256,4 +261,4 @@ export const DashboardCard: React.FC<DashboardCardProps> = ({
       </CardContent>
     </Card>
   );
-}; 
+};

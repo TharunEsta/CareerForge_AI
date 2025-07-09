@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -14,7 +14,7 @@ export default function ToolsPage() {
       description: 'AI-powered resume analysis with skill extraction and improvement suggestions',
       icon: '📄',
       color: 'blue',
-      features: ['Skill extraction', 'ATS optimization', 'Score analysis', 'Improvement tips']
+      features: ['Skill extraction', 'ATS optimization', 'Score analysis', 'Improvement tips'],
     },
     {
       id: 'job-matcher',
@@ -22,7 +22,12 @@ export default function ToolsPage() {
       description: 'Match your resume with job descriptions and get compatibility scores',
       icon: '🎯',
       color: 'green',
-      features: ['Compatibility scoring', 'Skill gap analysis', 'Keyword matching', 'Interview prep']
+      features: [
+        'Compatibility scoring',
+        'Skill gap analysis',
+        'Keyword matching',
+        'Interview prep',
+      ],
     },
     {
       id: 'cover-letter-generator',
@@ -30,7 +35,7 @@ export default function ToolsPage() {
       description: 'Create personalized cover letters based on your resume and job requirements',
       icon: '📧',
       color: 'purple',
-      features: ['Personalized content', 'Multiple formats', 'Industry-specific', 'A/B testing']
+      features: ['Personalized content', 'Multiple formats', 'Industry-specific', 'A/B testing'],
     },
     {
       id: 'linkedin-optimizer',
@@ -38,7 +43,7 @@ export default function ToolsPage() {
       description: 'Optimize your LinkedIn profile for better visibility and networking',
       icon: '🔗',
       color: 'indigo',
-      features: ['Keyword optimization', 'Profile scoring', 'Network suggestions', 'Content ideas']
+      features: ['Keyword optimization', 'Profile scoring', 'Network suggestions', 'Content ideas'],
     },
     {
       id: 'interview-prepper',
@@ -46,7 +51,7 @@ export default function ToolsPage() {
       description: 'AI-powered interview preparation with common questions and answers',
       icon: '💼',
       color: 'orange',
-      features: ['Question bank', 'Answer suggestions', 'Practice sessions', 'Feedback analysis']
+      features: ['Question bank', 'Answer suggestions', 'Practice sessions', 'Feedback analysis'],
     },
     {
       id: 'salary-negotiator',
@@ -54,7 +59,7 @@ export default function ToolsPage() {
       description: 'Get salary insights and negotiation strategies for your role and location',
       icon: '💰',
       color: 'yellow',
-      features: ['Market research', 'Negotiation tips', 'Benefits analysis', 'Counter-offer help']
+      features: ['Market research', 'Negotiation tips', 'Benefits analysis', 'Counter-offer help'],
     },
     {
       id: 'skill-gap-analyzer',
@@ -62,7 +67,12 @@ export default function ToolsPage() {
       description: 'Identify missing skills and get personalized learning recommendations',
       icon: '📚',
       color: 'teal',
-      features: ['Gap identification', 'Learning paths', 'Resource recommendations', 'Progress tracking']
+      features: [
+        'Gap identification',
+        'Learning paths',
+        'Resource recommendations',
+        'Progress tracking',
+      ],
     },
     {
       id: 'networking-assistant',
@@ -70,8 +80,13 @@ export default function ToolsPage() {
       description: 'AI-powered networking suggestions and conversation starters',
       icon: '🤝',
       color: 'pink',
-      features: ['Connection suggestions', 'Ice breakers', 'Follow-up templates', 'Event recommendations']
-    }
+      features: [
+        'Connection suggestions',
+        'Ice breakers',
+        'Follow-up templates',
+        'Event recommendations',
+      ],
+    },
   ];
 
   const getColorClasses = (color: string) => {
@@ -83,7 +98,7 @@ export default function ToolsPage() {
       orange: 'bg-orange-50 border-orange-200 hover:bg-orange-100 text-orange-700',
       yellow: 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100 text-yellow-700',
       teal: 'bg-teal-50 border-teal-200 hover:bg-teal-100 text-teal-700',
-      pink: 'bg-pink-50 border-pink-200 hover:bg-pink-100 text-pink-700'
+      pink: 'bg-pink-50 border-pink-200 hover:bg-pink-100 text-pink-700',
     };
     return colors[color] || colors.blue;
   };
@@ -120,8 +135,9 @@ export default function ToolsPage() {
             AI Career Tools
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Discover our comprehensive suite of AI-powered tools designed to accelerate your career growth. 
-            From resume optimization to interview preparation, we've got everything you need to succeed.
+            Discover our comprehensive suite of AI-powered tools designed to accelerate your career
+            growth. From resume optimization to interview preparation, we've got everything you need
+            to succeed.
           </p>
         </div>
 
@@ -136,9 +152,7 @@ export default function ToolsPage() {
               <div className="p-6">
                 <div className="text-4xl mb-4">{tool.icon}</div>
                 <h3 className="text-xl font-semibold mb-2">{tool.name}</h3>
-                <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-                  {tool.description}
-                </p>
+                <p className="text-sm text-gray-600 mb-4 leading-relaxed">{tool.description}</p>
                 <div className="space-y-2">
                   {tool.features.map((feature, index) => (
                     <div key={index} className="flex items-center text-xs">
@@ -165,7 +179,8 @@ export default function ToolsPage() {
               </div>
               <h3 className="text-lg font-semibold mb-2">Resume Analyzer</h3>
               <p className="text-gray-600 mb-4">
-                Get instant feedback on your resume with AI-powered analysis and improvement suggestions.
+                Get instant feedback on your resume with AI-powered analysis and improvement
+                suggestions.
               </p>
               <button
                 onClick={() => router.push('/dashboard/resume')}
@@ -197,7 +212,8 @@ export default function ToolsPage() {
               </div>
               <h3 className="text-lg font-semibold mb-2">Cover Letter Generator</h3>
               <p className="text-gray-600 mb-4">
-                Create compelling cover letters tailored to specific job requirements and your experience.
+                Create compelling cover letters tailored to specific job requirements and your
+                experience.
               </p>
               <button
                 onClick={() => router.push('/dashboard/cover-letter')}

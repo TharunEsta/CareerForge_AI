@@ -4,4 +4,4 @@ declare module 'react-icons/fi' {
   export const FiFileText: FC;
   export const FiAlertCircle: FC;
   export const FiCheckCircle: FC;
-} 
+}

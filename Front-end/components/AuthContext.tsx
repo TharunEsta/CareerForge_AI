@@ -1,38 +1,32 @@
-"use client"
+'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-interface User {
+interface SubscriptionType {
+  plan: 'free' | 'premium' | 'enterprise';
+  status?: string;
+}
+
+interface UserType {
   id: string;
-  email: string;
   name: string;
-  role: 'user' | 'admin';
+  email: string;
   avatarUrl?: string;
-  subscription?: {
-    plan: 'free' | 'premium' | 'enterprise';
-    expiresAt: string;
-  };
+  subscription?: SubscriptionType;
 }
 
 interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => Promise<void>;
-  register: (email: string, password: string, name: string) => Promise<boolean>;
-  updateProfile: (data: Partial<User>) => Promise<void>;
+  user: UserType | null;
+  login: (userData: UserType) => void;
+  logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>(null);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<UserType | null>(null);
 
+<<<<<<< Updated upstream
 interface AuthProviderProps {
   children: ReactNode;
 }
@@ -165,10 +159,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     updateProfile
   };
+=======
+  const login = (userData: UserType) => setUser(userData);
+  const logout = () => setUser(null);
+>>>>>>> Stashed changes
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
+  return context;
+};
+

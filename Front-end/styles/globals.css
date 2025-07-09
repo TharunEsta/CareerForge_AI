@@ -11,7 +11,7 @@ body {
     text-wrap: balance;
   }
 }
- .input {
+.input {
   @apply w-full border p-2 mb-2 rounded;
 }
 .btn {

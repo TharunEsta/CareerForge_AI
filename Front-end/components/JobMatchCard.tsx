@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -42,10 +42,10 @@ const JobMatchCard: React.FC<JobMatchCardProps> = ({ onMatch }) => {
     if (!resumeText.trim() || !jobDescription.trim()) return;
 
     setIsMatching(true);
-    
+
     // Simulate AI matching delay
-    await new Promise(resolve => setTimeout(resolve, 4000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 4000));
+
     const mockMatches: JobMatch[] = [
       {
         id: '1',
@@ -56,7 +56,7 @@ const JobMatchCard: React.FC<JobMatchCardProps> = ({ onMatch }) => {
         salary: '$150,000 - $200,000',
         description: 'Join our team to build scalable applications using modern technologies.',
         requirements: ['React', 'TypeScript', 'Node.js', '5+ years experience'],
-        benefits: ['Health insurance', '401k matching', 'Flexible PTO', 'Remote work']
+        benefits: ['Health insurance', '401k matching', 'Flexible PTO', 'Remote work'],
       },
       {
         id: '2',
@@ -67,7 +67,7 @@ const JobMatchCard: React.FC<JobMatchCardProps> = ({ onMatch }) => {
         salary: '$130,000 - $180,000',
         description: 'Develop cloud-native applications using Azure technologies.',
         requirements: ['C#', '.NET', 'Azure', '3+ years experience'],
-        benefits: ['Comprehensive benefits', 'Stock options', 'Professional development']
+        benefits: ['Comprehensive benefits', 'Stock options', 'Professional development'],
       },
       {
         id: '3',
@@ -78,10 +78,10 @@ const JobMatchCard: React.FC<JobMatchCardProps> = ({ onMatch }) => {
         salary: '$140,000 - $190,000',
         description: 'Build user interfaces for millions of users worldwide.',
         requirements: ['React', 'JavaScript', 'CSS', '4+ years experience'],
-        benefits: ['Unlimited PTO', 'Health benefits', 'Stock options']
-      }
+        benefits: ['Unlimited PTO', 'Health benefits', 'Stock options'],
+      },
     ];
-    
+
     const mockResult: JobMatchResult = {
       resumeText,
       jobDescription,
@@ -90,10 +90,10 @@ const JobMatchCard: React.FC<JobMatchCardProps> = ({ onMatch }) => {
       recommendations: [
         'Highlight your React experience more prominently',
         'Add specific project metrics to your resume',
-        'Include cloud platform experience if any'
-      ]
+        'Include cloud platform experience if any',
+      ],
     };
-    
+
     setMatches(mockMatches);
     setShowResult(true);
     onMatch(mockResult);
@@ -118,7 +118,9 @@ const JobMatchCard: React.FC<JobMatchCardProps> = ({ onMatch }) => {
             <Textarea
               placeholder="Paste your resume text here..."
               value={resumeText}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setResumeText(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                setResumeText(e.target.value)
+              }
               className="min-h-[200px]"
             />
           </div>
@@ -127,13 +129,15 @@ const JobMatchCard: React.FC<JobMatchCardProps> = ({ onMatch }) => {
             <Textarea
               placeholder="Paste the job description you're interested in..."
               value={jobDescription}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setJobDescription(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                setJobDescription(e.target.value)
+              }
               className="min-h-[200px]"
             />
           </div>
         </div>
 
-        <Button 
+        <Button
           onClick={handleMatch}
           disabled={!resumeText.trim() || !jobDescription.trim() || isMatching}
           className="w-full"
@@ -163,17 +167,16 @@ const JobMatchCard: React.FC<JobMatchCardProps> = ({ onMatch }) => {
                       <Target className="h-4 w-4" />
                       {job.location}
                     </div>
-                    <div className="text-sm font-medium text-green-600">
-                      {job.salary}
-                    </div>
-                    <p className="text-sm text-gray-700 line-clamp-3">
-                      {job.description}
-                    </p>
+                    <div className="text-sm font-medium text-green-600">{job.salary}</div>
+                    <p className="text-sm text-gray-700 line-clamp-3">{job.description}</p>
                     <div className="space-y-2">
                       <div className="text-xs font-medium text-gray-600">Key Requirements:</div>
                       <div className="flex flex-wrap gap-1">
                         {job.requirements.slice(0, 3).map((req, index) => (
-                          <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                          <span
+                            key={index}
+                            className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded"
+                          >
                             {req}
                           </span>
                         ))}
@@ -192,11 +195,16 @@ const JobMatchCard: React.FC<JobMatchCardProps> = ({ onMatch }) => {
               <div className="space-y-3">
                 <h4 className="font-medium">Your Top Skills</h4>
                 <div className="flex flex-wrap gap-2">
-                  {['React', 'TypeScript', 'Node.js', 'JavaScript', 'Python'].map((skill, index) => (
-                    <span key={index} className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
-                      {skill}
-                    </span>
-                  ))}
+                  {['React', 'TypeScript', 'Node.js', 'JavaScript', 'Python'].map(
+                    (skill, index) => (
+                      <span
+                        key={index}
+                        className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full"
+                      >
+                        {skill}
+                      </span>
+                    )
+                  )}
                 </div>
               </div>
               <div className="space-y-3">
@@ -205,7 +213,7 @@ const JobMatchCard: React.FC<JobMatchCardProps> = ({ onMatch }) => {
                   {[
                     'Highlight your React experience more prominently',
                     'Add specific project metrics to your resume',
-                    'Include cloud platform experience if any'
+                    'Include cloud platform experience if any',
                   ].map((rec, index) => (
                     <li key={index} className="flex items-start gap-2">
                       <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>

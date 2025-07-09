@@ -1,501 +1,193 @@
-"use client"
-
-import React, { useState, useEffect } from "react";
+'use client';
+import * as React from 'react';
+import { Logo } from '@/components/ui/logo';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import {
+  Mic,
+  Plus,
   User,
   LogOut,
-  Settings,
+  Upload,
   MessageSquare,
-  FileText,
-  Briefcase,
-  Menu,
-  Plus,
-  Zap,
-  Star,
-  Mic,
-  Brain,
+  Home,
   Globe,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Card, CardContent } from "@/components/ui/card"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useTheme } from "@/components/theme-provider"
-import {
-  Sidebar,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarNav,
-  SidebarNavItem,
-  SidebarNavItemIcon,
-  SidebarNavItemText
-} from '@/components/ui/sidebar'
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import Image from 'next/image'
-import { Loader2, Send } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import Link from 'next/link'
-import ResumeUploadCard from "@/components/ResumeUploadCard";
-import ResumeRewriteCard from "@/components/ResumeRewriteCard";
-import CoverLetterCard from "@/components/CoverLetterCard";
-import LinkedInOptimizationCard from "@/components/LinkedInOptimizationCard";
-import JobMatchCard from "@/components/JobMatchCard";
-import { cn } from "@/lib/utils"
-import { Logo } from "@/components/ui/logo"
-import * as React from 'react';
+  Layers,
+  ArrowUpRight,
+  Download,
+  Star,
+  Settings,
+} from 'lucide-react';
+import { motion } from 'framer-motion';
+import VoiceAssistant from '@/components/VoiceAssistant';
+import { useAuth } from '@/components/AuthContext';
 
-// Types
-type Message = {
-  id: string
-  content: string
-  sender: "user" | "ai"
-  timestamp: Date
-  type?:
-    | "text"
-    | "card"
-    | "resume-upload"
-    | "job-match"
-    | "ats-score"
-    | "job-search"
-    | "upgrade-prompt"
-    | "resume-rewrite"
-    | "changes-explanation"
-    | "final-score"
-  metadata?: any
-}
+export default function AppPage() {
+  const { user, logout } = useAuth();
+  const [showVoice, setShowVoice] = React.useState(false);
+  const [showSubWarning, setShowSubWarning] = React.useState(false);
 
-type ChatSession = {
-  id: string
-  title: string
-  lastMessage: string
-  timestamp: Date
-  messages: Message[]
-}
+  // TODO: Replace with real subscription check
+  const hasVoiceSubscription =
+    user?.subscription?.plan === 'premium' || user?.subscription?.plan === 'enterprise';
 
-type ATSAnalysis = {
-  score: number
-  matchedSkills: string[]
-  unmatchedSkills: string[]
-  suggestions: string[]
-  keywordDensity: number
-  formatScore: number
-  contentScore: number
-}
-
-// Sample data
-const sampleChatSessions: ChatSession[] = [
-  {
-    id: "1",
-    title: "Resume Analysis",
-    lastMessage: "Your ATS score is 85/100",
-    timestamp: new Date(2023, 5, 15),
-    messages: [],
-  },
-  {
-    id: "2",
-    title: "Job Search",
-    lastMessage: "Found 5 matching positions",
-    timestamp: new Date(2023, 5, 14),
-    messages: [],
-  },
-  {
-    id: "3",
-    title: "Cover Letter",
-    lastMessage: "Cover letter generated successfully",
-    timestamp: new Date(2023, 5, 12),
-    messages: [],
-  },
-]
-
-const initialMessages: Message[] = []
-
-// Create a new component that will be wrapped by both providers
-function AppContent() {
-  const [messages, setMessages] = useState<Message[]>(initialMessages)
-  const [input, setInput] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [activeTab, setActiveTab] = React.useState<string>("chat")
-  const [messageCount, setMessageCount] = useState(0)
-  const [chatSessions, setChatSessions] = useState<ChatSession[]>(sampleChatSessions)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-
-  const { theme, setTheme } = useTheme()
-
-  const [uploadedResume, setUploadedResume] = useState<File | null>(null)
-  const [uploadedJobDescription, setUploadedJobDescription] = useState<File | null>(null)
-  const [isUploading, setIsUploading] = useState(false)
-  const [resumeContent, setResumeContent] = useState<string>("")
-  const [currentATSAnalysis, setCurrentATSAnalysis] = useState<ATSAnalysis | null>(null)
-  const [isRewritingResume, setIsRewritingResume] = useState(false)
-
-  const [mounted, setMounted] = useState(false)
-
-  // Add state for chat cards
-  const [chatCards, setChatCards] = useState<React.ReactNode[]>([]);
-
-  const [showFeatureMenu, setShowFeatureMenu] = useState(false);
-
-  const [showFeedback, setShowFeedback] = useState(false);
-  const [feedbackRating, setFeedbackRating] = useState(0);
-  const [feedbackText, setFeedbackText] = useState("");
-  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  const hasFeatureAccess = (feature: string): boolean => {
-    switch (feature) {
-      case "ats-check":
-        return true // All plans have this
-      case "job-matching":
-      case "resume-rewrite":
-      case "cover-letter":
-      case "unlimited-chat":
-        return false // All plans have this
-      case "advanced-search":
-      case "salary-insights":
-      case "interview-prep":
-      case "linkedin-optimization":
-      case "career-coaching":
-        return false // All plans have this
-      default:
-        return false
-    }
-  }
-
-  const getMessageLimit = (): number => {
-    return 10 // Free plan limit
-  }
-
-  const readFileContent = async (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const content = e.target?.result as string;
-        resolve(content);
-      };
-      reader.onerror = reject;
-      reader.readAsText(file);
-    });
-  };
-
-  const analyzeATSCompatibility = (resumeText: string, jobText: string): ATSAnalysis => {
-    // Simple ATS analysis logic
-    const resumeWords = resumeText.toLowerCase().split(/\s+/);
-    const jobWords = jobText.toLowerCase().split(/\s+/);
-    
-    const commonWords = resumeWords.filter(word => jobWords.includes(word));
-    const keywordDensity = commonWords.length / Math.max(resumeWords.length, 1);
-    
-    const matchedSkills = ["Python", "JavaScript", "React"];
-    const unmatchedSkills = ["Docker", "Kubernetes"];
-    
-    return {
-      score: Math.min(85, Math.floor(keywordDensity * 100)),
-      matchedSkills,
-      unmatchedSkills,
-      suggestions: ["Add more keywords from job description", "Improve formatting"],
-      keywordDensity,
-      formatScore: 90,
-      contentScore: 85
-    };
-  };
-
-  const rewriteResume = (originalResume: string, jobDescription: string): { newResume: string; changes: string[] } => {
-    // Simple resume rewriting logic
-    const changes = ["Enhanced bullet points", "Added quantifiable achievements", "Improved keyword optimization"];
-    return {
-      newResume: originalResume + "\n\nEnhanced with AI optimization",
-      changes
-    };
-  };
-
-  const handleFileUpload = async (file: File, type: "resume" | "job-description") => {
-    if (type === "resume") {
-      setUploadedResume(file);
-      const content = await readFileContent(file);
-      setResumeContent(content);
+  const handleVoiceClick = () => {
+    if (!hasVoiceSubscription) {
+      setShowSubWarning(true);
     } else {
-      setUploadedJobDescription(file);
+      setShowVoice(true);
     }
   };
 
-  const incrementMessageCount = () => {
-    setMessageCount(prev => prev + 1);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      content: input,
-      sender: "user",
-      timestamp: new Date(),
-      type: "text"
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInput("");
-    setIsLoading(true);
-    incrementMessageCount();
-
-    // Simulate AI response
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: "I'm here to help you with your career journey! How can I assist you today?",
-        sender: "ai",
-        timestamp: new Date(),
-        type: "text"
-      };
-      setMessages(prev => [...prev, aiMessage]);
-      setIsLoading(false);
-    }, 1000);
-  };
-
-  const renderMessage = (message: Message) => {
-    return (
-      <div key={message.id} className={cn(
-        "flex gap-3 p-4 rounded-lg",
-        message.sender === "user" ? "justify-end" : "justify-start"
-      )}>
-        {message.sender === "ai" && (
-          <Avatar className="h-8 w-8">
-            <AvatarImage src="/placeholder-user.jpg" />
-            <AvatarFallback>AI</AvatarFallback>
-          </Avatar>
-        )}
-        <div className={cn(
-          "max-w-[80%] rounded-lg p-3",
-          message.sender === "user" 
-            ? "bg-primary text-primary-foreground" 
-            : "bg-muted"
-        )}>
-          <p className="text-sm">{message.content}</p>
-        </div>
-        {message.sender === "user" && (
-          <Avatar className="h-8 w-8">
-            <AvatarImage src="/placeholder-user.jpg" />
-            <AvatarFallback>U</AvatarFallback>
-          </Avatar>
-        )}
-      </div>
-    );
-  };
-
-  const handleShowResumeUpload = () => {
-    setShowFeatureMenu(false);
-    // Add resume upload logic
-  };
-
-  const handleShowResumeRewrite = () => {
-    setShowFeatureMenu(false);
-    // Add resume rewrite logic
-  };
-
-  const handleShowCoverLetter = () => {
-    setShowFeatureMenu(false);
-    // Add cover letter logic
-  };
-
-  const handleShowLinkedInOptimization = () => {
-    setShowFeatureMenu(false);
-    // Add LinkedIn optimization logic
-  };
-
-  const handleShowJobMatch = () => {
-    setShowFeatureMenu(false);
-    // Add job matching logic
-  };
-
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-  };
-
-  if (!mounted) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
   return (
-    <div className="flex h-screen bg-gradient-to-br from-background via-background to-primary-50/30">
+    <div className="flex min-h-screen bg-[#181A20] text-white">
       {/* Sidebar */}
-      <Sidebar className="hidden md:flex">
-        <SidebarHeader />
-        <SidebarNav>
-          <SidebarNavItem>
-            <SidebarNavItemIcon>
-              <MessageSquare className="h-4 w-4" />
-            </SidebarNavItemIcon>
-            <SidebarNavItemText>
-              <Button
-                variant="ghost"
-                className="w-full justify-start"
-                onClick={() => handleTabChange("chat")}
-              >
-                Chat
-              </Button>
-            </SidebarNavItemText>
-          </SidebarNavItem>
-          <SidebarNavItem>
-            <SidebarNavItemIcon>
-              <FileText className="h-4 w-4" />
-            </SidebarNavItemIcon>
-            <SidebarNavItemText>
-              <Button
-                variant="ghost"
-                className="w-full justify-start"
-                onClick={() => handleTabChange("resume")}
-              >
-                Resume
-              </Button>
-            </SidebarNavItemText>
-          </SidebarNavItem>
-          <SidebarNavItem>
-            <SidebarNavItemIcon>
-              <Briefcase className="h-4 w-4" />
-            </SidebarNavItemIcon>
-            <SidebarNavItemText>
-              <Button
-                variant="ghost"
-                className="w-full justify-start"
-                onClick={() => handleTabChange("jobs")}
-              >
-                Job Match
-              </Button>
-            </SidebarNavItemText>
-          </SidebarNavItem>
-        </SidebarNav>
-        <SidebarFooter>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="w-full justify-start">
-                <User className="mr-2 h-4 w-4" />
-                Account
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </SidebarFooter>
-      </Sidebar>
-
+      <aside className="flex flex-col items-center w-20 py-6 bg-[#1A1C23] border-r border-[#23242A] gap-4">
+        <div className="mb-8">
+          <Logo size="lg" variant="icon-only" />
+        </div>
+        <nav className="flex flex-col gap-4 flex-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white/80 hover:bg-[#23242A]"
+            aria-label="Home"
+          >
+            <Home className="h-6 w-6" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white/80 hover:bg-[#23242A]"
+            aria-label="Discover"
+          >
+            <Globe className="h-6 w-6" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white/80 hover:bg-[#23242A]"
+            aria-label="Spaces"
+          >
+            <Layers className="h-6 w-6" />
+          </Button>
+        </nav>
+        <Button
+          variant="secondary"
+          size="icon"
+          className="bg-[#23242A] text-white mb-8 shadow-lg hover:bg-[#23242A]/80"
+          aria-label="Add Resume"
+        >
+          <Plus className="h-7 w-7" />
+        </Button>
+        <div className="flex flex-col gap-2 w-full items-center mt-auto mb-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white/80 hover:bg-[#23242A]"
+            aria-label="Account"
+          >
+            <Avatar>
+              <AvatarImage
+                src={user?.avatarUrl || '/placeholder-user.jpg'}
+                alt={user?.name || 'U'}
+              />
+              <AvatarFallback>{user?.name?.[0] || 'U'}</AvatarFallback>
+            </Avatar>
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-blue-400 hover:bg-[#23242A]"
+            aria-label="Upgrade"
+          >
+            <Star className="h-6 w-6" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-green-400 hover:bg-[#23242A]"
+            aria-label="Install"
+          >
+            <Download className="h-6 w-6" />
+          </Button>
+        </div>
+      </aside>
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="border-b bg-card/50 backdrop-blur-xl">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-4">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
+          className="w-full max-w-xl mx-auto"
+        >
+          <h1 className="text-4xl font-bold text-center mb-8 tracking-tight">CareerForge AI</h1>
+          <div className="rounded-2xl bg-[#23242A] border border-[#23242A] shadow-xl p-8 flex flex-col gap-6">
+            <div className="flex items-center gap-3 mb-2">
+              <MessageSquare className="h-6 w-6 text-blue-400" />
+              <span className="text-lg font-semibold text-white/90">
+                Ask anything about your career, resume, or job search
+              </span>
+            </div>
+            <div className="flex items-center gap-2 bg-[#181A20] rounded-xl px-4 py-3">
+              <input
+                className="flex-1 bg-transparent outline-none text-white placeholder:text-white/40 text-lg"
+                placeholder="Ask anything or @mention a tool..."
+              />
+              <Button variant="ghost" size="icon" className="text-blue-400" aria-label="Send">
+                <ArrowUpRight className="h-6 w-6" />
+              </Button>
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="text-white/70"
+                aria-label="Upload Resume"
               >
-                <Menu className="h-4 w-4" />
+                <Upload className="h-6 w-6" />
               </Button>
-              <Logo size="md" />
-            </div>
-            
-            <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="text-cyan-400"
+                aria-label="Voice Assistant"
+                onClick={handleVoiceClick}
               >
-                <Globe className="h-4 w-4" />
+                <Mic className="h-6 w-6" />
               </Button>
             </div>
+            {/* TODO: Add chat history, AI responses, etc. here */}
           </div>
-        </header>
-
-        {/* Content Area */}
-        <main className="flex-1 overflow-hidden">
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="chat">Chat</TabsTrigger>
-              <TabsTrigger value="resume">Resume</TabsTrigger>
-              <TabsTrigger value="jobs">Job Match</TabsTrigger>
-            </TabsList>
-            
-            <div className="flex-1 overflow-auto p-4">
-              {activeTab === "chat" && (
-                <div className="space-y-4">
-                  <div className="space-y-4 max-h-[60vh] overflow-y-auto">
-                    {messages.map(renderMessage)}
-                    {isLoading && (
-                      <div className="flex gap-3 p-4">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src="/placeholder-user.jpg" />
-                          <AvatarFallback>AI</AvatarFallback>
-                        </Avatar>
-                        <div className="bg-muted rounded-lg p-3">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <form onSubmit={handleSubmit} className="flex gap-2">
-                    <Input
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      placeholder="Type your message..."
-                      className="flex-1"
-                    />
-                    <Button type="submit" disabled={isLoading}>
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </form>
-                </div>
-              )}
-              
-              {activeTab === "resume" && (
-                <div className="grid gap-6 md:grid-cols-2">
-                  <ResumeUploadCard onAnalysis={() => {}} />
-                  <ResumeRewriteCard onRewrite={() => {}} />
-                </div>
-              )}
-              
-              {activeTab === "jobs" && (
-                <div className="grid gap-6 md:grid-cols-2">
-                  <JobMatchCard onMatch={() => {}} />
-                  <CoverLetterCard onGenerate={() => {}} />
-                </div>
-              )}
+          {/* Voice Assistant Modal */}
+          {showVoice && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+              <div className="bg-[#23242A] rounded-2xl p-8 shadow-2xl max-w-lg w-full">
+                <VoiceAssistant />
+                <Button className="mt-4 w-full" onClick={() => setShowVoice(false)}>
+                  Close
+                </Button>
+              </div>
             </div>
-          </Tabs>
-        </main>
-      </div>
-    </div>
-  );
-}
-
-export default function Home() {
-  return (
-    <div className="min-h-screen bg-background">
-      <AppContent />
+          )}
+          {/* Subscription Warning Modal */}
+          {showSubWarning && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+              <div className="bg-[#23242A] rounded-2xl p-8 shadow-2xl max-w-md w-full flex flex-col items-center">
+                <Mic className="h-10 w-10 text-cyan-400 mb-4" />
+                <h2 className="text-2xl font-bold mb-2">Voice Assistant Requires Subscription</h2>
+                <p className="text-white/80 mb-6 text-center">
+                  Subscribe to unlock the AI voice assistant and get the most out of CareerForge AI.
+                </p>
+                <Button className="w-full mb-2" variant="default">
+                  Upgrade Now
+                </Button>
+                <Button className="w-full" variant="ghost" onClick={() => setShowSubWarning(false)}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+        </motion.div>
+      </main>
     </div>
   );
 }

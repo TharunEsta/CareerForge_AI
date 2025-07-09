@@ -1,3 +1,9 @@
+"use client";
+
+"use client";
+
+"use client";
+
 import React from 'react';
 import { Button } from './button';
 import { Card, CardContent } from './card';
@@ -23,33 +29,33 @@ interface HeroProps {
 }
 
 export const Hero: React.FC<HeroProps> = ({
-  title = "AI-Powered Career Forge",
-  subtitle = "Transform Your Career",
-  description = "Leverage cutting-edge AI to optimize your resume, match with perfect jobs, and accelerate your career growth with intelligent insights and personalized recommendations.",
+  title = 'AI-Powered Career Forge',
+  subtitle = 'Transform Your Career',
+  description = 'Leverage cutting-edge AI to optimize your resume, match with perfect jobs, and accelerate your career growth with intelligent insights and personalized recommendations.',
   primaryAction,
   secondaryAction,
   features = [
     {
       icon: <Target className="h-6 w-6" />,
-      title: "ATS Optimization",
-      description: "Ensure your resume passes through Applicant Tracking Systems"
+      title: 'ATS Optimization',
+      description: 'Ensure your resume passes through Applicant Tracking Systems',
     },
     {
       icon: <TrendingUp className="h-6 w-6" />,
-      title: "Smart Matching",
-      description: "AI-powered job matching based on your skills and experience"
+      title: 'Smart Matching',
+      description: 'AI-powered job matching based on your skills and experience',
     },
     {
       icon: <Sparkles className="h-6 w-6" />,
-      title: "AI Insights",
-      description: "Get personalized recommendations to improve your profile"
+      title: 'AI Insights',
+      description: 'Get personalized recommendations to improve your profile',
     },
     {
       icon: <Zap className="h-6 w-6" />,
-      title: "Instant Analysis",
-      description: "Real-time feedback and optimization suggestions"
-    }
-  ]
+      title: 'Instant Analysis',
+      description: 'Real-time feedback and optimization suggestions',
+    },
+  ],
 }) => {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-background via-background to-primary-50/30 dark:to-primary-950/30">
@@ -57,7 +63,7 @@ export const Hero: React.FC<HeroProps> = ({
       <div className="absolute inset-0 bg-grid-pattern opacity-5" />
       <div className="absolute top-0 left-0 w-72 h-72 bg-primary-500/10 rounded-full blur-3xl" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-secondary-500/10 rounded-full blur-3xl" />
-      
+
       <div className="relative container-modern section-padding">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Content */}
@@ -67,17 +73,17 @@ export const Hero: React.FC<HeroProps> = ({
                 <Sparkles className="h-4 w-4" />
                 Powered by Advanced AI
               </div>
-              
+
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
                 <span className="bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 bg-clip-text text-transparent">
                   {title}
                 </span>
               </h1>
-              
+
               <h2 className="text-2xl md:text-3xl font-semibold text-muted-foreground">
                 {subtitle}
               </h2>
-              
+
               <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl">
                 {description}
               </p>
@@ -86,7 +92,7 @@ export const Hero: React.FC<HeroProps> = ({
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
               {primaryAction && (
-                <Button 
+                <Button
                   onClick={primaryAction.onClick}
                   size="lg"
                   className="bg-gradient-primary hover:shadow-glow text-white font-semibold group"
@@ -95,9 +101,9 @@ export const Hero: React.FC<HeroProps> = ({
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               )}
-              
+
               {secondaryAction && (
-                <Button 
+                <Button
                   onClick={secondaryAction.onClick}
                   variant="outline"
                   size="lg"
@@ -138,10 +144,10 @@ export const Hero: React.FC<HeroProps> = ({
                     Upload your resume to get started with AI-powered optimization
                   </p>
                 </div>
-                
+
                 <div className="space-y-4">
                   {features.map((feature, index) => (
-                    <div 
+                    <div
                       key={index}
                       className="flex items-center gap-4 p-4 rounded-lg bg-muted/50 hover:bg-muted/80 transition-colors"
                     >
@@ -179,4 +185,4 @@ if (typeof document !== 'undefined') {
   const style = document.createElement('style');
   style.textContent = gridPatternCSS;
   document.head.appendChild(style);
-} 
+}

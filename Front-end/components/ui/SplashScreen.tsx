@@ -1,12 +1,24 @@
+<<<<<<< Updated upstream
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
+=======
+"use client";
+
+"use client";
+
+"use client";
+
+import * as React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { LogoAnimated } from './logo';
+>>>>>>> Stashed changes
 
 interface SplashScreenProps {
   show: boolean;
 }
 
 const gradientBg =
-  "bg-gradient-to-br from-blue-700 via-purple-700 to-cyan-500 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900";
+  'bg-gradient-to-br from-blue-700 via-purple-700 to-cyan-500 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900';
 
 export const SplashScreen = ({ show }: SplashScreenProps) => {
   return show ? (
@@ -16,12 +28,12 @@ export const SplashScreen = ({ show }: SplashScreenProps) => {
         initial={{ opacity: 1 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0, transition: { duration: 0.6 } }}
-        transition={{ duration: 0.8, ease: "easeInOut" }}
+        transition={{ duration: 0.8, ease: 'easeInOut' }}
       >
         <motion.div
           initial={{ scale: 0.7, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.8, ease: "backOut" }}
+          transition={{ duration: 0.8, ease: 'backOut' }}
           className="mb-6"
         >
           <img src="/ai-doc-logo.svg" alt="CareerForge Logo" className="h-32 w-auto" draggable={false} />
@@ -30,7 +42,7 @@ export const SplashScreen = ({ show }: SplashScreenProps) => {
           className="text-3xl md:text-5xl font-extrabold text-white drop-shadow-lg mb-2"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
+          transition={{ delay: 0.3, duration: 0.8, ease: 'easeOut' }}
         >
           <span className="bg-gradient-to-r from-white via-blue-200 to-cyan-200 bg-clip-text text-transparent">
             CareerForge AI
@@ -73,4 +85,4 @@ export const SplashScreen = ({ show }: SplashScreenProps) => {
   ) : null;
 };
 
-export default SplashScreen; 
+export default SplashScreen;

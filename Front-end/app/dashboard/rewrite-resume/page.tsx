@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -24,9 +24,9 @@ export default function RewriteResumePage() {
   };
 
   const handleOptionChange = (option: string, value: string) => {
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      [option]: value
+      [option]: value,
     }));
   };
 
@@ -102,9 +102,9 @@ Tools & Methodologies: Agile, Scrum, JIRA, Postman`,
             'Added specific metrics and results to experience descriptions',
             'Improved action verbs and technical terminology',
             'Organized skills into clear categories',
-            'Added quantifiable impact statements'
+            'Added quantifiable impact statements',
           ],
-          score: 92
+          score: 92,
         };
         setRewrittenResume(mockResults);
         setIsLoading(false);
@@ -123,20 +123,55 @@ Tools & Methodologies: Agile, Scrum, JIRA, Postman`,
           <span className="font-bold text-lg text-blue-700">CareerForge AI</span>
         </div>
         <nav className="flex-1 space-y-2">
-          <a href="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">🏠 Dashboard</a>
-          <a href="/dashboard/resume" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">📄 Resume Analysis</a>
-          <a href="/dashboard/rewrite-resume" className="flex items-center gap-3 px-3 py-2 rounded-lg text-blue-700 bg-blue-100 font-medium transition">✍️ Resume Rewriting</a>
-          <a href="/dashboard/cover-letter" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">📧 Cover Letter</a>
-          <a href="/dashboard/job-matching" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">🎯 Job Matching</a>
-          <a href="/dashboard/linkedin-optimization" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">🔗 LinkedIn Optimization</a>
-          <a href="/pricing" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition">💳 Subscription Plans</a>
+          <a
+            href="/dashboard"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition"
+          >
+            🏠 Dashboard
+          </a>
+          <a
+            href="/dashboard/resume"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition"
+          >
+            📄 Resume Analysis
+          </a>
+          <a
+            href="/dashboard/rewrite-resume"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-blue-700 bg-blue-100 font-medium transition"
+          >
+            ✍️ Resume Rewriting
+          </a>
+          <a
+            href="/dashboard/cover-letter"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition"
+          >
+            📧 Cover Letter
+          </a>
+          <a
+            href="/dashboard/job-matching"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition"
+          >
+            🎯 Job Matching
+          </a>
+          <a
+            href="/dashboard/linkedin-optimization"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition"
+          >
+            🔗 LinkedIn Optimization
+          </a>
+          <a
+            href="/pricing"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 hover:text-blue-700 font-medium transition"
+          >
+            💳 Subscription Plans
+          </a>
         </nav>
       </aside>
-      
+
       <main className="flex-1 p-8">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-3xl font-bold mb-8 text-blue-700">AI Resume Rewriter</h1>
-          
+
           {!rewrittenResume ? (
             <div className="space-y-6">
               {/* File Upload */}
@@ -152,8 +187,18 @@ Tools & Methodologies: Agile, Scrum, JIRA, Postman`,
                   />
                   <label htmlFor="resume-upload" className="cursor-pointer">
                     <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      <svg
+                        className="w-6 h-6 text-blue-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                        />
                       </svg>
                     </div>
                     <p className="text-lg font-medium text-gray-900 mb-2">Choose a file</p>
@@ -164,8 +209,18 @@ Tools & Methodologies: Agile, Scrum, JIRA, Postman`,
                 {selectedFile && (
                   <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                     <div className="flex items-center">
-                      <svg className="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <svg
+                        className="w-5 h-5 text-green-600 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                       <span className="text-green-800 font-medium">{selectedFile.name}</span>
                     </div>
@@ -178,7 +233,9 @@ Tools & Methodologies: Agile, Scrum, JIRA, Postman`,
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Customize Your Rewrite</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Writing Style</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Writing Style
+                    </label>
                     <select
                       value={form.style}
                       onChange={(e) => handleOptionChange('style', e.target.value)}
@@ -192,7 +249,9 @@ Tools & Methodologies: Agile, Scrum, JIRA, Postman`,
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Focus Area</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Focus Area
+                    </label>
                     <select
                       value={form.focus}
                       onChange={(e) => handleOptionChange('focus', e.target.value)}
@@ -219,7 +278,9 @@ Tools & Methodologies: Agile, Scrum, JIRA, Postman`,
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Target Role (Optional)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Target Role (Optional)
+                    </label>
                     <input
                       type="text"
                       value={form.targetRole}
@@ -244,9 +305,25 @@ Tools & Methodologies: Agile, Scrum, JIRA, Postman`,
                 >
                   {isLoading ? (
                     <div className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
                       Rewriting...
                     </div>
@@ -270,7 +347,9 @@ Tools & Methodologies: Agile, Scrum, JIRA, Postman`,
                   <div className="flex items-center">
                     <h2 className="text-xl font-semibold text-gray-900 mr-4">Rewrite Complete</h2>
                     <div className="flex items-center bg-green-100 px-3 py-1 rounded-full">
-                      <span className="text-green-800 font-medium">{rewrittenResume.score}% Improved</span>
+                      <span className="text-green-800 font-medium">
+                        {rewrittenResume.score}% Improved
+                      </span>
                     </div>
                   </div>
                   <button
@@ -290,7 +369,9 @@ Tools & Methodologies: Agile, Scrum, JIRA, Postman`,
                 <div className="bg-white p-6 rounded-lg shadow-md">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Original Resume</h3>
                   <div className="bg-gray-50 p-4 rounded-lg max-h-96 overflow-y-auto">
-                    <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono">{rewrittenResume.originalText}</pre>
+                    <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono">
+                      {rewrittenResume.originalText}
+                    </pre>
                   </div>
                 </div>
 
@@ -298,7 +379,9 @@ Tools & Methodologies: Agile, Scrum, JIRA, Postman`,
                 <div className="bg-white p-6 rounded-lg shadow-md">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">AI-Enhanced Resume</h3>
                   <div className="bg-blue-50 p-4 rounded-lg max-h-96 overflow-y-auto">
-                    <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono">{rewrittenResume.rewrittenText}</pre>
+                    <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono">
+                      {rewrittenResume.rewrittenText}
+                    </pre>
                   </div>
                 </div>
               </div>
@@ -309,8 +392,18 @@ Tools & Methodologies: Agile, Scrum, JIRA, Postman`,
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {rewrittenResume.improvements.map((improvement: string, index: number) => (
                     <div key={index} className="flex items-start">
-                      <svg className="w-5 h-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <svg
+                        className="w-5 h-5 text-green-600 mr-2 mt-0.5 flex-shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                       <span className="text-gray-700">{improvement}</span>
                     </div>

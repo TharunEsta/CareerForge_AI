@@ -13,13 +13,10 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await AIService.analyzeATSCompatibility(resumeText, jobDescription);
-    
+
     return NextResponse.json(result);
   } catch (error) {
     console.error('ATS Analysis API Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to analyze ATS compatibility' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to analyze ATS compatibility' }, { status: 500 });
   }
-} 
+}

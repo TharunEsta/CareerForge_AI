@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
 
@@ -14,9 +14,10 @@ export default function AgentPage() {
     {
       id: '1',
       type: 'assistant',
-      content: "Hello! I&rsquo;m your AI career assistant. I can help you with resume optimization, job matching, interview preparation, and much more. What would you like to work on today?",
-      timestamp: new Date()
-    }
+      content:
+        'Hello! I&rsquo;m your AI career assistant. I can help you with resume optimization, job matching, interview preparation, and much more. What would you like to work on today?',
+      timestamp: new Date(),
+    },
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -37,36 +38,36 @@ export default function AgentPage() {
       id: Date.now().toString(),
       type: 'user',
       content: inputMessage,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInputMessage('');
     setIsLoading(true);
 
     // Simulate AI response
     setTimeout(() => {
       const responses = [
-        "I&rsquo;d be happy to help you with that! Let me analyze your request and provide some personalized suggestions.",
-        "That&rsquo;s a great question! Based on your situation, I recommend focusing on highlighting your most relevant achievements.",
-        "I can help you optimize your resume for that specific role. Would you like me to analyze your current resume first?",
-        "For interview preparation, I suggest practicing common questions and preparing specific examples from your experience.",
-        "Let me help you identify the key skills and keywords that would make your application stand out for this position.",
-        "I can assist you with creating a compelling cover letter that matches the job requirements and your background.",
-        "Based on your experience, I&rsquo;d recommend emphasizing your technical skills and quantifiable achievements.",
-        "For networking, I suggest reaching out to professionals in your target companies and attending industry events."
+        'I&rsquo;d be happy to help you with that! Let me analyze your request and provide some personalized suggestions.',
+        'That&rsquo;s a great question! Based on your situation, I recommend focusing on highlighting your most relevant achievements.',
+        'I can help you optimize your resume for that specific role. Would you like me to analyze your current resume first?',
+        'For interview preparation, I suggest practicing common questions and preparing specific examples from your experience.',
+        'Let me help you identify the key skills and keywords that would make your application stand out for this position.',
+        'I can assist you with creating a compelling cover letter that matches the job requirements and your background.',
+        'Based on your experience, I&rsquo;d recommend emphasizing your technical skills and quantifiable achievements.',
+        'For networking, I suggest reaching out to professionals in your target companies and attending industry events.',
       ];
 
       const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
         content: randomResponse,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
+      setMessages((prev) => [...prev, assistantMessage]);
       setIsLoading(false);
     }, 1500);
   };
@@ -79,12 +80,12 @@ export default function AgentPage() {
   };
 
   const quickActions = [
-    "Help me optimize my resume",
-    "Analyze a job description",
-    "Prepare for an interview",
-    "Write a cover letter",
-    "Improve my LinkedIn profile",
-    "Negotiate salary"
+    'Help me optimize my resume',
+    'Analyze a job description',
+    'Prepare for an interview',
+    'Write a cover letter',
+    'Improve my LinkedIn profile',
+    'Negotiate salary',
   ];
 
   const handleQuickAction = (action: string) => {
@@ -100,8 +101,8 @@ export default function AgentPage() {
             AI Career Agent
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Your personal AI assistant for career development. Get personalized advice, resume optimization, 
-            interview preparation, and more through natural conversation.
+            Your personal AI assistant for career development. Get personalized advice, resume
+            optimization, interview preparation, and more through natural conversation.
           </p>
         </div>
 
@@ -116,7 +117,9 @@ export default function AgentPage() {
                 </div>
                 <div>
                   <h2 className="text-xl font-semibold">Career AI Assistant</h2>
-                  <p className="text-blue-100 text-sm">Always here to help with your career goals</p>
+                  <p className="text-blue-100 text-sm">
+                    Always here to help with your career goals
+                  </p>
                 </div>
                 <div className="ml-auto">
                   <div className="flex items-center">
@@ -142,30 +145,41 @@ export default function AgentPage() {
                     }`}
                   >
                     <p className="text-sm">{message.content}</p>
-                    <p className={`text-xs mt-1 ${
-                      message.type === 'user' ? 'text-blue-100' : 'text-gray-500'
-                    }`}>
-                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    <p
+                      className={`text-xs mt-1 ${
+                        message.type === 'user' ? 'text-blue-100' : 'text-gray-500'
+                      }`}
+                    >
+                      {message.timestamp.toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
                     </p>
                   </div>
                 </div>
               ))}
-              
+
               {isLoading && (
                 <div className="flex justify-start">
                   <div className="bg-gray-100 text-gray-800 max-w-xs lg:max-w-md px-4 py-3 rounded-2xl">
                     <div className="flex items-center space-x-2">
                       <div className="flex space-x-1">
                         <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        <div
+                          className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                          style={{ animationDelay: '0.1s' }}
+                        ></div>
+                        <div
+                          className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                          style={{ animationDelay: '0.2s' }}
+                        ></div>
                       </div>
                       <span className="text-sm text-gray-500">AI is thinking...</span>
                     </div>
                   </div>
                 </div>
               )}
-              
+
               <div ref={messagesEndRef} />
             </div>
 
@@ -209,7 +223,12 @@ export default function AgentPage() {
                   }`}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                    />
                   </svg>
                 </button>
               </div>
@@ -224,7 +243,8 @@ export default function AgentPage() {
               </div>
               <h3 className="text-lg font-semibold mb-2">Resume Optimization</h3>
               <p className="text-gray-600 text-sm">
-                Get personalized feedback and suggestions to improve your resume&rsquo;s effectiveness.
+                Get personalized feedback and suggestions to improve your resume&rsquo;s
+                effectiveness.
               </p>
             </div>
 

@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,10 +31,10 @@ const CoverLetterCard: React.FC<CoverLetterCardProps> = ({ onGenerate }) => {
     if (!jobTitle.trim() || !companyName.trim() || !jobDescription.trim()) return;
 
     setIsGenerating(true);
-    
+
     // Simulate AI generation delay
-    await new Promise(resolve => setTimeout(resolve, 4000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 4000));
+
     const mockResult: CoverLetterResult = {
       jobTitle,
       companyName,
@@ -54,10 +54,10 @@ Best regards,
       suggestions: [
         'Customize the opening paragraph',
         'Add specific achievements',
-        'Mention relevant projects'
-      ]
+        'Mention relevant projects',
+      ],
     };
-    
+
     setCoverLetter(mockResult.coverLetter);
     setShowResult(true);
     onGenerate(mockResult);
@@ -114,14 +114,18 @@ Best regards,
           <Textarea
             placeholder="Paste the job description here..."
             value={jobDescription}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setJobDescription(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              setJobDescription(e.target.value)
+            }
             className="min-h-[150px]"
           />
         </div>
 
-        <Button 
+        <Button
           onClick={handleGenerate}
-          disabled={!jobTitle.trim() || !companyName.trim() || !jobDescription.trim() || isGenerating}
+          disabled={
+            !jobTitle.trim() || !companyName.trim() || !jobDescription.trim() || isGenerating
+          }
           className="w-full"
         >
           {isGenerating ? 'Generating...' : 'Generate Cover Letter'}
@@ -132,7 +136,9 @@ Best regards,
             <div className="space-y-2">
               <label className="text-sm font-medium">Generated Cover Letter</label>
               <div className="p-4 bg-muted rounded-md min-h-[300px]">
-                <pre className="text-sm leading-relaxed whitespace-pre-wrap font-sans">{coverLetter}</pre>
+                <pre className="text-sm leading-relaxed whitespace-pre-wrap font-sans">
+                  {coverLetter}
+                </pre>
               </div>
             </div>
 

@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, ChangeEvent } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Paypal, Globe, Check, Lock } from "lucide-react";
+import React, { useState, useEffect, ChangeEvent } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { CreditCard, Globe, Check, Lock } from 'lucide-react';
 
 interface Plan {
   id: string;
@@ -15,9 +15,27 @@ interface Plan {
 }
 
 const PLANS: Plan[] = [
-  { id: "starter", name: "Starter", price_monthly: 9.99, price_yearly: 99, description: "Great for individual job seekers" },
-  { id: "pro", name: "Pro", price_monthly: 24.99, price_yearly: 249, description: "Perfect for serious career development" },
-  { id: "growth", name: "Growth", price_monthly: 49.99, price_yearly: 499, description: "For power users and small teams" }
+  {
+    id: 'starter',
+    name: 'Starter',
+    price_monthly: 9.99,
+    price_yearly: 99,
+    description: 'Great for individual job seekers',
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    price_monthly: 24.99,
+    price_yearly: 249,
+    description: 'Perfect for serious career development',
+  },
+  {
+    id: 'growth',
+    name: 'Growth',
+    price_monthly: 49.99,
+    price_yearly: 499,
+    description: 'For power users and small teams',
+  },
 ];
 
 export default function PaymentPage() {
@@ -26,8 +44,9 @@ export default function PaymentPage() {
   const [loading, setLoading] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<string>('');
 
-  const getPrice = () => billingCycle === 'monthly' ? selectedPlan.price_monthly : selectedPlan.price_yearly;
-  const getCurrency = () => "USD";
+  const getPrice = () =>
+    billingCycle === 'monthly' ? selectedPlan.price_monthly : selectedPlan.price_yearly;
+  const getCurrency = () => 'USD';
   const getSavings = () => {
     if (billingCycle === 'yearly') {
       const monthlyTotal = selectedPlan.price_monthly * 12;
@@ -51,7 +70,7 @@ export default function PaymentPage() {
           user_country: 'US', // or detect
           user_email: 'user@example.com', // get from auth
           user_id: 'user123', // get from auth
-        })
+        }),
       });
       const data = await res.json();
       if (data && data.payment_url) {
@@ -83,9 +102,14 @@ export default function PaymentPage() {
             {/* Plan Selection */}
             <div>
               <label htmlFor="plan">Choose Plan</label>
-              <select value={selectedPlan.id} onChange={(e: ChangeEvent<HTMLSelectElement>) => setSelectedPlan(PLANS.find(p => p.id === e.target.value) || PLANS[0])}>
+              <select
+                value={selectedPlan.id}
+                onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                  setSelectedPlan(PLANS.find((p) => p.id === e.target.value) || PLANS[0])
+                }
+              >
                 <option value={selectedPlan.id}>{selectedPlan.name}</option>
-                {PLANS.map(plan => (
+                {PLANS.map((plan) => (
                   <option key={plan.id} value={plan.id}>
                     {plan.name}
                   </option>
@@ -101,7 +125,9 @@ export default function PaymentPage() {
                 name="billingCycle"
                 value="monthly"
                 checked={billingCycle === 'monthly'}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setBillingCycle(e.target.value as 'monthly' | 'yearly')}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setBillingCycle(e.target.value as 'monthly' | 'yearly')
+                }
               />
               <label htmlFor="monthly">Monthly</label>
               <input
@@ -109,9 +135,13 @@ export default function PaymentPage() {
                 name="billingCycle"
                 value="yearly"
                 checked={billingCycle === 'yearly'}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setBillingCycle(e.target.value as 'monthly' | 'yearly')}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setBillingCycle(e.target.value as 'monthly' | 'yearly')
+                }
               />
-              <label htmlFor="yearly">Yearly {getSavings() > 0 && <Badge className="ml-2">Save {getSavings()}%</Badge>}</label>
+              <label htmlFor="yearly">
+                Yearly {getSavings() > 0 && <Badge className="ml-2">Save {getSavings()}%</Badge>}
+              </label>
             </div>
 
             {/* Plan Summary */}
@@ -125,7 +155,9 @@ export default function PaymentPage() {
               {billingCycle === 'yearly' && getSavings() > 0 && (
                 <div className="flex justify-between items-center mt-2">
                   <span className="text-gray-600">Savings</span>
-                  <Badge variant="secondary" className="text-green-600">Save {getSavings()}%</Badge>
+                  <Badge variant="secondary" className="text-green-600">
+                    Save {getSavings()}%
+                  </Badge>
                 </div>
               )}
             </div>
@@ -142,7 +174,7 @@ export default function PaymentPage() {
                   <span>Processing...</span>
                 ) : (
                   <>
-                    <Paypal className="h-5 w-5" />
+                    <CreditCard className="h-5 w-5" />
                     Pay with PayPal
                   </>
                 )}
@@ -165,10 +197,10 @@ export default function PaymentPage() {
         {/* Supported Payment Methods */}
         <div className="mt-6 flex items-center justify-center gap-4 text-muted-foreground text-sm">
           <span>Supported:</span>
-          <Paypal className="h-5 w-5" />
+          <CreditCard className="h-5 w-5" />
           <Globe className="h-5 w-5" />
         </div>
       </div>
     </div>
   );
-} 
+}

@@ -3,4 +3,4 @@ declare global {
     plausible?: any;
   }
 }
-export {}; 
+export {};

@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,18 +37,18 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
 
     setIsUploading(true);
     setUploadedFile(file);
-    
+
     // Simulate upload delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     setIsUploading(false);
   };
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
+    if (e.type === 'dragenter' || e.type === 'dragover') {
       setDragActive(true);
-    } else if (e.type === "dragleave") {
+    } else if (e.type === 'dragleave') {
       setDragActive(false);
     }
   };
@@ -57,10 +57,10 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
-      if (file.type === "application/pdf" || file.type.includes("word")) {
+      if (file.type === 'application/pdf' || file.type.includes('word')) {
         setUploadedFile(file);
       }
     }
@@ -73,17 +73,28 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
     }
     if (!uploadedFile) return;
     setIsAnalyzing(true);
+<<<<<<< Updated upstream
     await new Promise(resolve => setTimeout(resolve, 2000));
+=======
+
+    // Simulate analysis delay
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+>>>>>>> Stashed changes
     const mockResult: ResumeAnalysisResult = {
       skills: ['React', 'TypeScript', 'Node.js', 'Python', 'AWS'],
       experience: '5+ years in software development',
-      education: 'Bachelor\'s in Computer Science',
+      education: "Bachelor's in Computer Science",
       recommendations: [
         'Add more specific metrics and achievements',
         'Include relevant certifications',
-        'Highlight leadership experience'
-      ]
+        'Highlight leadership experience',
+      ],
     };
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
     onAnalysis(mockResult);
     setIsAnalyzing(false);
     const newCount = usageCount + 1;
@@ -128,10 +139,10 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div 
+        <div
           className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 ${
-            dragActive 
-              ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20' 
+            dragActive
+              ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
               : 'border-gray-300 dark:border-gray-600 hover:border-primary-400'
           }`}
           onDragEnter={handleDrag}
@@ -159,8 +170,8 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
               id="resume-upload"
             />
             <label htmlFor="resume-upload">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="cursor-pointer hover:bg-primary hover:text-white transition-all duration-300"
               >
                 Choose File
@@ -176,15 +187,13 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
               <p className="font-medium text-success-800 dark:text-success-200">
                 File uploaded successfully
               </p>
-              <p className="text-sm text-success-600 dark:text-success-400">
-                {uploadedFile.name}
-              </p>
+              <p className="text-sm text-success-600 dark:text-success-400">{uploadedFile.name}</p>
             </div>
           </div>
         )}
 
         <div className="space-y-4">
-          <Button 
+          <Button
             onClick={handleAnalyze}
             disabled={!uploadedFile || isAnalyzing}
             className="w-full h-12 text-base font-semibold bg-gradient-primary hover:shadow-glow transition-all duration-300"
@@ -201,7 +210,7 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
               </>
             )}
           </Button>
-          
+
           <div className="grid grid-cols-3 gap-4 text-center">
             <div className="space-y-2">
               <div className="mx-auto w-8 h-8 bg-info-100 dark:bg-info-900/30 rounded-full flex items-center justify-center">

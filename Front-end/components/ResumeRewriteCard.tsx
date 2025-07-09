@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,10 +27,10 @@ const ResumeRewriteCard: React.FC<ResumeRewriteCardProps> = ({ onRewrite }) => {
     if (!originalText.trim()) return;
 
     setIsRewriting(true);
-    
+
     // Simulate AI rewriting delay
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
     const mockResult: ResumeRewriteResult = {
       originalText,
       rewrittenText: `Enhanced version of your resume with improved clarity, impact, and professional language. The AI has optimized your experience descriptions, strengthened action verbs, and highlighted key achievements with quantifiable results.`,
@@ -38,11 +38,11 @@ const ResumeRewriteCard: React.FC<ResumeRewriteCardProps> = ({ onRewrite }) => {
         'Strengthened action verbs',
         'Added quantifiable achievements',
         'Improved clarity and readability',
-        'Enhanced professional language'
+        'Enhanced professional language',
       ],
-      score: 85
+      score: 85,
     };
-    
+
     setRewrittenText(mockResult.rewrittenText);
     setShowResult(true);
     onRewrite(mockResult);
@@ -80,12 +80,14 @@ const ResumeRewriteCard: React.FC<ResumeRewriteCardProps> = ({ onRewrite }) => {
           <Textarea
             placeholder="Paste your resume text here..."
             value={originalText}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setOriginalText(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              setOriginalText(e.target.value)
+            }
             className="min-h-[200px]"
           />
         </div>
 
-        <Button 
+        <Button
           onClick={handleRewrite}
           disabled={!originalText.trim() || isRewriting}
           className="w-full"
