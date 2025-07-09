@@ -16,7 +16,7 @@ const sizeMap: Record<NonNullable<LogoProps['size']>, string> = {
 export const Logo: React.FC<LogoProps> = ({ size = 'md', className = '' }) => {
   return (
     <img
-      src="/placeholder-logo.svg"
+      src="/ai-doc-logo.svg"
       alt="CareerForge Logo"
       className={cn(sizeMap[size as keyof typeof sizeMap], className)}
       draggable={false}

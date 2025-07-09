@@ -1,6 +1,5 @@
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogoAnimated } from "./logo";
 
 interface SplashScreenProps {
   show: boolean;
@@ -25,7 +24,7 @@ export const SplashScreen = ({ show }: SplashScreenProps) => {
           transition={{ duration: 0.8, ease: "backOut" }}
           className="mb-6"
         >
-          <LogoAnimated size="xl" />
+          <img src="/ai-doc-logo.svg" alt="CareerForge Logo" className="h-32 w-auto" draggable={false} />
         </motion.div>
         <motion.h1
           className="text-3xl md:text-5xl font-extrabold text-white drop-shadow-lg mb-2"
