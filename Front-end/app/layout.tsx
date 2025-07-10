@@ -6,6 +6,12 @@ import './globals.css'
 import * as React from 'react'
 import { Providers } from '@/components/Providers'
 import { Logo } from '@/components/ui/logo'
+import { SidebarWithLogo, SidebarNav, SidebarNavItem, SidebarNavItemIcon, SidebarNavItemText, SidebarFooter } from '@/components/ui/sidebar'
+import { User, Settings, Sun, Moon, History, Plus, LogOut, MessageSquare, FileText, UserCircle, Cog, Zap } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import { useRouter } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
+import { CommandPalette } from '@/components/CommandPalette'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -76,7 +82,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
   const [showSplash, setShowSplash] = React.useState(true);
+  const { theme, setTheme } = useTheme();
+  const router = useRouter();
 
   React.useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 1500);
@@ -94,6 +103,38 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     };
   }, [sidebarOpen]);
 
+  // Handler for New Chat
+  const handleNewChat = () => {
+    // TODO: Reset chat state here
+    router.push('/dashboard');
+    setSidebarOpen(false);
+  };
+
+  // Handler for Previous Chats
+  const handlePreviousChats = () => {
+    // TODO: Open chat history or navigate
+    router.push('/dashboard?history=1');
+    setSidebarOpen(false);
+  };
+
+  // Handler for Account
+  const handleAccount = () => {
+    router.push('/account');
+    setSidebarOpen(false);
+  };
+
+  // Handler for Settings
+  const handleSettings = () => {
+    router.push('/settings');
+    setSidebarOpen(false);
+  };
+
+  // Handler for Get Plus
+  const handleGetPlus = () => {
+    router.push('/pricing');
+    setSidebarOpen(false);
+  };
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -107,25 +148,63 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           {showSplash && <SplashScreen />}
           <ErrorBoundary>
+            <CommandPalette />
             {/* Sidebar */}
-            <aside className={`fixed left-0 top-0 z-50 flex flex-col w-64 h-screen bg-black/80 border-r border-gray-800 p-6 transition-transform duration-300 md:translate-x-0 md:static md:flex md:z-40 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
-              style={{ boxShadow: sidebarOpen ? '0 0 0 9999px rgba(0,0,0,0.3)' : undefined }}
-              aria-label="Sidebar"
-              tabIndex={-1}
-            >
-              <div className="flex flex-col items-center mb-8">
-                <Logo size="lg" />
-                <span className="text-white font-bold text-xl mt-2">CareerForge AI</span>
-              </div>
-              <nav className="flex-1 flex flex-col gap-4 text-gray-300">
-                <a href="/" className="hover:bg-gray-800 rounded-lg px-4 py-2">Home</a>
-                <a href="/dashboard" className="hover:bg-gray-800 rounded-lg px-4 py-2">Dashboard</a>
-                <a href="/job_match" className="hover:bg-gray-800 rounded-lg px-4 py-2">Job Match</a>
-                <a href="/resume" className="hover:bg-gray-800 rounded-lg px-4 py-2">Resume</a>
-                <a href="/pricing" className="hover:bg-gray-800 rounded-lg px-4 py-2">Pricing</a>
-              </nav>
-              <div className="mt-auto text-xs text-gray-500 text-center">© 2024 CareerForge</div>
-            </aside>
+            <AnimatePresence>
+              {sidebarOpen && (
+                <motion.div
+                  key="sidebar"
+                  initial={{ x: -300, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: -300, opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                  className={`fixed left-0 top-0 z-50 flex flex-col h-screen bg-black/80 border-r border-gray-800 transition-all duration-300 md:translate-x-0 md:static md:flex md:z-40 ${sidebarCollapsed ? 'w-20 p-2' : 'w-64 p-6'}`}
+                  style={{ boxShadow: sidebarOpen ? '0 0 0 9999px rgba(0,0,0,0.3)' : undefined }}
+                  aria-label="Sidebar"
+                  tabIndex={-1}
+                >
+                  {/* Collapse/Expand button (desktop only) */}
+                  <button
+                    className="hidden md:block absolute top-4 right-2 z-50 p-1 rounded hover:bg-gray-700 transition"
+                    aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                    onClick={() => setSidebarCollapsed((c) => !c)}
+                    type="button"
+                  >
+                    {sidebarCollapsed ? <Plus size={18} /> : <History size={18} />}
+                  </button>
+                  <SidebarWithLogo className="flex-1 flex flex-col" >
+                    <SidebarNav>
+                      <SidebarNavItem onClick={handleNewChat}>
+                        <SidebarNavItemIcon><Plus size={20} /></SidebarNavItemIcon>
+                        {!sidebarCollapsed && <SidebarNavItemText>New Chat</SidebarNavItemText>}
+                      </SidebarNavItem>
+                      <SidebarNavItem onClick={handlePreviousChats}>
+                        <SidebarNavItemIcon><History size={20} /></SidebarNavItemIcon>
+                        {!sidebarCollapsed && <SidebarNavItemText>Previous Chats</SidebarNavItemText>}
+                      </SidebarNavItem>
+                      <SidebarNavItem onClick={handleAccount}>
+                        <SidebarNavItemIcon><UserCircle size={20} /></SidebarNavItemIcon>
+                        {!sidebarCollapsed && <SidebarNavItemText>Account</SidebarNavItemText>}
+                      </SidebarNavItem>
+                      <SidebarNavItem onClick={handleSettings}>
+                        <SidebarNavItemIcon><Cog size={20} /></SidebarNavItemIcon>
+                        {!sidebarCollapsed && <SidebarNavItemText>Settings</SidebarNavItemText>}
+                      </SidebarNavItem>
+                      <SidebarNavItem onClick={() => { setTheme(theme === 'dark' ? 'light' : 'dark'); setSidebarOpen(false); }}>
+                        <SidebarNavItemIcon>{theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}</SidebarNavItemIcon>
+                        {!sidebarCollapsed && <SidebarNavItemText>Theme</SidebarNavItemText>}
+                      </SidebarNavItem>
+                    </SidebarNav>
+                    <SidebarFooter>
+                      <button onClick={handleGetPlus} className={`flex items-center w-full justify-center gap-2 bg-yellow-400 text-black font-bold py-2 px-4 rounded-lg mt-8 hover:bg-yellow-300 transition ${sidebarCollapsed ? 'justify-center px-2' : ''}`}>
+                        <Zap className="text-yellow-600" size={20} />
+                        {!sidebarCollapsed && 'Get Plus'}
+                      </button>
+                    </SidebarFooter>
+                  </SidebarWithLogo>
+                </motion.div>
+              )}
+            </AnimatePresence>
             {/* Hamburger icon for mobile */}
             <button
               className="fixed top-4 left-4 z-50 md:hidden flex flex-col items-center justify-center w-10 h-10 rounded-lg bg-black/70 hover:bg-black/90 focus:outline-none focus:ring-2 focus:ring-blue-500"
