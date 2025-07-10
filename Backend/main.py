@@ -11,7 +11,7 @@ import re
 import secrets
 import tempfile
 from datetime import UTC, datetime, timedelta
-from pathlib import Path
+
 
 import docx2txt
 import fitz  # PyMuPDF
@@ -34,7 +34,7 @@ from fastapi import (
     status,
 )
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import jwt
 from pydantic import BaseModel, EmailStr
@@ -75,7 +75,7 @@ logger = logging.getLogger(__name__)
 app_state = {}
 
 @asynccontextmanager
-async def lifespan(fastapi_app: FastAPI):
+async def lifespan(_: FastAPI):
     """Application lifespan manager"""
     # Startup
     logger.info("Starting CareerForge AI API server...")

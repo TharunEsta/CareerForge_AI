@@ -132,7 +132,7 @@ async def update_user_subscription(user_id: str, subscription_id: str, status: s
     logger.info("Updating user %s subscription %s to status: %s", user_id, subscription_id, status)
     pass
 
-async def update_payment_record(payment_id: str, status: str, amount: Optional[str] = None):
+async def update_payment_record(payment_id: str, status: str, _: Optional[str] = None):
     """Update payment record in database"""
     # Implement based on your database setup
     logger.info("Updating payment %s to status: %s", payment_id, status)
@@ -144,46 +144,4 @@ def verify_webhook_signature(_: bytes, __: Dict[str, str]) -> bool:
     # using PayPal's webhook verification SDK
     return True  # For development - implement proper verification for production
 
-# Helper functions for database operations (implement these based on your database setup)
-
-async def update_user_subscription(user_id: str, subscription_id: str, status: str):
-    """Update user's subscription status in database"""
-    # Implement based on your database setup
-    logger.info(f"Updating user {user_id} subscription {subscription_id} to status: {status}")
-    pass
-
-async def update_payment_record(payment_id: str, status: str, amount: str = None):
-    """Update payment record in database"""
-    # Implement based on your database setup
-    logger.info(f"Updating payment {payment_id} to status: {status}")
-    pass
-
-async def send_welcome_email(user_id: str):
-    """Send welcome email to new subscriber"""
-    # Implement email sending logic
-    logger.info(f"Sending welcome email to user: {user_id}")
-    pass
-
-async def send_cancellation_email(user_id: str):
-    """Send cancellation email to user"""
-    # Implement email sending logic
-    logger.info(f"Sending cancellation email to user: {user_id}")
-    pass
-
-async def send_expiration_email(user_id: str):
-    """Send expiration email to user"""
-    # Implement email sending logic
-    logger.info(f"Sending expiration email to user: {user_id}")
-    pass
-
-async def send_payment_confirmation_email(subscription_id: str):
-    """Send payment confirmation email"""
-    # Implement email sending logic
-    logger.info(f"Sending payment confirmation email for subscription: {subscription_id}")
-    pass
-
-async def send_payment_failure_email(subscription_id: str):
-    """Send payment failure email"""
-    # Implement email sending logic
-    logger.info(f"Sending payment failure email for subscription: {subscription_id}")
-    pass 
+ 

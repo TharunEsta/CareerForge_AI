@@ -8,7 +8,7 @@ from datetime import datetime
 from typing import Dict, Any, Optional
 from pydantic import BaseModel
 
-from subscription_plans import get_plan_by_id, check_user_usage
+
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ class UsageTracker:
             
             # Check if we need to reset (monthly reset)
             current_record = self.usage_records[key]
-            if self._should_reset(current_record.reset_date):
+            if UsageTracker._should_reset(current_record.reset_date):
                 current_record.usage_count = 0
                 current_record.reset_date = datetime.utcnow()
                 current_record.plan = user_plan
@@ -92,12 +92,12 @@ class UsageTracker:
             current_record = self.usage_records[key]
             
             # Check if we need to reset
-            if self._should_reset(current_record.reset_date):
+            if UsageTracker._should_reset(current_record.reset_date):
                 current_record.usage_count = 0
                 current_record.reset_date = datetime.utcnow()
                 current_record.plan = user_plan
             
-            limit = self._get_feature_limit(feature, user_plan)
+            limit = UsageTracker._get_feature_limit(feature, user_plan)
             allowed = current_record.usage_count < limit
             
             return {
@@ -135,12 +135,12 @@ class UsageTracker:
                 feature_name = record.feature
                 
                 # Check if we need to reset
-                if self._should_reset(record.reset_date):
+                if UsageTracker._should_reset(record.reset_date):
                     record.usage_count = 0
                     record.reset_date = datetime.utcnow()
                     record.plan = user_plan
                 
-                limit = self._get_feature_limit(feature_name, user_plan)
+                limit = UsageTracker._get_feature_limit(feature_name, user_plan)
                 
                 summary["features"][feature_name] = {
                     "name": feature_name,
@@ -177,12 +177,14 @@ class UsageTracker:
         except Exception as e:
             logger.error("Error resetting usage for user %s: %s", user_id, e)
     
-    def _should_reset(self, reset_date: datetime) -> bool:
+    @staticmethod
+    def _should_reset(reset_date: datetime) -> bool:
         """Check if usage should be reset (monthly reset)"""
         now = datetime.utcnow()
         return (now.year != reset_date.year or now.month != reset_date.month)
     
-    def _get_feature_limit(self, feature: str, plan: str) -> int:
+    @staticmethod
+    def _get_feature_limit(feature: str, plan: str) -> int:
         """Get usage limit for a feature based on plan"""
         # Define limits based on plan and feature
         limits = {
