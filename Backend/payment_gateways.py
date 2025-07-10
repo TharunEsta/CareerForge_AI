@@ -246,8 +246,107 @@ class PayPalGateway:
         self.client_secret = os.getenv("PAYPAL_CLIENT_SECRET")
         self.mode = os.getenv("PAYPAL_MODE", "sandbox")  # sandbox or live
     
+    async def create_subscription_plan(self, plan_id: str, billing_cycle: str, amount: float) -> str:
+        """Create a PayPal billing plan for subscriptions"""
+        try:
+            import paypalrestsdk
+            
+            paypalrestsdk.configure({
+                "mode": self.mode,
+                "client_id": self.client_id,
+                "client_secret": self.client_secret
+            })
+            
+            # Define billing plan
+            billing_plan = paypalrestsdk.BillingPlan({
+                "name": f"CareerForge AI - {plan_id.title()} Plan",
+                "description": f"CareerForge AI {billing_cycle} subscription for {plan_id} plan",
+                "type": "FIXED",
+                "payment_definitions": [{
+                    "name": f"{billing_cycle.capitalize()} Payment",
+                    "type": "REGULAR",
+                    "frequency": billing_cycle.upper(),
+                    "frequency_interval": "1",
+                    "amount": {
+                        "value": str(amount),
+                        "currency": "USD"
+                    },
+                    "cycles": "0"  # Unlimited cycles
+                }],
+                "merchant_preferences": {
+                    "setup_fee": {
+                        "value": "0",
+                        "currency": "USD"
+                    },
+                    "cancel_url": f"{os.getenv('FRONTEND_URL', 'http://localhost:3000')}/payment/cancel",
+                    "return_url": f"{os.getenv('FRONTEND_URL', 'http://localhost:3000')}/payment/success",
+                    "max_fail_attempts": "0",
+                    "auto_bill_amount": "YES",
+                    "initial_fail_amount_action": "CONTINUE"
+                }
+            })
+            
+            if billing_plan.create():
+                return billing_plan.id
+            else:
+                raise Exception(f"PayPal billing plan creation failed: {billing_plan.error}")
+                
+        except Exception as e:
+            logger.error("PayPal billing plan creation failed: %s", e)
+            raise e
+    
+    async def create_subscription(self, plan_id: str, billing_cycle: str, amount: float, user_email: str) -> PaymentResponse:
+        """Create PayPal subscription"""
+        try:
+            import paypalrestsdk
+            
+            paypalrestsdk.configure({
+                "mode": self.mode,
+                "client_id": self.client_id,
+                "client_secret": self.client_secret
+            })
+            
+            # Create or get billing plan
+            billing_plan_id = await self.create_subscription_plan(plan_id, billing_cycle, amount)
+            
+            # Create agreement (subscription)
+            agreement = paypalrestsdk.BillingAgreement({
+                "name": f"CareerForge AI - {plan_id.title()} Plan",
+                "description": f"CareerForge AI {billing_cycle} subscription",
+                "start_date": "2024-01-01T00:00:00Z",  # Will be updated to current date
+                "payer": {
+                    "payment_method": "paypal"
+                },
+                "plan": {
+                    "id": billing_plan_id
+                }
+            })
+            
+            if agreement.create():
+                return PaymentResponse(
+                    payment_id=agreement.id,
+                    status=PaymentStatus.PENDING,
+                    gateway=PaymentGateway.PAYPAL,
+                    amount=amount,
+                    currency="USD",
+                    payment_url=agreement.links[0].href  # PayPal approval URL
+                )
+            else:
+                raise Exception(f"PayPal subscription creation failed: {agreement.error}")
+                
+        except Exception as e:
+            logger.error("PayPal subscription creation failed: %s", e)
+            return PaymentResponse(
+                payment_id="",
+                status=PaymentStatus.FAILED,
+                gateway=PaymentGateway.PAYPAL,
+                amount=amount,
+                currency="USD",
+                error_message=str(e)
+            )
+    
     async def create_payment(self, request: PaymentRequest) -> PaymentResponse:
-        """Create PayPal payment"""
+        """Create PayPal payment (for one-time payments)"""
         try:
             import paypalrestsdk
             
@@ -340,6 +439,46 @@ class PayPalGateway:
             logger.error("PayPal payment verification failed: %s", e)
             return PaymentResponse(
                 payment_id=payment_id,
+                status=PaymentStatus.FAILED,
+                gateway=PaymentGateway.PAYPAL,
+                amount=0,
+                currency="USD",
+                error_message=str(e)
+            )
+    
+    async def verify_subscription(self, subscription_id: str) -> PaymentResponse:
+        """Verify PayPal subscription"""
+        try:
+            import paypalrestsdk
+            
+            paypalrestsdk.configure({
+                "mode": self.mode,
+                "client_id": self.client_id,
+                "client_secret": self.client_secret
+            })
+            
+            agreement = paypalrestsdk.BillingAgreement.find(subscription_id)
+            
+            status_map = {
+                "Active": PaymentStatus.SUCCESS,
+                "Pending": PaymentStatus.PENDING,
+                "Cancelled": PaymentStatus.CANCELLED,
+                "Suspended": PaymentStatus.FAILED
+            }
+            
+            return PaymentResponse(
+                payment_id=subscription_id,
+                status=status_map.get(agreement.state, PaymentStatus.FAILED),
+                gateway=PaymentGateway.PAYPAL,
+                amount=float(agreement.plan.payment_definitions[0].amount.value),
+                currency=agreement.plan.payment_definitions[0].amount.currency,
+                transaction_id=agreement.id
+            )
+            
+        except Exception as e:
+            logger.error("PayPal subscription verification failed: %s", e)
+            return PaymentResponse(
+                payment_id=subscription_id,
                 status=PaymentStatus.FAILED,
                 gateway=PaymentGateway.PAYPAL,
                 amount=0,

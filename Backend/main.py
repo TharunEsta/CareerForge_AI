@@ -1,3 +1,8 @@
+"""
+CareerForge AI - Main API Server
+FastAPI-based backend for AI-powered career optimization
+"""
+
 # Standard library imports
 import hashlib
 import logging
@@ -36,6 +41,8 @@ from sentence_transformers import SentenceTransformer
 from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
+from contextlib import asynccontextmanager
+from fastapi.staticfiles import StaticFiles
 
 # Local application imports
 from models import RevokedToken, SessionLocal
@@ -48,7 +55,10 @@ from utils import (
     allowed_file,
     parse_resume,
     parse_resume_with_job_matching,
+    setup_logging,
 )
+from usage_tracker import usage_tracker
+from paypal_webhook import router as webhook_router
 
 # Load environment variables (must come *after* all imports)
 load_dotenv("key.env")
@@ -58,39 +68,48 @@ load_dotenv(".env")
 uploads_dir = "uploads"
 os.makedirs(uploads_dir, exist_ok=True)
 
-# Logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
-
+# Setup logging
+setup_logging()
 logger = logging.getLogger(__name__)
-file_handler = logging.FileHandler("backend.log")
-file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
-logger.addHandler(file_handler)
 
-# Rate limiter
-rate_limiter = Limiter(key_func=get_remote_address)
-limiter = Limiter(key_func=get_remote_address)
+# Global state
+app_state = {}
 
-# FastAPI Setup
-app = FastAPI(title="CareerForge API")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan manager"""
+    # Startup
+    logger.info("Starting CareerForge AI API server...")
+    app_state["startup_time"] = "2024-01-01T00:00:00Z"
+    
+    yield
+    
+    # Shutdown
+    logger.info("Shutting down CareerForge AI API server...")
 
+# Create FastAPI app
+app = FastAPI(
+    title="CareerForge AI API",
+    description="AI-powered career optimization platform",
+    version="1.0.0",
+    lifespan=lifespan
+)
 
-app.state.limiter = limiter
-
-
-# CORS
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Configure appropriately for production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Include routers
-app.include_router(realtime_router)
-app.include_router(skills_jobs_router)
-app.include_router(subscription_router)
-app.include_router(payment_router)
+app.include_router(payment_router, prefix="/api/payment", tags=["payment"])
+app.include_router(skills_jobs_router, prefix="/api/skills-jobs", tags=["skills-jobs"])
+app.include_router(realtime_router, prefix="/api/realtime", tags=["realtime"])
+app.include_router(subscription_router, prefix="/api/subscription", tags=["subscription"])
+app.include_router(webhook_router, prefix="/api/paypal-webhook", tags=["paypal-webhook"])
 
 # Security & Config
 SECRET_KEY = os.getenv("SECRET_KEY", "secret")
@@ -389,8 +408,6 @@ def extract_education(text: str):
         if any(keyword in line for keyword in education_keywords):
             education.append(line.title())
     return education
-
-
 
 # Routes
 
@@ -976,11 +993,77 @@ async def log_requests(request: Request, call_next):
 # Add this after the imports
 LOG_FILE = "backend.log"
 
+# Usage tracking endpoints
+@app.post("/api/usage/track")
+async def track_usage(user_id: str, feature: str, user_plan: str = "free"):
+    """Track usage of a feature for a user"""
+    try:
+        result = usage_tracker.increment_usage(user_id, feature, user_plan)
+        return result
+    except Exception as e:
+        logger.error(f"Error tracking usage: {e}")
+        raise HTTPException(status_code=500, detail="Failed to track usage")
+
+@app.get("/api/usage/check/{user_id}/{feature}")
+async def check_usage(user_id: str, feature: str, user_plan: str = "free"):
+    """Check if user can use a feature"""
+    try:
+        result = usage_tracker.check_usage_limit(user_id, feature, user_plan)
+        return result
+    except Exception as e:
+        logger.error(f"Error checking usage: {e}")
+        raise HTTPException(status_code=500, detail="Failed to check usage")
+
+@app.get("/api/usage/summary/{user_id}")
+async def get_usage_summary(user_id: str, user_plan: str = "free"):
+    """Get usage summary for a user"""
+    try:
+        result = usage_tracker.get_user_usage_summary(user_id, user_plan)
+        return result
+    except Exception as e:
+        logger.error(f"Error getting usage summary: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get usage summary")
+
+@app.post("/api/usage/reset/{user_id}")
+async def reset_usage(user_id: str, feature: str = None):
+    """Reset usage for a user (admin function)"""
+    try:
+        usage_tracker.reset_user_usage(user_id, feature)
+        return {"message": "Usage reset successfully"}
+    except Exception as e:
+        logger.error(f"Error resetting usage: {e}")
+        raise HTTPException(status_code=500, detail="Failed to reset usage")
+
+# Health check endpoint
+@app.get("/health")
+async def health_check():
+    """Health check endpoint"""
+    return {
+        "status": "healthy",
+        "service": "CareerForge AI API",
+        "version": "1.0.0",
+        "startup_time": app_state.get("startup_time")
+    }
+
+# Root endpoint
+@app.get("/")
+async def root():
+    """Root endpoint"""
+    return {
+        "message": "CareerForge AI API",
+        "version": "1.0.0",
+        "docs": "/docs",
+        "health": "/health"
+    }
+
+# Mount static files (if needed)
+# app.mount("/static", StaticFiles(directory="static"), name="static")
+
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
-        host=os.getenv("UVICORN_HOST", "127.0.0.1"),
-        port=int(os.getenv("UVICORN_PORT", "8000")),
+        host="0.0.0.0",
+        port=8000,
         reload=True,
-        workers=1,
+        log_level="info"
     )

@@ -15,11 +15,15 @@ from subscription_plans import (
     get_plan_by_id,
     get_plans,
 )
+from payment_gateways import PayPalGateway, PaymentGateway
 
 # Setup logging
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/subscription", tags=["subscription"])
+
+# Initialize PayPal gateway
+paypal_gateway = PayPalGateway()
 
 # PYDANTIC MODELS
 
@@ -60,6 +64,17 @@ class PlansComparisonResponse(BaseModel):
     features: list[str]
     currency: str
     billing_cycle: str
+
+class UpgradeRequest(BaseModel):
+    plan: str
+    userId: str
+    billing_cycle: str = "monthly"
+    user_email: str = ""
+
+class UpgradeResponse(BaseModel):
+    success: bool
+    checkoutUrl: str | None = None
+    message: str
 
 # SUBSCRIPTION ENDPOINTS
 
@@ -196,6 +211,64 @@ async def get_plans_comparison():
         logger.error("Error generating plan comparison: %s", e)
         raise HTTPException(status_code=500, detail="Failed to generate plan comparison")
 
+@router.post("/upgrade", response_model=UpgradeResponse)
+async def upgrade_subscription(request: UpgradeRequest):
+    """Upgrade user subscription to a new plan using PayPal"""
+    try:
+        # Validate the requested plan
+        plan = get_plan_by_id(request.plan)
+        if not plan:
+            raise HTTPException(status_code=404, detail="Plan not found")
+        
+        # Get pricing based on billing cycle
+        if request.billing_cycle == "yearly":
+            price = plan.price_yearly
+            interval = "year"
+        else:
+            price = plan.price_monthly
+            interval = "month"
+        
+        # For free plan, just update the user's plan
+        if plan.id == "free":
+            # Here you would update the user's plan in your database
+            # For now, we'll return success
+            return UpgradeResponse(
+                success=True,
+                message="Successfully upgraded to Free plan"
+            )
+        
+        # For paid plans, create PayPal subscription
+        try:
+            # Create PayPal subscription
+            payment_response = await paypal_gateway.create_subscription(
+                plan_id=request.plan,
+                billing_cycle=interval,
+                amount=price,
+                user_email=request.user_email
+            )
+            
+            if payment_response.status.value == "pending":
+                return UpgradeResponse(
+                    success=True,
+                    checkoutUrl=payment_response.payment_url,
+                    message="PayPal subscription created successfully"
+                )
+            else:
+                raise Exception(f"PayPal subscription creation failed: {payment_response.error_message}")
+                
+        except ImportError:
+            # PayPal SDK not available, return mock response for development
+            logger.warning("PayPal SDK not available, returning mock checkout URL")
+            return UpgradeResponse(
+                success=True,
+                checkoutUrl="https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_xclick-subscriptions&business=your-paypal-email@example.com&item_name=CareerForge%20AI%20Subscription&a3=19.00&p3=1&t3=M&src=1&currency_code=USD",
+                message="Mock PayPal subscription created (PayPal SDK not configured)"
+            )
+        
+    except Exception as e:
+        logger.error("Error upgrading subscription: %s", e)
+        raise HTTPException(status_code=500, detail="Failed to upgrade subscription")
+
 @router.get("/features")
 async def get_all_features():
     """Get all available features across all plans"""
@@ -219,9 +292,13 @@ async def get_all_features():
 @router.get("/health")
 async def subscription_health_check():
     """Health check for subscription service"""
-    return {
-        "status": "healthy",
-        "service": "subscription",
-        "timestamp": datetime.now().isoformat(),
-        "plans_available": len(get_plans())
-    } 
+    try:
+        plans = get_plans()
+        return {
+            "status": "healthy",
+            "plans_count": len(plans),
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        logger.error("Subscription health check failed: %s", e)
+        raise HTTPException(status_code=500, detail="Subscription service unhealthy") 

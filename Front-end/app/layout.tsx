@@ -1,28 +1,16 @@
-<<<<<<< HEAD
+"use client";
+
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import * as React from 'react'
 import ClientAppWrapper from '@/components/ClientAppWrapper'
 import ClientRootLayout from '@/components/ClientRootLayout'
-=======
-"use client";
->>>>>>> dabb9f7 (Perplexity-style UI: sidebar, centered chat, build fixes, and dependency updates)
+import { Providers } from '@/components/Providers'
+import MicroDashboardMenu from '@/components/ui/MicroDashboardMenu'
+import { Logo } from '@/components/ui/logo'
 
-<<<<<<< Updated upstream
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
-import "./globals.css"
-import { Providers } from "@/components/Providers"
-import SplashScreen from "@/components/ui/SplashScreen"
-import * as React from "react"
-import MicroDashboardMenu from "@/components/ui/MicroDashboardMenu"
-import { Logo } from "@/components/ui/logo"
-
-const inter = Inter({ subsets: ["latin"] })
-=======
 const inter = Inter({ subsets: ['latin'] })
->>>>>>> Stashed changes
 
 export const metadata: Metadata = {
   title: 'CareerForge AI - AI-Powered Career Optimization',
@@ -88,6 +76,20 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+
+  // Prevent scrolling when sidebar is open on mobile
+  React.useEffect(() => {
+    if (sidebarOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [sidebarOpen]);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -97,15 +99,37 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="theme-color" content="#3B82F6" />
         <meta name="msapplication-TileColor" content="#3B82F6" />
       </head>
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-      <body className={inter.className + " bg-gradient-to-br from-gray-900 via-gray-950 to-gray-900 min-h-screen flex flex-col items-center justify-center"}>
-=======
       <body className={inter.className + " bg-gradient-to-br from-gray-900 via-gray-950 to-gray-900 min-h-screen flex flex-row"}>
->>>>>>> dabb9f7 (Perplexity-style UI: sidebar, centered chat, build fixes, and dependency updates)
         <Providers>
           <MicroDashboardMenu />
-          <aside className="hidden md:flex flex-col w-64 h-screen bg-black/80 border-r border-gray-800 p-6 fixed left-0 top-0 z-40">
+          {/* Hamburger icon for mobile */}
+          <button
+            className="fixed top-4 left-4 z-50 md:hidden flex flex-col items-center justify-center w-10 h-10 rounded-lg bg-black/70 hover:bg-black/90 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+            onClick={() => setSidebarOpen((open) => !open)}
+            type="button"
+          >
+            <span className="block w-6 h-0.5 bg-white mb-1 rounded transition-all duration-300" style={{ transform: sidebarOpen ? 'rotate(45deg) translateY(7px)' : 'none' }} />
+            <span className={`block w-6 h-0.5 bg-white mb-1 rounded transition-all duration-300 ${sidebarOpen ? 'opacity-0' : ''}`} />
+            <span className="block w-6 h-0.5 bg-white rounded transition-all duration-300" style={{ transform: sidebarOpen ? 'rotate(-45deg) translateY(-7px)' : 'none' }} />
+          </button>
+          {/* Sidebar overlay for mobile */}
+          {sidebarOpen && (
+            <div
+              className="fixed inset-0 z-40 bg-black/60 md:hidden animate-fade-in"
+              onClick={() => setSidebarOpen(false)}
+              aria-label="Close sidebar overlay"
+            />
+          )}
+          {/* Sidebar */}
+          <aside
+            className={`fixed left-0 top-0 z-50 flex flex-col w-64 h-screen bg-black/80 border-r border-gray-800 p-6 transition-transform duration-300
+              ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+              md:translate-x-0 md:static md:flex md:z-40`}
+            style={{ boxShadow: sidebarOpen ? '0 0 0 9999px rgba(0,0,0,0.3)' : undefined }}
+            aria-label="Sidebar"
+            tabIndex={-1}
+          >
             <div className="flex flex-col items-center mb-8">
               <Logo size="lg" />
               <span className="text-white font-bold text-xl mt-2">CareerForge AI</span>
@@ -119,18 +143,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </nav>
             <div className="mt-auto text-xs text-gray-500 text-center">© 2024 CareerForge</div>
           </aside>
+          {/* Main content */}
           <div className="flex-1 flex flex-col items-center justify-center min-h-screen ml-0 md:ml-64 transition-all duration-300">
             <main className="w-full max-w-2xl flex flex-col items-center justify-center bg-black/60 rounded-2xl shadow-xl p-8 my-8 mx-auto">
               <ClientRootLayout>{children}</ClientRootLayout>
             </main>
           </div>
         </Providers>
-=======
-      <body className={inter.className}>
-        <ClientAppWrapper>
-          <ClientRootLayout>{children}</ClientRootLayout>
-        </ClientAppWrapper>
->>>>>>> Stashed changes
       </body>
     </html>
   )

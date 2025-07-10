@@ -10,9 +10,8 @@ from pydantic import BaseModel
 
 class PlanType(str, Enum):
     FREE = "free"
-    STARTER = "starter"
+    PLUS = "plus"
     PRO = "pro"
-    GROWTH = "growth"
 
 class Feature(BaseModel):
     name: str
@@ -31,45 +30,45 @@ class SubscriptionPlan(BaseModel):
 
 # Feature definitions
 FEATURES = {
-    "job_matches": Feature(
-        name="Job Matches",
-        description="Number of AI-powered job matches per month"
+    "ai_chats": Feature(
+        name="AI Chats",
+        description="AI-powered chat conversations with GPT"
     ),
-    "resume_analysis": Feature(
-        name="Resume Analysis",
-        description="AI-powered resume and skills analysis"
+    "ats_analysis": Feature(
+        name="ATS Analysis",
+        description="Advanced ATS (Applicant Tracking System) analysis"
     ),
-    "skill_recommendations": Feature(
-        name="Skill Recommendations",
-        description="Personalized skill development recommendations"
+    "resume_parsing": Feature(
+        name="Resume Parsing",
+        description="Intelligent resume parsing and data extraction"
     ),
-    "market_trends": Feature(
-        name="Market Trends",
-        description="Real-time market trends and salary insights"
+    "cover_letter_generation": Feature(
+        name="Cover Letter Generation",
+        description="AI-powered cover letter creation"
     ),
-    "ai_enhancement": Feature(
-        name="AI Enhancement",
-        description="Advanced AI-powered analysis and insights"
+    "job_matching": Feature(
+        name="Job Matching",
+        description="AI-powered job matching and recommendations"
     ),
-    "export_reports": Feature(
-        name="Export Reports",
-        description="Download detailed analysis reports"
+    "linkedin_optimization": Feature(
+        name="LinkedIn Optimization",
+        description="LinkedIn profile optimization and enhancement"
+    ),
+    "voice_assistant": Feature(
+        name="Voice Assistant",
+        description="Voice-powered AI assistant with 🎙️"
+    ),
+    "unlimited_usage": Feature(
+        name="Unlimited Usage",
+        description="No monthly usage limits"
     ),
     "priority_support": Feature(
         name="Priority Support",
-        description="Priority email and chat support"
+        description="Priority customer support"
     ),
-    "api_access": Feature(
-        name="API Access",
-        description="Programmatic access to CareerForge AI"
-    ),
-    "white_label": Feature(
-        name="White Label",
-        description="Custom branding and white-label options"
-    ),
-    "dedicated_support": Feature(
-        name="Dedicated Support",
-        description="Dedicated account manager and support"
+    "pwa_access": Feature(
+        name="PWA Access",
+        description="Access to Progressive Web App (Install App)"
     )
 }
 
@@ -80,95 +79,78 @@ SUBSCRIPTION_PLANS = {
         name="Free",
         price_monthly=0.0,
         price_yearly=0.0,
-        description="Perfect for trying out CareerForge AI",
+        description="Perfect for getting started",
         features=[
-            FEATURES["job_matches"],
-            FEATURES["resume_analysis"]
+            FEATURES["ai_chats"],
+            FEATURES["ats_analysis"],
+            FEATURES["cover_letter_generation"]
         ],
         limits={
-            "job_matches_per_month": 5,
-            "resume_analyses_per_month": 3,
-            "skill_recommendations_per_month": 0,
-            "market_trends_per_month": 0,
-            "export_reports": 0,
-            "api_calls_per_month": 0
+            "ai_chats_per_month": 5,
+            "ats_analyses_per_month": 3,
+            "cover_letters_per_month": 2,
+            "resume_parses_per_month": 0,
+            "job_matches_per_month": 0,
+            "linkedin_optimizations_per_month": 0,
+            "voice_assistant_calls_per_month": 0,
+            "pwa_access": 0
         }
     ),
     
-    PlanType.STARTER: SubscriptionPlan(
-        id="starter",
-        name="Starter",
-        price_monthly=9.99,
-        price_yearly=99.0,
-        description="Great for individual job seekers",
+    PlanType.PLUS: SubscriptionPlan(
+        id="plus",
+        name="Plus",
+        price_monthly=19.0,
+        price_yearly=190.0,
+        description="Great for active job seekers",
+        popular=True,
         features=[
-            FEATURES["job_matches"],
-            FEATURES["resume_analysis"],
-            FEATURES["skill_recommendations"],
-            FEATURES["export_reports"]
+            FEATURES["ai_chats"],
+            FEATURES["ats_analysis"],
+            FEATURES["cover_letter_generation"],
+            FEATURES["resume_parsing"],
+            FEATURES["job_matching"],
+            FEATURES["linkedin_optimization"]
         ],
         limits={
-            "job_matches_per_month": 25,
-            "resume_analyses_per_month": 10,
-            "skill_recommendations_per_month": 5,
-            "market_trends_per_month": 3,
-            "export_reports": 5,
-            "api_calls_per_month": 100
+            "ai_chats_per_month": 100,
+            "ats_analyses_per_month": 50,
+            "cover_letters_per_month": 25,
+            "resume_parses_per_month": 20,
+            "job_matches_per_month": 30,
+            "linkedin_optimizations_per_month": 10,
+            "voice_assistant_calls_per_month": 0,
+            "pwa_access": 0
         }
     ),
     
     PlanType.PRO: SubscriptionPlan(
         id="pro",
         name="Pro",
-        price_monthly=24.99,
-        price_yearly=249.0,
-        description="Perfect for serious career development",
-        popular=True,
+        price_monthly=49.0,
+        price_yearly=490.0,
+        description="For power users and professionals",
         features=[
-            FEATURES["job_matches"],
-            FEATURES["resume_analysis"],
-            FEATURES["skill_recommendations"],
-            FEATURES["market_trends"],
-            FEATURES["ai_enhancement"],
-            FEATURES["export_reports"],
+            FEATURES["ai_chats"],
+            FEATURES["ats_analysis"],
+            FEATURES["cover_letter_generation"],
+            FEATURES["resume_parsing"],
+            FEATURES["job_matching"],
+            FEATURES["linkedin_optimization"],
+            FEATURES["voice_assistant"],
+            FEATURES["unlimited_usage"],
             FEATURES["priority_support"],
-            FEATURES["api_access"]
+            FEATURES["pwa_access"]
         ],
         limits={
-            "job_matches_per_month": 100,
-            "resume_analyses_per_month": 50,
-            "skill_recommendations_per_month": 25,
-            "market_trends_per_month": 15,
-            "export_reports": 20,
-            "api_calls_per_month": 1000
-        }
-    ),
-    
-    PlanType.GROWTH: SubscriptionPlan(
-        id="growth",
-        name="Growth",
-        price_monthly=49.99,
-        price_yearly=499.0,
-        description="For power users and small teams",
-        features=[
-            FEATURES["job_matches"],
-            FEATURES["resume_analysis"],
-            FEATURES["skill_recommendations"],
-            FEATURES["market_trends"],
-            FEATURES["ai_enhancement"],
-            FEATURES["export_reports"],
-            FEATURES["priority_support"],
-            FEATURES["api_access"],
-            FEATURES["white_label"],
-            FEATURES["dedicated_support"]
-        ],
-        limits={
+            "ai_chats_per_month": -1,  # Unlimited
+            "ats_analyses_per_month": -1,  # Unlimited
+            "cover_letters_per_month": -1,  # Unlimited
+            "resume_parses_per_month": -1,  # Unlimited
             "job_matches_per_month": -1,  # Unlimited
-            "resume_analyses_per_month": -1,  # Unlimited
-            "skill_recommendations_per_month": -1,  # Unlimited
-            "market_trends_per_month": -1,  # Unlimited
-            "export_reports": -1,  # Unlimited
-            "api_calls_per_month": 10000
+            "linkedin_optimizations_per_month": -1,  # Unlimited
+            "voice_assistant_calls_per_month": -1,  # Unlimited
+            "pwa_access": 1
         }
     )
 }
@@ -198,9 +180,13 @@ class SubscriptionManager:
     def check_usage_limit(self, user_plan: PlanType, feature: str, current_usage: int) -> dict[str, any]:
         """Check if user has exceeded usage limits"""
         plan = self.get_plan(user_plan)
-        limit = plan.limits.get(f"{feature}_per_month", 0)
         
-        if limit == -1:  # Unlimited
+        # Get the limit for this feature
+        limit_key = f"{feature}_per_month"
+        limit = plan.limits.get(limit_key, 0)
+        
+        # Check if unlimited (-1) or within limit
+        if limit == -1:
             return {
                 "allowed": True,
                 "limit": -1,
@@ -208,8 +194,8 @@ class SubscriptionManager:
                 "remaining": -1
             }
         
-        remaining = max(0, limit - current_usage)
         allowed = current_usage < limit
+        remaining = max(0, limit - current_usage) if limit > 0 else 0
         
         return {
             "allowed": allowed,
@@ -219,61 +205,65 @@ class SubscriptionManager:
         }
     
     def get_plan_comparison(self) -> dict[str, any]:
-        """Get plan comparison for pricing page"""
-        comparison = {
-            "plans": [],
-            "features": list(FEATURES.keys()),
+        """Get detailed plan comparison for pricing page"""
+        features = [
+            "AI Chats",
+            "ATS Analysis", 
+            "Cover Letter Generation",
+            "Resume Parsing",
+            "Job Matching",
+            "LinkedIn Optimization",
+            "Voice Assistant",
+            "Unlimited Usage",
+            "Priority Support",
+            "PWA Access"
+        ]
+        
+        return {
+            "plans": [
+                {
+                    "id": plan.id,
+                    "name": plan.name,
+                    "price_monthly": plan.price_monthly,
+                    "price_yearly": plan.price_yearly,
+                    "description": plan.description,
+                    "popular": plan.popular,
+                    "features": [f.name for f in plan.features]
+                }
+                for plan in self.plans.values()
+            ],
+            "features": features,
             "currency": "USD",
             "billing_cycle": "monthly"
         }
-        
-        for _, plan in self.plans.items():
-            plan_data = {
-                "id": plan.id,
-                "name": plan.name,
-                "price_monthly": plan.price_monthly,
-                "price_yearly": plan.price_yearly,
-                "description": plan.description,
-                "popular": plan.popular,
-                "features": {},
-                "limits": plan.limits
-            }
-            
-            # Add feature availability
-            for feature in plan.features:
-                plan_data["features"][feature.name] = feature.available
-            
-            comparison["plans"].append(plan_data)
-        
-        return comparison
 
-# Global instance
+# Global subscription manager instance
 subscription_manager = SubscriptionManager()
 
-# Convenience functions for API endpoints
+# Helper functions
 def get_plans() -> list[SubscriptionPlan]:
-    """Get all subscription plans"""
+    """Get all available subscription plans"""
     return subscription_manager.get_all_plans()
 
 def get_plan_by_id(plan_id: str) -> SubscriptionPlan | None:
-    """Get plan by ID"""
-    for plan in get_plans():
+    """Get subscription plan by ID"""
+    for plan in subscription_manager.get_all_plans():
         if plan.id == plan_id:
             return plan
     return None
 
 def check_user_access(user_plan: str, feature: str) -> bool:
-    """Check if user has access to a feature"""
+    """Check if user has access to a specific feature"""
     try:
-        plan_type = PlanType(user_plan)
+        plan_type = PlanType(user_plan.lower())
         return subscription_manager.check_feature_access(plan_type, feature)
     except ValueError:
         return False
 
 def check_user_usage(user_plan: str, feature: str, current_usage: int) -> dict[str, any]:
-    """Check user usage limits"""
+    """Check if user has exceeded usage limits"""
     try:
-        plan_type = PlanType(user_plan)
+        plan_type = PlanType(user_plan.lower())
         return subscription_manager.check_usage_limit(plan_type, feature, current_usage)
     except ValueError:
         return {
