@@ -7,7 +7,6 @@ import logging
 import json
 from typing import Dict, Optional
 from fastapi import APIRouter, Request, HTTPException
-from payment_gateways import PayPalGateway
 
 # Setup logging
 logger = logging.getLogger(__name__)
