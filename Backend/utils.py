@@ -533,3 +533,10 @@ if __name__ == "__main__":
 
     import pprint
     pprint.pprint(result)
+
+def setup_logging():
+    import logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    )

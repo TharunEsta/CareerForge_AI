@@ -11,6 +11,7 @@ import re
 import secrets
 import tempfile
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 
 import docx2txt
 import fitz  # PyMuPDF
@@ -38,11 +39,9 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import jwt
 from pydantic import BaseModel, EmailStr
 from sentence_transformers import SentenceTransformer
-from slowapi import Limiter
-from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
+
 from contextlib import asynccontextmanager
-from fastapi.staticfiles import StaticFiles
+
 
 # Local application imports
 from models import RevokedToken, SessionLocal
@@ -76,7 +75,7 @@ logger = logging.getLogger(__name__)
 app_state = {}
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(fastapi_app: FastAPI):
     """Application lifespan manager"""
     # Startup
     logger.info("Starting CareerForge AI API server...")
@@ -412,7 +411,6 @@ def extract_education(text: str):
 # Routes
 
 @app.post("/api/resume/upload")
-@rate_limiter.limit("3/minute")
 async def upload_resume(request: Request, file: UploadFile = None, current_user: dict = None):
     if file is None:
         file = File(...)
@@ -446,31 +444,16 @@ async def upload_resume(request: Request, file: UploadFile = None, current_user:
         logger.error("Error processing resume: %s", e)
         raise HTTPException(status_code=500, detail="Failed to process resume") from e
 
-@app.exception_handler(RateLimitExceeded)
-async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
-    return JSONResponse(
-        status_code=429,
-        content={"detail": "Rate limit exceeded. Try again later."}
-    )
 
-# Example Rate-Limited GET Endpoint
+
+# Example GET Endpoint
 @app.get("/api/some-endpoint")
-@rate_limiter.limit("3/minute")
 async def my_endpoint(request: Request):
     return {"message": "Hello! You are within the rate limit."}
 
-@app.get("/")
-def root():
-    return {"message": "CareerForge API is running"}
 
-# Add SlowAPI rate limiter
-limiter = Limiter(key_func=get_remote_address, default_limits=["10/minute"])
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, lambda request, exc: JSONResponse(status_code=429, content={"detail": "Rate limit exceeded"}))
 
-@app.on_event("startup")
-def on_startup():
-    logger.info("API server started with rate limiting.")
+
         
 @app.get("/api/resume/parsed")
 async def get_parsed_resume(current_user: User = Depends(get_current_user)):
@@ -650,9 +633,7 @@ async def analyze_resume(file: UploadFile = None, job_description: str = None, c
         logger.error("Error analyzing resume: %s", e)
         raise HTTPException(status_code=500, detail=str(e)) from e
 
-@app.get("/api/health")
-async def health_check():
-    return {"status": "ok"}
+
 
 @app.post("/match_resume")
 async def match_resume(file: UploadFile = None, job_description: str = None, current_user: dict = None):
@@ -1062,7 +1043,7 @@ async def root():
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
-        host="0.0.0.0",
+        host="127.0.0.1",  # Changed from 0.0.0.0 to localhost for security
         port=8000,
         reload=True,
         log_level="info"

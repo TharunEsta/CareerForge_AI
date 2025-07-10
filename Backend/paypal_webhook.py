@@ -1,35 +1,20 @@
 """
-PayPal Webhook Handler for CareerForge AI
-Processes subscription events from PayPal
+PayPal Webhook Handler
+Handles PayPal subscription and payment webhook events
 """
 
 import logging
-import os
-from datetime import datetime
-from typing import Dict, Any
-
-from fastapi import APIRouter, HTTPException, Request
-from pydantic import BaseModel
-
-from payment_gateways import PayPalGateway, PaymentStatus
+import json
+from typing import Dict, Optional
+from fastapi import APIRouter, Request, HTTPException
 
 # Setup logging
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/webhooks", tags=["webhooks"])
+router = APIRouter()
 
-# Initialize PayPal gateway
-paypal_gateway = PayPalGateway()
-
-class PayPalWebhookEvent(BaseModel):
-    id: str
-    event_type: str
-    create_time: str
-    resource_type: str
-    resource: Dict[str, Any]
-
-@router.post("/paypal")
-async def paypal_webhook(request: Request):
+@router.post("/webhook")
+async def handle_paypal_webhook(request: Request):
     """Handle PayPal webhook events"""
     try:
         # Get the raw body
@@ -40,124 +25,124 @@ async def paypal_webhook(request: Request):
         # verify_webhook_signature(body, headers)
         
         # Parse the webhook data
-        webhook_data = await request.json()
+        webhook_data = json.loads(body.decode('utf-8'))
         
-        # Extract the event
-        event = PayPalWebhookEvent(**webhook_data)
+        # Extract event type and data
+        event_type = webhook_data.get('event_type')
+        resource = webhook_data.get('resource', {})
         
-        logger.info(f"Received PayPal webhook: {event.event_type}")
+        logger.info("Received PayPal webhook: %s", event_type)
         
         # Handle different event types
-        if event.event_type == "BILLING.SUBSCRIPTION.ACTIVATED":
-            await handle_subscription_activated(event)
-        elif event.event_type == "BILLING.SUBSCRIPTION.CANCELLED":
-            await handle_subscription_cancelled(event)
-        elif event.event_type == "BILLING.SUBSCRIPTION.EXPIRED":
-            await handle_subscription_expired(event)
-        elif event.event_type == "PAYMENT.SALE.COMPLETED":
-            await handle_payment_completed(event)
-        elif event.event_type == "PAYMENT.SALE.DENIED":
-            await handle_payment_denied(event)
+        if event_type == 'BILLING.SUBSCRIPTION.ACTIVATED':
+            await handle_subscription_activated(resource)
+        elif event_type == 'BILLING.SUBSCRIPTION.CANCELLED':
+            await handle_subscription_cancelled(resource)
+        elif event_type == 'BILLING.SUBSCRIPTION.SUSPENDED':
+            await handle_subscription_suspended(resource)
+        elif event_type == 'PAYMENT.SALE.COMPLETED':
+            await handle_payment_completed(resource)
+        elif event_type == 'PAYMENT.SALE.DENIED':
+            await handle_payment_denied(resource)
         else:
-            logger.info(f"Unhandled webhook event type: {event.event_type}")
+            logger.info("Unhandled webhook event type: %s", event_type)
         
-        return {"status": "success"}
+        return {"status": "success", "message": "Webhook processed"}
         
     except Exception as e:
-        logger.error(f"Error processing PayPal webhook: {e}")
-        raise HTTPException(status_code=500, detail="Webhook processing failed")
+        logger.error("Error processing PayPal webhook: %s", e)
+        raise HTTPException(status_code=500, detail="Failed to process webhook")
 
-async def handle_subscription_activated(event: PayPalWebhookEvent):
+async def handle_subscription_activated(subscription_data: Dict):
     """Handle subscription activation"""
     try:
-        subscription_id = event.resource.get("id")
-        user_id = event.resource.get("custom_id")  # You should set this when creating subscription
+        subscription_id = subscription_data.get('id')
+        custom_id = subscription_data.get('custom_id')  # This should be the user_id
         
-        logger.info(f"Subscription activated: {subscription_id} for user: {user_id}")
-        
-        # Update user's subscription status in database
-        # await update_user_subscription(user_id, subscription_id, "active")
-        
-        # Send welcome email
-        # await send_welcome_email(user_id)
-        
+        if custom_id:
+            # Update user subscription status in database
+            await update_user_subscription(custom_id, subscription_id, 'active')
+            logger.info("Subscription %s activated for user %s", subscription_id, custom_id)
+        else:
+            logger.warning("No custom_id found in subscription data: %s", subscription_data)
+            
     except Exception as e:
-        logger.error(f"Error handling subscription activation: {e}")
+        logger.error("Error handling subscription activation: %s", e)
 
-async def handle_subscription_cancelled(event: PayPalWebhookEvent):
+async def handle_subscription_cancelled(subscription_data: Dict):
     """Handle subscription cancellation"""
     try:
-        subscription_id = event.resource.get("id")
-        user_id = event.resource.get("custom_id")
+        subscription_id = subscription_data.get('id')
+        custom_id = subscription_data.get('custom_id')
         
-        logger.info(f"Subscription cancelled: {subscription_id} for user: {user_id}")
-        
-        # Update user's subscription status in database
-        # await update_user_subscription(user_id, subscription_id, "cancelled")
-        
-        # Send cancellation email
-        # await send_cancellation_email(user_id)
-        
+        if custom_id:
+            await update_user_subscription(custom_id, subscription_id, 'cancelled')
+            logger.info("Subscription %s cancelled for user %s", subscription_id, custom_id)
+        else:
+            logger.warning("No custom_id found in subscription data: %s", subscription_data)
+            
     except Exception as e:
-        logger.error(f"Error handling subscription cancellation: {e}")
+        logger.error("Error handling subscription cancellation: %s", e)
 
-async def handle_subscription_expired(event: PayPalWebhookEvent):
-    """Handle subscription expiration"""
+async def handle_subscription_suspended(subscription_data: Dict):
+    """Handle subscription suspension"""
     try:
-        subscription_id = event.resource.get("id")
-        user_id = event.resource.get("custom_id")
+        subscription_id = subscription_data.get('id')
+        custom_id = subscription_data.get('custom_id')
         
-        logger.info(f"Subscription expired: {subscription_id} for user: {user_id}")
-        
-        # Update user's subscription status in database
-        # await update_user_subscription(user_id, subscription_id, "expired")
-        
-        # Send expiration email
-        # await send_expiration_email(user_id)
-        
+        if custom_id:
+            await update_user_subscription(custom_id, subscription_id, 'suspended')
+            logger.info("Subscription %s suspended for user %s", subscription_id, custom_id)
+        else:
+            logger.warning("No custom_id found in subscription data: %s", subscription_data)
+            
     except Exception as e:
-        logger.error(f"Error handling subscription expiration: {e}")
+        logger.error("Error handling subscription suspension: %s", e)
 
-async def handle_payment_completed(event: PayPalWebhookEvent):
-    """Handle successful payment"""
+async def handle_payment_completed(payment_data: Dict):
+    """Handle payment completion"""
     try:
-        payment_id = event.resource.get("id")
-        subscription_id = event.resource.get("billing_agreement_id")
-        amount = event.resource.get("amount", {}).get("total")
+        payment_id = payment_data.get('id')
+        subscription_id = payment_data.get('billing_agreement_id')
+        amount = payment_data.get('amount', {}).get('total')
         
-        logger.info(f"Payment completed: {payment_id} for subscription: {subscription_id}, amount: {amount}")
-        
-        # Update payment record in database
-        # await update_payment_record(payment_id, "completed", amount)
-        
-        # Send payment confirmation email
-        # await send_payment_confirmation_email(subscription_id)
+        # Update payment record
+        await update_payment_record(payment_id, 'completed', amount)
+        logger.info("Payment %s completed for subscription %s", payment_id, subscription_id)
         
     except Exception as e:
-        logger.error(f"Error handling payment completion: {e}")
+        logger.error("Error handling payment completion: %s", e)
 
-async def handle_payment_denied(event: PayPalWebhookEvent):
-    """Handle failed payment"""
+async def handle_payment_denied(payment_data: Dict):
+    """Handle payment denial"""
     try:
-        payment_id = event.resource.get("id")
-        subscription_id = event.resource.get("billing_agreement_id")
+        payment_id = payment_data.get('id')
+        subscription_id = payment_data.get('billing_agreement_id')
         
-        logger.info(f"Payment denied: {payment_id} for subscription: {subscription_id}")
-        
-        # Update payment record in database
-        # await update_payment_record(payment_id, "denied")
-        
-        # Send payment failure email
-        # await send_payment_failure_email(subscription_id)
+        # Update payment record
+        await update_payment_record(payment_id, 'denied')
+        logger.info("Payment %s denied for subscription %s", payment_id, subscription_id)
         
     except Exception as e:
-        logger.error(f"Error handling payment denial: {e}")
+        logger.error("Error handling payment denial: %s", e)
 
-def verify_webhook_signature(body: bytes, headers: Dict[str, str]) -> bool:
+async def update_user_subscription(user_id: str, subscription_id: str, status: str):
+    """Update user subscription status in database"""
+    # Implement based on your database setup
+    logger.info("Updating user %s subscription %s to status: %s", user_id, subscription_id, status)
+    pass
+
+async def update_payment_record(payment_id: str, status: str, amount: Optional[str] = None):
+    """Update payment record in database"""
+    # Implement based on your database setup
+    logger.info("Updating payment %s to status: %s", payment_id, status)
+    pass
+
+def verify_webhook_signature(_: bytes, __: Dict[str, str]) -> bool:
     """Verify PayPal webhook signature (implement this for production)"""
     # This is a placeholder - you should implement proper signature verification
     # using PayPal's webhook verification SDK
-    return True
+    return True  # For development - implement proper verification for production
 
 # Helper functions for database operations (implement these based on your database setup)
 

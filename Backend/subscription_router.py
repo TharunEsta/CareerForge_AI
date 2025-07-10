@@ -15,7 +15,7 @@ from subscription_plans import (
     get_plan_by_id,
     get_plans,
 )
-from payment_gateways import PayPalGateway, PaymentGateway
+from payment_gateways import PayPalGateway
 
 # Setup logging
 logger = logging.getLogger(__name__)
