@@ -7,6 +7,7 @@ import logging
 import json
 from typing import Dict, Optional
 from fastapi import APIRouter, Request, HTTPException
+from payment_gateways import PayPalGateway
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -19,10 +20,10 @@ async def handle_paypal_webhook(request: Request):
     try:
         # Get the raw body
         body = await request.body()
-        headers = dict(request.headers)
+        _headers = dict(request.headers)
         
         # Verify webhook signature (you should implement this)
-        # verify_webhook_signature(body, headers)
+        # verify_webhook_signature(body, _headers)
         
         # Parse the webhook data
         webhook_data = json.loads(body.decode('utf-8'))
@@ -108,7 +109,7 @@ async def handle_payment_completed(payment_data: Dict):
         
         # Update payment record
         await update_payment_record(payment_id, 'completed', amount)
-        logger.info("Payment %s completed for subscription %s", payment_id, subscription_id)
+        logger.info("Payment %s completed for subscription %s, amount: %s", payment_id, subscription_id, amount)
         
     except Exception as e:
         logger.error("Error handling payment completion: %s", e)
@@ -132,13 +133,13 @@ async def update_user_subscription(user_id: str, subscription_id: str, status: s
     logger.info("Updating user %s subscription %s to status: %s", user_id, subscription_id, status)
     pass
 
-async def update_payment_record(payment_id: str, status: str, _: Optional[str] = None):
+async def update_payment_record(payment_id: str, status: str, _amount: str = None):
     """Update payment record in database"""
     # Implement based on your database setup
     logger.info("Updating payment %s to status: %s", payment_id, status)
     pass
 
-def verify_webhook_signature(_: bytes, __: Dict[str, str]) -> bool:
+def verify_webhook_signature(_body: bytes, _headers: Dict[str, str]) -> bool:
     """Verify PayPal webhook signature (implement this for production)"""
     # This is a placeholder - you should implement proper signature verification
     # using PayPal's webhook verification SDK

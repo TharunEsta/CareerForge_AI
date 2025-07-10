@@ -41,7 +41,11 @@ from pydantic import BaseModel, EmailStr
 from sentence_transformers import SentenceTransformer
 
 from contextlib import asynccontextmanager
-
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from slowapi.extension import Limiter as rate_limiter
+from fastapi.responses import JSONResponse
 
 # Local application imports
 from models import RevokedToken, SessionLocal
@@ -75,7 +79,7 @@ logger = logging.getLogger(__name__)
 app_state = {}
 
 @asynccontextmanager
-async def lifespan(_: FastAPI):
+async def lifespan(_app: FastAPI):
     """Application lifespan manager"""
     # Startup
     logger.info("Starting CareerForge AI API server...")
@@ -601,10 +605,6 @@ async def job_match(file: UploadFile = None, current_user: dict = None, _top_n: 
         logger.error("Error matching job: %s", e)
         raise HTTPException(status_code=500, detail=str(e)) from e
 
-@app.get("/api/test")
-async def test_endpoint():
-    return {"message": "Backend is working!"}
-
 @app.post("/api/analyze-resume")
 async def analyze_resume(file: UploadFile = None, job_description: str = None, current_user: dict = None):
     if file is None:
@@ -982,7 +982,7 @@ async def track_usage(user_id: str, feature: str, user_plan: str = "free"):
         result = usage_tracker.increment_usage(user_id, feature, user_plan)
         return result
     except Exception as e:
-        logger.error(f"Error tracking usage: {e}")
+        logger.error("Error tracking usage: %s", e)
         raise HTTPException(status_code=500, detail="Failed to track usage")
 
 @app.get("/api/usage/check/{user_id}/{feature}")
@@ -992,7 +992,7 @@ async def check_usage(user_id: str, feature: str, user_plan: str = "free"):
         result = usage_tracker.check_usage_limit(user_id, feature, user_plan)
         return result
     except Exception as e:
-        logger.error(f"Error checking usage: {e}")
+        logger.error("Error checking usage: %s", e)
         raise HTTPException(status_code=500, detail="Failed to check usage")
 
 @app.get("/api/usage/summary/{user_id}")
@@ -1002,7 +1002,7 @@ async def get_usage_summary(user_id: str, user_plan: str = "free"):
         result = usage_tracker.get_user_usage_summary(user_id, user_plan)
         return result
     except Exception as e:
-        logger.error(f"Error getting usage summary: {e}")
+        logger.error("Error getting usage summary: %s", e)
         raise HTTPException(status_code=500, detail="Failed to get usage summary")
 
 @app.post("/api/usage/reset/{user_id}")
@@ -1012,7 +1012,7 @@ async def reset_usage(user_id: str, feature: str = None):
         usage_tracker.reset_user_usage(user_id, feature)
         return {"message": "Usage reset successfully"}
     except Exception as e:
-        logger.error(f"Error resetting usage: {e}")
+        logger.error("Error resetting usage: %s", e)
         raise HTTPException(status_code=500, detail="Failed to reset usage")
 
 # Health check endpoint
@@ -1040,10 +1040,22 @@ async def root():
 # Mount static files (if needed)
 # app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# Initialize the rate limiter
+rate_limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = rate_limiter
+
+# Optionally, add exception handler for rate limit exceeded
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    return JSONResponse(
+        status_code=429,
+        content={"detail": "Rate limit exceeded"}
+    )
+
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
-        host="127.0.0.1",  # Changed from 0.0.0.0 to localhost for security
+        host="127.0.0.1",  # Only accessible from localhost
         port=8000,
         reload=True,
         log_level="info"
