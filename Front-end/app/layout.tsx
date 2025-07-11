@@ -1,17 +1,16 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import * as React from 'react';
 import { Providers } from '@/components/Providers';
-import ClientRootLayout from '@/components/ClientRootLayout';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'CareerForge AI - AI-Powered Career Optimization',
+  title: 'CareerForge AI - AI-Powered Career Assistant',
   description:
-    'Transform your career with AI-powered resume optimization, job matching, and career insights. Get personalized recommendations and improve your ATS score.',
-  keywords: 'AI, career, resume, job matching, ATS optimization, career advice, job search',
+    'Your AI-powered assistant for resumes, job matching, and career help. Transform your career with intelligent insights and personalized recommendations.',
+  keywords:
+    'AI, career, resume, job matching, ATS optimization, career advice, job search, AI assistant',
   authors: [{ name: 'CareerForge AI Team' }],
   creator: 'CareerForge AI',
   publisher: 'CareerForge AI',
@@ -21,24 +20,22 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://careerforge.ai',
-    title: 'CareerForge AI - AI-Powered Career Optimization',
-    description:
-      'Transform your career with AI-powered resume optimization, job matching, and career insights.',
+    title: 'CareerForge AI - AI-Powered Career Assistant',
+    description: 'Your AI-powered assistant for resumes, job matching, and career help.',
     siteName: 'CareerForge AI',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'CareerForge AI - AI-Powered Career Optimization',
+        alt: 'CareerForge AI - AI-Powered Career Assistant',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'CareerForge AI - AI-Powered Career Optimization',
-    description:
-      'Transform your career with AI-powered resume optimization, job matching, and career insights.',
+    title: 'CareerForge AI - AI-Powered Career Assistant',
+    description: 'Your AI-powered assistant for resumes, job matching, and career help.',
     images: ['/og-image.png'],
   },
   icons: {
@@ -55,28 +52,19 @@ export const metadata: Metadata = {
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#3B82F6',
+  themeColor: '#0d1117',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="dark">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="icon" href="/favicon.ico" />
-        <meta name="theme-color" content="#3B82F6" />
-        <meta name="msapplication-TileColor" content="#3B82F6" />
       </head>
-      <body
-        className={
-          inter.className +
-          ' bg-gradient-to-br from-gray-900 via-gray-950 to-gray-900 min-h-screen flex flex-row'
-        }
-      >
-        <Providers>
-          <ClientRootLayout>{children}</ClientRootLayout>
-        </Providers>
+      <body className={`${inter.className} antialiased`}>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
