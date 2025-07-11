@@ -135,7 +135,7 @@
 
   /* Enhanced Focus States */
   *:focus-visible {
-    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+    @apply outline-none ring-2 ring-gray-200 ring-offset-2 ring-offset-background;
   }
 
   /* Enhanced Selection */
@@ -335,5 +335,11 @@
 @media print {
   .no-print {
     @apply hidden;
+  }
+}
+
+@layer utilities {
+  .ring-ring {
+    @apply ring-2 ring-offset-2 ring-blue-500;
   }
 }

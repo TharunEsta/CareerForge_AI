@@ -167,7 +167,7 @@ export default function DashboardPage() {
             )}
             <div ref={chatEndRef} />
           </div>
-        </div>
+                    </div>
         {/* ChatBar pinned to bottom */}
         <ChatBar onSend={handleSend} loading={loading || showUpgrade} />
         <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} />
@@ -182,11 +182,11 @@ export default function DashboardPage() {
                 readOnly
                 onFocus={e => e.target.select()}
               />
-              <button
+                <button
                 className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2"
                 onClick={() => {navigator.clipboard.writeText(shareUrl)}}
               >Copy Link</button>
-              <button
+                <button
                 className="text-gray-500 hover:text-gray-700 text-sm"
                 onClick={() => setShareModal(false)}
               >Close</button>
