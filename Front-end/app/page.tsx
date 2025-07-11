@@ -394,6 +394,26 @@ export default function ChatInterface() {
                       </div>
                     </button>
                   </div>
+
+                  {/* Test Connection Button */}
+                  <div className="mt-6">
+                    <button
+                      onClick={async () => {
+                        try {
+                          const response = await fetch('/api/test');
+                          const data = await response.json();
+                          alert(
+                            `Connection Test: ${data.status === 'success' ? '✅ Success!' : '❌ Failed'}\n${data.message}`
+                          );
+                        } catch (error) {
+                          alert('❌ Connection failed: Unable to reach server');
+                        }
+                      }}
+                      className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm transition-colors"
+                    >
+                      Test API Connection
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
