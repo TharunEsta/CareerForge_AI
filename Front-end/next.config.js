@@ -3,10 +3,6 @@ const nextConfig = {
   images: {
     domains: ['localhost'],
   },
-  // Improve development stability
-  experimental: {
-    turbo: false, // Disable turbo for stability if needed
-  },
   // Configure webpack for better hot reloading
   webpack: (config, { dev, isServer }) => {
     if (dev && !isServer) {
