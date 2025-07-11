@@ -248,7 +248,7 @@ export default function ChatInterface() {
 
       {/* Sidebar */}
       <AnimatePresence>
-        {(sidebarOpen || window.innerWidth >= 768) && (
+        {(sidebarOpen || !isMobile) && (
           <motion.div
             initial={{ x: -320, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
