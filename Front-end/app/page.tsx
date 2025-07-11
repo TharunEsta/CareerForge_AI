@@ -81,6 +81,9 @@ export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'connecting' | 'error'>(
+    'connected'
+  );
   const [chats] = useState<Chat[]>([
     {
       id: '1',
