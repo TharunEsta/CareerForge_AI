@@ -329,6 +329,24 @@ export default function ChatInterface() {
           <div className="flex-1 text-center md:text-left">
             <h1 className="font-semibold text-lg">CareerForge AI</h1>
           </div>
+          <div className="flex items-center space-x-2">
+            <div
+              className={`w-2 h-2 rounded-full ${
+                connectionStatus === 'connected'
+                  ? 'bg-green-500'
+                  : connectionStatus === 'connecting'
+                    ? 'bg-yellow-500 animate-pulse'
+                    : 'bg-red-500'
+              }`}
+            />
+            <span className="text-xs text-gray-400">
+              {connectionStatus === 'connected'
+                ? 'Connected'
+                : connectionStatus === 'connecting'
+                  ? 'Connecting...'
+                  : 'Connection Error'}
+            </span>
+          </div>
         </div>
 
         {/* Chat Area */}
