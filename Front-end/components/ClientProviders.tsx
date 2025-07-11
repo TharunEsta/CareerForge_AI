@@ -8,7 +8,10 @@ interface ClientProvidersProps {
   children: ReactNode;
 }
 
-class ErrorBoundary extends React.Component<{ children: ReactNode }, { hasError: boolean; error: any }> {
+class ErrorBoundary extends React.Component<
+  { children: ReactNode },
+  { hasError: boolean; error: any }
+> {
   constructor(props: { children: ReactNode }) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -24,7 +27,8 @@ class ErrorBoundary extends React.Component<{ children: ReactNode }, { hasError:
     if (this.state.hasError) {
       return (
         <div className="fixed top-0 left-0 w-full z-50 bg-red-600 text-white p-4 text-center font-semibold shadow-lg">
-          Oops! Something went wrong. Please try again later.<br />
+          Oops! Something went wrong. Please try again later.
+          <br />
           <span className="text-xs">{this.state.error?.message || ''}</span>
         </div>
       );
@@ -35,22 +39,10 @@ class ErrorBoundary extends React.Component<{ children: ReactNode }, { hasError:
 
 const ClientProviders: React.FC<ClientProvidersProps> = ({ children }) => {
   return (
-<<<<<<< Updated upstream
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
-      <AuthProvider>
-        <ErrorBoundary>
-          {children}
-        </ErrorBoundary>
-      </AuthProvider>
-=======
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <AuthProvider>{children}</AuthProvider>
->>>>>>> Stashed changes
+      <AuthProvider>
+        <ErrorBoundary>{children}</ErrorBoundary>
+      </AuthProvider>
     </ThemeProvider>
   );
 };
