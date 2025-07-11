@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-import * as React from "react";
-import { motion, AnimatePresence } from "framer-motion";
-=======
 "use client";
 
 "use client";
@@ -10,8 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogoAnimated } from './logo';
->>>>>>> Stashed changes
+import { Logo } from './logo';
 
 interface SplashScreenProps {
   show: boolean;

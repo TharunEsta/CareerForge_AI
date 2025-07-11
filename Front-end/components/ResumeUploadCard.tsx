@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Upload, FileText, CheckCircle, Sparkles, TrendingUp, Target } from 'lucide-react';
-import { useResumeParser } from '../src/lib/hooks';
+import { useResumeParser } from '@/lib/hooks';
 
 interface ResumeAnalysisResult {
   skills: string[];
@@ -79,7 +79,7 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
     const formData = new FormData();
     formData.append('file', uploadedFile);
     resumeParser.mutate(formData, {
-      onSuccess: (result) => {
+      onSuccess: (result: any) => {
         onAnalysis({
           skills: result.skills,
           experience: result.experience?.join(', ') || '',

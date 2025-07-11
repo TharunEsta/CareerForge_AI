@@ -1,6 +1,6 @@
 "use client";
 import React, { useRef, useState } from 'react';
-import { Mic, Send, Paperclip, Loader2, Search, RefreshCw, Sparkles, Globe, Waveform, Zap } from 'lucide-react';
+import { Mic, Send, Paperclip, Loader2, Search, RefreshCw, Sparkles, Globe, AudioLines } from 'lucide-react';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuItem } from './ui/dropdown-menu';
 import { useChatStore, ModelType } from '@/app/context/ChatStore';
 import { UpgradeModal } from './UpgradeModal';
@@ -29,8 +29,8 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
   };
   const modelIcons: Record<ModelType, React.ReactNode> = {
     'gpt-3.5': <Sparkles size={18} className="text-blue-400" />,
-    'gpt-4': <Zap size={18} className="text-purple-400" />,
-    'dalle': <Waveform size={18} className="text-green-400" />,
+    'gpt-4': <Sparkles size={18} className="text-purple-400" />,
+    'dalle': <AudioLines size={18} className="text-green-400" />,
   };
 
   const templates = useChatStore((s) => s.templates);
@@ -248,7 +248,7 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
         type="button"
         disabled={loading || (!input.trim() && !file)}
       >
-        {loading ? <Loader2 size={22} className="animate-spin" /> : <Waveform size={22} />}
+        {loading ? <Loader2 size={22} className="animate-spin" /> : <AudioLines size={22} />}
       </button>
       {/* Save Template Modal */}
       {showTemplateModal && (

@@ -53,7 +53,7 @@ export const CommandPalette: React.FC = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, highlighted, query]);
+  }, [open, highlighted, query, filtered, handleAction]);
 
   useEffect(() => {
     if (open) {

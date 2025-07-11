@@ -2,10 +2,6 @@
 
 import React, { ReactNode } from 'react';
 import { AuthProvider } from '../../components/AuthContext';
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 
 interface ClientProvidersProps {
   children: ReactNode;

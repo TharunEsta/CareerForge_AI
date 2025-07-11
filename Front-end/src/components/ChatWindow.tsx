@@ -2,10 +2,10 @@
 import React, { useRef, useState, useEffect } from "react";
 import { PromptSuggestions } from "./ui/PromptSuggestions";
 import { MessageBubble } from "./ui/MessageBubble";
-import { Loader2, RefreshCw, Sparkles, Globe, Paperclip, Mic, Waveform, Search } from "lucide-react";
+import { Loader2, RefreshCw, Sparkles, Globe, Paperclip, Mic, AudioLines, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useChat } from '../lib/hooks';
+import { useChat } from '@/lib/hooks';
 
 interface Message { role: "user" | "ai"; content: string; }
 
@@ -49,18 +49,18 @@ export function ChatWindow() {
       return;
     }
     const newMessages = [...messages, { role: "user", content }];
-    setMessages(newMessages);
+    setMessages(newMessages as Message[]);
     setInput("");
     setFreeCount((c) => c + 1);
     setThinking(true);
     chatMutation.mutate(
       { messages: newMessages },
       {
-        onSuccess: (data) => {
+        onSuccess: (data: any) => {
           setMessages((msgs) => [...msgs, { role: "ai", content: data.response }]);
           setThinking(false);
         },
-        onError: (err) => {
+        onError: (err: any) => {
           setMessages((msgs) => [...msgs, { role: "ai", content: "Sorry, something went wrong. Please try again." }]);
           setThinking(false);
         },
@@ -156,7 +156,7 @@ export function ChatWindow() {
                   disabled={loading || thinking || !input.trim()}
                   aria-label="Send"
                 >
-                  <Waveform size={22} />
+                  <AudioLines size={22} />
                 </button>
               </div>
               {/* Input field */}

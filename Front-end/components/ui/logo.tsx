@@ -4,28 +4,39 @@
 
 "use client";
 
-import * as React from 'react';
-import { cn } from '@/lib/utils';
+import React from 'react';
 
-export interface LogoProps {
-  size?: 'sm' | 'md' | 'lg' | 'xl';
-  className?: string;
-}
-
-const sizeMap: Record<NonNullable<LogoProps['size']>, string> = {
-  sm: 'h-6 w-auto',
-  md: 'h-10 w-auto',
-  lg: 'h-16 w-auto',
-  xl: 'h-24 w-auto',
-};
-
-export const Logo: React.FC<LogoProps> = ({ size = 'md', className = '' }) => {
+export const Logo: React.FC<{ size?: 'sm' | 'md' | 'lg' | number; className?: string }> = ({ size = 'md', className = '' }) => {
+  // Size mapping
+  const sizeMap: Record<string, string> = {
+    sm: 'w-8 h-8',
+    md: 'w-12 h-12',
+    lg: 'w-20 h-20',
+  };
+  const svgSize = typeof size === 'number' ? { width: size, height: size } : {};
   return (
-    <img
-      src="/ai-doc-logo.svg"
-      alt="CareerForge Logo"
-      className={cn(sizeMap[size as keyof typeof sizeMap], className, 'select-none')}
-      draggable={false}
-    />
+    <svg
+      viewBox="0 0 48 48"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={`${typeof size === 'string' ? sizeMap[size] : ''} ${className}`}
+      {...svgSize}
+    >
+      <rect x="4" y="4" width="40" height="40" rx="12" fill="url(#cf-gradient)" />
+      <path
+        d="M16 32V16h8a8 8 0 110 16h-8z"
+        fill="#fff"
+        fillOpacity="0.95"
+      />
+      <circle cx="32" cy="24" r="4" fill="#fff" fillOpacity="0.8" />
+      <defs>
+        <linearGradient id="cf-gradient" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#6366F1" />
+          <stop offset="1" stopColor="#06B6D4" />
+        </linearGradient>
+      </defs>
+    </svg>
   );
 };
+
+export default Logo;

@@ -6,6 +6,7 @@
 
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { cn } from '@/lib/utils';
 import { Logo } from './logo';
@@ -33,13 +34,13 @@ export interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
   ({ className, children, variant, ...props }, ref) => (
-    <div
+    <motion.div
       ref={ref}
       className={cn(SidebarVariants({ variant }), className)}
       {...props}
     >
       {children}
-    </div>
+    </motion.div>
   )
 );
 Sidebar.displayName = 'Sidebar';
@@ -56,8 +57,8 @@ export const SidebarNav = ({ children }: { children?: React.ReactNode }) => (
   <div className="space-y-1">{children}</div>
 );
 
-export const SidebarNavItem = ({ children }: { children?: React.ReactNode }) => (
-  <div className="flex items-center space-x-2 px-2 py-1 hover:bg-accent rounded-md cursor-pointer">
+export const SidebarNavItem = ({ children, onClick }: { children?: React.ReactNode; onClick?: () => void }) => (
+  <div className="flex items-center space-x-2 px-2 py-1 hover:bg-accent rounded-md cursor-pointer" onClick={onClick} style={{ cursor: onClick ? 'pointer' : undefined }}>
     {children}
   </div>
 );
@@ -97,4 +98,21 @@ export const SidebarWithLogo: React.FC<SidebarProps> = ({
     {children}
   </Sidebar>
 );
+
+{/* Sidebar Drawer/Overlay */}
+<AnimatePresence>
+  {isSidebarOpen && (
+    <motion.div
+      key="sidebar"
+      initial={{ x: -300, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: -300, opacity: 0 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      className="fixed inset-y-0 left-0 z-40 w-64 bg-gray-900 text-white shadow-lg flex flex-col"
+    >
+      {/* ...sidebar content... */}
+      { /* Place the rest of your sidebar content here as before */ }
+    </motion.div>
+  )}
+</AnimatePresence>
 

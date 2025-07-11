@@ -35,7 +35,6 @@ class ErrorBoundary extends React.Component<{ children: ReactNode }, { hasError:
 
 const ClientProviders: React.FC<ClientProvidersProps> = ({ children }) => {
   return (
-<<<<<<< Updated upstream
     <ThemeProvider
       attribute="class"
       defaultTheme="system"
@@ -47,10 +46,6 @@ const ClientProviders: React.FC<ClientProvidersProps> = ({ children }) => {
           {children}
         </ErrorBoundary>
       </AuthProvider>
-=======
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <AuthProvider>{children}</AuthProvider>
->>>>>>> Stashed changes
     </ThemeProvider>
   );
 };
