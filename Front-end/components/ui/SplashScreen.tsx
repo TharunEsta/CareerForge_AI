@@ -1,17 +1,7 @@
-<<<<<<< Updated upstream
-import * as React from "react";
-import { motion, AnimatePresence } from "framer-motion";
-=======
-"use client";
-
-"use client";
-
-"use client";
+'use client';
 
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogoAnimated } from './logo';
->>>>>>> Stashed changes
 
 interface SplashScreenProps {
   show: boolean;
@@ -36,7 +26,12 @@ export const SplashScreen = ({ show }: SplashScreenProps) => {
           transition={{ duration: 0.8, ease: 'backOut' }}
           className="mb-6"
         >
-          <img src="/ai-doc-logo.svg" alt="CareerForge Logo" className="h-32 w-auto" draggable={false} />
+          <img
+            src="/ai-doc-logo.svg"
+            alt="CareerForge Logo"
+            className="h-32 w-auto"
+            draggable={false}
+          />
         </motion.div>
         <motion.h1
           className="text-3xl md:text-5xl font-extrabold text-white drop-shadow-lg mb-2"
