@@ -113,6 +113,7 @@ function Logo({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
 export default function ChatInterface() {
   const [showSplash, setShowSplash] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
