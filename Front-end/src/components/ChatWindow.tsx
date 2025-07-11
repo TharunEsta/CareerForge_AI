@@ -141,7 +141,7 @@ export function ChatWindow() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 40, opacity: 0 }}
           >
-            <div className="w-full max-w-2xl bg-card/90 border border-border rounded-2xl shadow-xl px-2 py-4 flex flex-col gap-2 md:gap-4 mx-auto">
+            <div className="w-full max-w-2xl bg-card/90 border border-gray-200 rounded-2xl shadow-xl px-2 py-4 flex flex-col gap-2 md:gap-4 mx-auto">
               {/* Perplexity-style button row */}
               <div className="flex items-center gap-2 mb-2">
                 <button className="p-2 rounded-lg hover:bg-gray-200 transition" aria-label="Search"><Search size={20} /></button>
@@ -163,7 +163,7 @@ export function ChatWindow() {
               <div className="flex items-center gap-2 w-full">
                 <input
                   type="text"
-                  className="flex-1 bg-transparent text-foreground px-4 py-2 rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="flex-1 bg-transparent text-foreground px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary"
                   placeholder="Ask anything or @mention a Space"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}

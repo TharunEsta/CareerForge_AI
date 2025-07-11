@@ -70,13 +70,13 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-64 bg-card/80 backdrop-blur-xl border-r border-border/50 transform transition-transform duration-300 ease-in-out',
+          'fixed inset-y-0 left-0 z-50 w-64 bg-card/80 backdrop-blur-xl border-r border-gray-200/50 transform transition-transform duration-300 ease-in-out',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-border/50">
+          <div className="flex items-center justify-between p-6 border-b border-gray-200/50">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
                 <FileText className="h-5 w-5 text-white" />
@@ -130,7 +130,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
           {/* User Section */}
           {user && (
-            <div className="p-4 border-t border-border/50">
+            <div className="p-4 border-t border-gray-200/50">
               <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                 <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
                   <User className="h-4 w-4 text-white" />
@@ -158,7 +158,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       {/* Main Content */}
       <div className="lg:pl-64">
         {/* Top Bar */}
-        <header className="sticky top-0 z-30 bg-card/80 backdrop-blur-xl border-b border-border/50">
+        <header className="sticky top-0 z-30 bg-card/80 backdrop-blur-xl border-b border-gray-200/50">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-4">
               <Button
@@ -183,7 +183,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 <input
                   type="text"
                   placeholder="Search..."
-                  className="pl-10 pr-4 py-2 bg-muted/50 border border-border/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50"
+                  className="pl-10 pr-4 py-2 bg-muted/50 border border-gray-200/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50"
                 />
               </div>
 

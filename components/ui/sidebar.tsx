@@ -7,7 +7,7 @@ const SidebarVariants = cva(
   {
     variants: {
       variant: {
-        default: "border-border",
+        default: "border-gray-200",
         secondary: "border-secondary",
       },
     },

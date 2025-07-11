@@ -82,7 +82,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-gray-200;
   }
 
   html {
@@ -147,7 +147,7 @@
 @layer components {
   /* Enhanced Cards */
   .card-modern {
-    @apply bg-card border border-border/50 shadow-sm hover:shadow-md transition-all duration-300 rounded-xl backdrop-blur-sm;
+    @apply bg-card border border-gray-200/50 shadow-sm hover:shadow-md transition-all duration-300 rounded-xl backdrop-blur-sm;
   }
 
   .card-glass {
@@ -165,12 +165,12 @@
 
   /* Enhanced Inputs */
   .input-modern {
-    @apply bg-background border border-border/50 focus:border-primary/50 rounded-lg px-4 py-3 transition-all duration-300 focus:ring-2 focus:ring-primary/20;
+    @apply bg-background border border-gray-200/50 focus:border-primary/50 rounded-lg px-4 py-3 transition-all duration-300 focus:ring-2 focus:ring-primary/20;
   }
 
   /* Enhanced Sidebar */
   .sidebar-modern {
-    @apply bg-card/50 backdrop-blur-xl border-r border-border/50;
+    @apply bg-card/50 backdrop-blur-xl border-r border-gray-200/50;
   }
 
   /* Loading States */
