@@ -73,14 +73,10 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
     }
     if (!uploadedFile) return;
     setIsAnalyzing(true);
-<<<<<<< Updated upstream
-    await new Promise(resolve => setTimeout(resolve, 2000));
-=======
 
     // Simulate analysis delay
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
->>>>>>> Stashed changes
     const mockResult: ResumeAnalysisResult = {
       skills: ['React', 'TypeScript', 'Node.js', 'Python', 'AWS'],
       experience: '5+ years in software development',
@@ -91,10 +87,7 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
         'Highlight leadership experience',
       ],
     };
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
     onAnalysis(mockResult);
     setIsAnalyzing(false);
     const newCount = usageCount + 1;
@@ -110,10 +103,15 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
       {showGetPlus && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
-            <h2 className="text-2xl font-bold mb-4 text-blue-700">Get Plus to Unlock More Analyses</h2>
-            <p className="mb-4 text-gray-700">You have reached your free limit of {FREE_LIMIT} resume analyses. Upgrade to Plus for unlimited access and premium features!</p>
+            <h2 className="text-2xl font-bold mb-4 text-blue-700">
+              Get Plus to Unlock More Analyses
+            </h2>
+            <p className="mb-4 text-gray-700">
+              You have reached your free limit of {FREE_LIMIT} resume analyses. Upgrade to Plus for
+              unlimited access and premium features!
+            </p>
             <button
-              onClick={() => window.location.href = '/pricing'}
+              onClick={() => (window.location.href = '/pricing')}
               className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg transition mb-2"
             >
               Upgrade to Plus
