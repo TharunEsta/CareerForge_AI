@@ -287,7 +287,7 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
         type="button"
         disabled={loading || (!input.trim() && !file)}
       >
-        {loading ? <Loader2 size={22} className="animate-spin" /> : <Waveform size={22} />}
+        {loading ? <Loader2 size={22} className="animate-spin" /> : <Send size={22} />}
       </button>
       {/* Save Template Modal */}
       {showTemplateModal && (
