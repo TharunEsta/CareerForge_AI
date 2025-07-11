@@ -1,31 +1,25 @@
-"use client";
+'use client';
 
-"use client";
+import React from 'react';
 
-"use client";
-
-import * as React from 'react';
-import { cn } from '@/lib/utils';
-
-export interface LogoProps {
+interface LogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
 }
 
-const sizeMap: Record<NonNullable<LogoProps['size']>, string> = {
-  sm: 'h-6 w-auto',
-  md: 'h-10 w-auto',
-  lg: 'h-16 w-auto',
-  xl: 'h-24 w-auto',
-};
+export function Logo({ size = 'md', className = '' }: LogoProps) {
+  const sizeClasses = {
+    sm: 'w-8 h-8',
+    md: 'w-12 h-12',
+    lg: 'w-16 h-16',
+    xl: 'w-24 h-24',
+  };
 
-export const Logo: React.FC<LogoProps> = ({ size = 'md', className = '' }) => {
   return (
-    <img
-      src="/ai-doc-logo.svg"
-      alt="CareerForge Logo"
-      className={cn(sizeMap[size as keyof typeof sizeMap], className, 'select-none')}
-      draggable={false}
-    />
+    <div
+      className={`${sizeClasses[size]} bg-blue-600 rounded-lg flex items-center justify-center ${className}`}
+    >
+      <span className="text-white font-bold text-xl">CF</span>
+    </div>
   );
-};
+}
