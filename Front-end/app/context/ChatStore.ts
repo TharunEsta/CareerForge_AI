@@ -31,30 +31,25 @@ interface ChatState {
 
 export const useChatStore = create<ChatState>()(
   persist(
-    (set: (partial: Partial<ChatState> | ((state: ChatState) => Partial<ChatState>), replace?: boolean) => void) => ({
+    (set) => ({
       messages: [],
       freeMessageCount: 0,
       userPlan: 'free',
       model: 'gpt-3.5',
       templates: [],
-      setUserPlan: (plan: 'free' | 'plus' | 'pro') => set({ userPlan: plan }),
-      setModel: (model: ModelType) => set({ model }),
-      addMessage: (msg: Message) => set((state: ChatState) => ({ messages: [...state.messages, msg] })),
+      setUserPlan: (plan) => set({ userPlan: plan }),
+      setModel: (model) => set({ model }),
+      addMessage: (msg) => set((state) => ({ messages: [...state.messages, msg] })),
       resetChat: () => set({ messages: [], freeMessageCount: 0 }),
-      incrementMessageCount: () => set((state: ChatState) => ({ freeMessageCount: state.freeMessageCount + 1 })),
-      setMessages: (msgs: Message[]) => set({ messages: msgs }),
-      addTemplate: (template: PromptTemplate) => set((state: ChatState) => ({ templates: [...state.templates, template] })),
-      removeTemplate: (name: string) => set((state: ChatState) => ({ templates: state.templates.filter(t => t.name !== name) })),
+      incrementMessageCount: () =>
+        set((state) => ({ freeMessageCount: state.freeMessageCount + 1 })),
+      setMessages: (msgs) => set({ messages: msgs }),
+      addTemplate: (template) => set((state) => ({ templates: [...state.templates, template] })),
+      removeTemplate: (name) =>
+        set((state) => ({ templates: state.templates.filter((t) => t.name !== name) })),
     }),
     {
-      name: 'careerforge-chat', // localStorage key
-      partialize: (state: ChatState) => ({
-        messages: state.messages,
-        freeMessageCount: state.freeMessageCount,
-        userPlan: state.userPlan,
-        model: state.model,
-        templates: state.templates,
-      }),
+      name: 'chat-store',
     }
   )
-); 
+);
