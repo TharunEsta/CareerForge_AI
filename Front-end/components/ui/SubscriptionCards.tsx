@@ -25,7 +25,7 @@ const plans: SubscriptionPlan[] = [
     price: '$0',
     description: 'forever',
     features: [
-      '5 AI chats per month',
+      '15 AI chats per month',
       'Basic ATS analysis',
       'Basic cover letter generator',
       'Community support'

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Upload, FileText, CheckCircle, Sparkles, TrendingUp, Target } from 'lucide-react';
+import { useResumeParser } from '../src/lib/hooks';
 
 interface ResumeAnalysisResult {
   skills: string[];
@@ -30,6 +31,8 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
   });
 
   const FREE_LIMIT = 5;
+
+  const resumeParser = useResumeParser();
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -73,36 +76,29 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
     }
     if (!uploadedFile) return;
     setIsAnalyzing(true);
-<<<<<<< Updated upstream
-    await new Promise(resolve => setTimeout(resolve, 2000));
-=======
-
-    // Simulate analysis delay
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
->>>>>>> Stashed changes
-    const mockResult: ResumeAnalysisResult = {
-      skills: ['React', 'TypeScript', 'Node.js', 'Python', 'AWS'],
-      experience: '5+ years in software development',
-      education: "Bachelor's in Computer Science",
-      recommendations: [
-        'Add more specific metrics and achievements',
-        'Include relevant certifications',
-        'Highlight leadership experience',
-      ],
-    };
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
-    onAnalysis(mockResult);
-    setIsAnalyzing(false);
-    const newCount = usageCount + 1;
-    setUsageCount(newCount);
-    localStorage.setItem('resume_usage', newCount.toString());
-    if (newCount >= FREE_LIMIT) {
-      setShowGetPlus(true);
-    }
+    const formData = new FormData();
+    formData.append('file', uploadedFile);
+    resumeParser.mutate(formData, {
+      onSuccess: (result) => {
+        onAnalysis({
+          skills: result.skills,
+          experience: result.experience?.join(', ') || '',
+          education: result.education || '',
+          recommendations: result.recommendations || [],
+        });
+        setIsAnalyzing(false);
+        const newCount = usageCount + 1;
+        setUsageCount(newCount);
+        localStorage.setItem('resume_usage', newCount.toString());
+        if (newCount >= FREE_LIMIT) {
+          setShowGetPlus(true);
+        }
+      },
+      onError: () => {
+        setIsAnalyzing(false);
+        alert('Failed to analyze resume. Please try again.');
+      },
+    });
   };
 
   return (
@@ -232,6 +228,10 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
             </div>
           </div>
         </div>
+
+        {resumeParser.isError && (
+          <div className="text-red-600 text-center text-sm mt-2">Failed to parse resume. Please try again.</div>
+        )}
       </CardContent>
     </Card>
   );
