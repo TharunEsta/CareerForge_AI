@@ -18,6 +18,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { apiCall, FetchError } from '@/lib/fetch-utils';
 
 interface Message {
   id: string;
