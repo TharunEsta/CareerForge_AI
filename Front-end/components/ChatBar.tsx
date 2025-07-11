@@ -1,7 +1,24 @@
-"use client";
+'use client';
 import React, { useRef, useState } from 'react';
-import { Mic, Send, Paperclip, Loader2, Search, RefreshCw, Sparkles, Globe, Waveform, Zap } from 'lucide-react';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuItem } from './ui/dropdown-menu';
+import {
+  Mic,
+  Send,
+  Paperclip,
+  Loader2,
+  Search,
+  RefreshCw,
+  Sparkles,
+  Globe,
+  Zap,
+} from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuItem,
+} from './ui/dropdown-menu';
 import { useChatStore, ModelType } from '@/app/context/ChatStore';
 import { UpgradeModal } from './UpgradeModal';
 
@@ -25,12 +42,12 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
   const modelLabels: Record<ModelType, string> = {
     'gpt-3.5': 'GPT-3.5',
     'gpt-4': 'GPT-4',
-    'dalle': 'DALL·E',
+    dalle: 'DALL·E',
   };
   const modelIcons: Record<ModelType, React.ReactNode> = {
     'gpt-3.5': <Sparkles size={18} className="text-blue-400" />,
     'gpt-4': <Zap size={18} className="text-purple-400" />,
-    'dalle': <Waveform size={18} className="text-green-400" />,
+    dalle: <Waveform size={18} className="text-green-400" />,
   };
 
   const templates = useChatStore((s) => s.templates);
@@ -50,7 +67,8 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
       setListening(false);
       return;
     }
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     recognition = new SpeechRecognition();
     recognition.lang = 'en-US';
     recognition.interimResults = false;
@@ -124,14 +142,21 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium transition">
-            {modelIcons[model]}<span className="hidden sm:inline">{modelLabels[model]}</span>
+            {modelIcons[model]}
+            <span className="hidden sm:inline">{modelLabels[model]}</span>
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
           <DropdownMenuRadioGroup value={model} onValueChange={handleModelChange}>
             <DropdownMenuRadioItem value="gpt-3.5">GPT-3.5</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="gpt-4" disabled={userPlan === 'free'}>GPT-4 {userPlan === 'free' && <span className="ml-2 text-xs text-yellow-500">Plus</span>}</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="dalle" disabled={userPlan === 'free'}>DALL·E {userPlan === 'free' && <span className="ml-2 text-xs text-yellow-500">Plus</span>}</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="gpt-4" disabled={userPlan === 'free'}>
+              GPT-4{' '}
+              {userPlan === 'free' && <span className="ml-2 text-xs text-yellow-500">Plus</span>}
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="dalle" disabled={userPlan === 'free'}>
+              DALL·E{' '}
+              {userPlan === 'free' && <span className="ml-2 text-xs text-yellow-500">Plus</span>}
+            </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -164,7 +189,11 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
         {/* Templates Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="p-2 rounded-full hover:bg-gray-800 transition text-gray-400" aria-label="Templates" type="button">
+            <button
+              className="p-2 rounded-full hover:bg-gray-800 transition text-gray-400"
+              aria-label="Templates"
+              type="button"
+            >
               <Sparkles size={20} />
             </button>
           </DropdownMenuTrigger>
@@ -175,7 +204,15 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
               templates.map((t) => (
                 <DropdownMenuItem key={t.name} onClick={() => handleInsertTemplate(t.prompt)}>
                   <span className="flex-1">{t.name}</span>
-                  <button className="ml-2 text-xs text-red-500 hover:underline" onClick={e => { e.stopPropagation(); removeTemplate(t.name); }}>Delete</button>
+                  <button
+                    className="ml-2 text-xs text-red-500 hover:underline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeTemplate(t.name);
+                    }}
+                  >
+                    Delete
+                  </button>
                 </DropdownMenuItem>
               ))
             )}
@@ -188,7 +225,9 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
           placeholder="Type your message..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') handleSend(); }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleSend();
+          }}
           disabled={loading}
         />
         {/* Save as Template Button */}
@@ -258,7 +297,7 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
             <input
               className="w-full p-2 border rounded mb-4 text-gray-700 bg-gray-100"
               value={templateName}
-              onChange={e => setTemplateName(e.target.value)}
+              onChange={(e) => setTemplateName(e.target.value)}
               placeholder="Template name (e.g. Cover Letter for React job)"
               autoFocus
             />
@@ -266,14 +305,18 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
               className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-2"
               onClick={handleConfirmSave}
               disabled={!templateName.trim()}
-            >Save</button>
+            >
+              Save
+            </button>
             <button
               className="text-gray-500 hover:text-gray-700 text-sm"
               onClick={() => setShowTemplateModal(false)}
-            >Cancel</button>
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}
     </div>
   );
-}; 
+};
