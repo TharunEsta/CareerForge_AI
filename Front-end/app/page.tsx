@@ -186,6 +186,8 @@ export default function ChatInterface() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: inputValue }),
+        // Add timeout and other options for better reliability
+        signal: AbortSignal.timeout(30000), // 30 second timeout
       });
 
       if (response.ok) {
@@ -197,12 +199,24 @@ export default function ChatInterface() {
           timestamp: new Date(),
         };
         setMessages((prev) => [...prev, assistantMessage]);
+      } else {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error sending message:', error);
+      let errorContent = 'Sorry, I encountered an error. Please try again.';
+
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          errorContent = 'Request timed out. Please try again.';
+        } else if (error.message.includes('Failed to fetch')) {
+          errorContent = 'Network error. Please check your connection and try again.';
+        }
+      }
+
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: 'Sorry, I encountered an error. Please try again.',
+        content: errorContent,
         role: 'assistant',
         timestamp: new Date(),
       };
