@@ -18,6 +18,12 @@ import {
   MoreHorizontal,
   ChevronRight,
   Crown,
+  Globe,
+  Zap,
+  Target,
+  TrendingUp,
+  Users,
+  Brain,
 } from 'lucide-react';
 
 interface Message {
@@ -94,45 +100,39 @@ export default function CareerForgeInterface() {
     }
   };
 
-  const quickActions = [
-    { icon: FileText, label: 'Resume Analysis', color: 'text-blue-400' },
-    { icon: Briefcase, label: 'Job Matching', color: 'text-green-400' },
-    { icon: User, label: 'Interview Prep', color: 'text-purple-400' },
-    { icon: Sparkles, label: 'Career Advice', color: 'text-yellow-400' },
-  ];
-
   if (messages.length > 0) {
     return (
-      <div className="flex h-screen bg-[#0f0f0f] text-gray-100">
+      <div className="flex h-screen bg-[#202020] text-gray-100">
         {/* Sidebar */}
-        <div className="w-16 bg-[#1a1a1a] border-r border-gray-800 flex flex-col items-center py-4 space-y-6">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">CF</span>
+        <div className="w-16 bg-[#171717] border-r border-[#2a2a2a] flex flex-col items-center py-6 space-y-8">
+          <div className="w-6 h-6 text-white">
+            <Sparkles size={24} />
           </div>
 
-          <div className="space-y-4">
-            <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+          <div className="space-y-6">
+            <button className="p-2 text-gray-400 hover:text-white hover:bg-[#2a2a2a] rounded-lg transition-colors">
               <Plus size={20} />
             </button>
-            <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+            <button className="p-2 text-gray-400 hover:text-white hover:bg-[#2a2a2a] rounded-lg transition-colors">
               <Home size={20} />
             </button>
-            <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
-              <MessageCircle size={20} />
+            <button className="p-2 text-gray-400 hover:text-white hover:bg-[#2a2a2a] rounded-lg transition-colors">
+              <Globe size={20} />
             </button>
-            <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+            <button className="p-2 text-gray-400 hover:text-white hover:bg-[#2a2a2a] rounded-lg transition-colors">
               <Archive size={20} />
             </button>
           </div>
 
           <div className="flex-1"></div>
 
-          <div className="space-y-4">
-            <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
-              <User size={20} />
+          <div className="space-y-6">
+            <button className="p-2 text-gray-400 hover:text-white hover:bg-[#2a2a2a] rounded-lg transition-colors">
+              <MessageCircle size={20} />
             </button>
-            <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
-              <Settings size={20} />
+            <button className="relative p-2 text-gray-400 hover:text-white hover:bg-[#2a2a2a] rounded-lg transition-colors">
+              <ChevronRight size={20} />
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
             </button>
           </div>
         </div>
@@ -140,17 +140,17 @@ export default function CareerForgeInterface() {
         {/* Main Chat Area */}
         <div className="flex-1 flex flex-col">
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <div className="flex-1 overflow-y-auto p-8 space-y-8">
             {messages.map((message) => (
               <div
                 key={message.id}
                 className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-4xl ${message.role === 'user' ? 'bg-blue-600 text-white' : 'bg-[#1a1a1a] border border-gray-800'} rounded-2xl px-6 py-4`}
+                  className={`max-w-4xl ${message.role === 'user' ? 'bg-[#20b2aa] text-white' : 'bg-[#2a2a2a] border border-[#3a3a3a]'} rounded-3xl px-8 py-6`}
                 >
-                  <p className="whitespace-pre-wrap">{message.content}</p>
-                  <p className="text-xs opacity-70 mt-2">
+                  <p className="whitespace-pre-wrap text-lg leading-relaxed">{message.content}</p>
+                  <p className="text-sm opacity-70 mt-3">
                     {message.timestamp.toLocaleTimeString()}
                   </p>
                 </div>
@@ -159,8 +159,8 @@ export default function CareerForgeInterface() {
 
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-[#1a1a1a] border border-gray-800 rounded-2xl px-6 py-4">
-                  <div className="flex space-x-1">
+                <div className="bg-[#2a2a2a] border border-[#3a3a3a] rounded-3xl px-8 py-6">
+                  <div className="flex space-x-2">
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
                     <div
                       className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
@@ -177,24 +177,24 @@ export default function CareerForgeInterface() {
           </div>
 
           {/* Input Area */}
-          <div className="p-6 border-t border-gray-800">
+          <div className="p-8 border-t border-[#2a2a2a]">
             <div className="max-w-4xl mx-auto">
-              <div className="relative bg-[#1a1a1a] border border-gray-700 rounded-2xl">
+              <div className="relative bg-[#2a2a2a] border border-[#3a3a3a] rounded-3xl">
                 <textarea
                   ref={textareaRef}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Ask anything about your career..."
-                  className="w-full bg-transparent text-gray-100 placeholder-gray-400 px-6 py-4 pr-16 resize-none outline-none rounded-2xl min-h-[60px] max-h-32"
+                  className="w-full bg-transparent text-gray-100 placeholder-gray-400 px-8 py-6 pr-20 resize-none outline-none rounded-3xl min-h-[70px] max-h-40 text-lg"
                   rows={1}
                 />
                 <button
                   onClick={handleSendMessage}
                   disabled={!inputValue.trim() || isLoading}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-gray-600 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg flex items-center justify-center transition-colors"
+                  className="absolute right-6 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-[#20b2aa] hover:bg-[#1a9990] disabled:opacity-50 disabled:cursor-not-allowed rounded-xl flex items-center justify-center transition-colors"
                 >
-                  <ChevronRight size={16} className="text-white" />
+                  <ChevronRight size={20} className="text-white" />
                 </button>
               </div>
             </div>
@@ -205,147 +205,224 @@ export default function CareerForgeInterface() {
   }
 
   return (
-    <div className="flex h-screen bg-[#0f0f0f] text-gray-100">
-      {/* Sidebar */}
-      <div className="w-16 bg-[#1a1a1a] border-r border-gray-800 flex flex-col items-center py-4 space-y-6">
-        {/* Logo */}
-        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-          <span className="text-white font-bold text-sm">CF</span>
+    <div className="flex h-screen bg-[#202020] text-gray-100">
+      {/* Sidebar - Exact Perplexity Style */}
+      <div className="w-16 bg-[#171717] border-r border-[#2a2a2a] flex flex-col items-center py-6 space-y-8">
+        {/* Top Logo */}
+        <div className="w-6 h-6 text-white">
+          <Sparkles size={24} />
         </div>
 
-        {/* Navigation */}
-        <div className="space-y-4">
-          <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+        {/* Navigation Icons */}
+        <div className="space-y-6">
+          <button className="p-2 text-gray-400 hover:text-white hover:bg-[#2a2a2a] rounded-lg transition-colors">
             <Plus size={20} />
           </button>
-          <button className="p-2 text-blue-400 bg-gray-800 rounded-lg">
+          <button className="p-2 text-[#20b2aa] bg-[#2a2a2a] rounded-lg">
             <Home size={20} />
           </button>
-          <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
-            <MessageCircle size={20} />
+          <button className="p-2 text-gray-400 hover:text-white hover:bg-[#2a2a2a] rounded-lg transition-colors">
+            <Globe size={20} />
           </button>
-          <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+          <button className="p-2 text-gray-400 hover:text-white hover:bg-[#2a2a2a] rounded-lg transition-colors">
             <Archive size={20} />
           </button>
         </div>
 
         <div className="flex-1"></div>
 
-        {/* Bottom Navigation */}
-        <div className="space-y-4">
-          <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
-            <User size={20} />
+        {/* Bottom Icons */}
+        <div className="space-y-6">
+          <button className="p-2 text-gray-400 hover:text-white hover:bg-[#2a2a2a] rounded-lg transition-colors">
+            <MessageCircle size={20} />
           </button>
-          <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
-            <Settings size={20} />
+          <button className="relative p-2 text-gray-400 hover:text-white hover:bg-[#2a2a2a] rounded-lg transition-colors">
+            <ChevronRight size={20} />
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs font-bold">3</span>
+            </div>
           </button>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6">
-        <div className="w-full max-w-2xl space-y-8">
+      {/* Main Content - Exact Perplexity Layout */}
+      <div className="flex-1 flex flex-col items-center justify-center px-8 py-12">
+        <div className="w-full max-w-2xl space-y-12">
           {/* Main Title */}
           <div className="text-center">
-            <h1 className="text-4xl font-light text-white mb-2">careerforge</h1>
+            <h1 className="text-5xl font-light text-white tracking-wide">careerforge</h1>
           </div>
 
-          {/* Search Input */}
+          {/* Search Input - Exact Perplexity Style */}
           <div className="relative">
-            <div className="relative bg-[#1a1a1a] border border-gray-700 rounded-2xl hover:border-gray-600 transition-colors">
-              <div className="flex items-center px-6 py-4">
-                <Search size={20} className="text-gray-400 mr-4" />
+            <div className="relative bg-[#2a2a2a] border border-[#3a3a3a] rounded-3xl hover:border-[#4a4a4a] transition-colors">
+              <div className="flex items-center px-8 py-6">
+                <Search size={24} className="text-gray-400 mr-6" />
                 <textarea
                   ref={textareaRef}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Ask anything about your career or @mention a skill"
-                  className="flex-1 bg-transparent text-gray-100 placeholder-gray-400 resize-none outline-none min-h-[24px] max-h-32"
+                  placeholder="Ask anything or @mention a Career Skill"
+                  className="flex-1 bg-transparent text-gray-100 text-lg placeholder-gray-400 resize-none outline-none min-h-[28px] max-h-40 leading-relaxed"
                   rows={1}
                 />
-                <div className="flex items-center space-x-2 ml-4">
-                  <button className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors">
-                    <Mic size={16} />
+                <div className="flex items-center space-x-3 ml-6">
+                  <button className="p-2 text-gray-400 hover:text-white hover:bg-[#3a3a3a] rounded-xl transition-colors">
+                    <Mic size={20} />
                   </button>
-                  <button className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors">
-                    <Upload size={16} />
+                  <button className="p-2 text-gray-400 hover:text-white hover:bg-[#3a3a3a] rounded-xl transition-colors">
+                    <Upload size={20} />
                   </button>
-                  <button className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors">
-                    <Image size={16} />
+                  <button className="p-2 text-gray-400 hover:text-white hover:bg-[#3a3a3a] rounded-xl transition-colors">
+                    <Image size={20} />
                   </button>
-                  <button className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors">
-                    <MoreHorizontal size={16} />
+                  <button className="p-2 text-gray-400 hover:text-white hover:bg-[#3a3a3a] rounded-xl transition-colors">
+                    <MoreHorizontal size={20} />
                   </button>
                   <button
                     onClick={handleSendMessage}
                     disabled={!inputValue.trim()}
-                    className="ml-2 w-8 h-8 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg flex items-center justify-center transition-colors"
+                    className="ml-3 w-12 h-12 bg-[#20b2aa] hover:bg-[#1a9990] disabled:opacity-50 disabled:cursor-not-allowed rounded-xl flex items-center justify-center transition-colors"
                   >
-                    <ChevronRight size={16} className="text-white" />
+                    <ChevronRight size={20} className="text-white" />
                   </button>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Career Features Card */}
-          <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-2xl p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-white font-medium mb-1">Introducing CareerForge Pro</h3>
-                <p className="text-gray-400 text-sm">
-                  AI-powered career optimization and unlimited job matching
-                </p>
+          {/* Career Pro Card - Perplexity Max Style */}
+          <div className="relative">
+            <div className="bg-gradient-to-r from-[#20b2aa]/20 to-[#4169e1]/20 border border-[#20b2aa]/30 rounded-3xl p-8 overflow-hidden">
+              <div className="flex items-center justify-between relative z-10">
+                <div>
+                  <h3 className="text-white text-xl font-medium mb-2">
+                    Introducing CareerForge Pro
+                  </h3>
+                  <p className="text-gray-300 text-lg">
+                    Upgrade for unlimited Career and unlimited job searches
+                  </p>
+                </div>
+                <div className="w-20 h-20 bg-gradient-to-br from-[#20b2aa] to-[#4169e1] rounded-2xl flex items-center justify-center">
+                  <Crown size={32} className="text-white" />
+                </div>
               </div>
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <Crown size={24} className="text-white" />
+              {/* Background pattern */}
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-4 right-4 w-32 h-32 bg-gradient-to-br from-white to-transparent rounded-full"></div>
+                <div className="absolute bottom-4 left-4 w-24 h-24 bg-gradient-to-br from-white to-transparent rounded-full"></div>
               </div>
             </div>
           </div>
 
-          {/* Quick Actions */}
-          <div className="space-y-4">
+          {/* Career Space Creation */}
+          <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h3 className="text-white font-medium">Create your first career plan</h3>
-              <button className="text-gray-400 hover:text-white">
-                <ChevronRight size={16} />
+              <h3 className="text-white text-xl font-medium">Create your first career space</h3>
+              <button className="text-gray-400 hover:text-white transition-colors">
+                <ChevronRight size={20} />
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              {quickActions.map((action, index) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    setInputValue(`Help me with ${action.label.toLowerCase()}`);
-                    setTimeout(() => textareaRef.current?.focus(), 100);
-                  }}
-                  className="flex items-center space-x-3 p-4 bg-[#1a1a1a] hover:bg-[#222] border border-gray-800 hover:border-gray-700 rounded-xl transition-colors text-left"
-                >
-                  <action.icon size={20} className={action.color} />
-                  <span className="text-gray-300 font-medium">{action.label}</span>
-                </button>
-              ))}
+            <p className="text-gray-400 text-lg leading-relaxed">
+              Organizing your career development
+            </p>
+
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => {
+                  setInputValue(
+                    'Help me create a comprehensive resume analysis and optimization plan'
+                  );
+                  setTimeout(() => textareaRef.current?.focus(), 100);
+                }}
+                className="flex items-center space-x-4 p-6 bg-[#2a2a2a] hover:bg-[#3a3a3a] border border-[#3a3a3a] hover:border-[#4a4a4a] rounded-2xl transition-colors text-left"
+              >
+                <FileText size={24} className="text-[#20b2aa] flex-shrink-0" />
+                <span className="text-gray-200 text-lg font-medium">Resume Analysis</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setInputValue(
+                    'I need help finding job opportunities that match my skills and experience'
+                  );
+                  setTimeout(() => textareaRef.current?.focus(), 100);
+                }}
+                className="flex items-center space-x-4 p-6 bg-[#2a2a2a] hover:bg-[#3a3a3a] border border-[#3a3a3a] hover:border-[#4a4a4a] rounded-2xl transition-colors text-left"
+              >
+                <Briefcase size={24} className="text-[#4169e1] flex-shrink-0" />
+                <span className="text-gray-200 text-lg font-medium">Job Matching</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setInputValue('Help me prepare for technical and behavioral interviews');
+                  setTimeout(() => textareaRef.current?.focus(), 100);
+                }}
+                className="flex items-center space-x-4 p-6 bg-[#2a2a2a] hover:bg-[#3a3a3a] border border-[#3a3a3a] hover:border-[#4a4a4a] rounded-2xl transition-colors text-left"
+              >
+                <Target size={24} className="text-[#ff6b6b] flex-shrink-0" />
+                <span className="text-gray-200 text-lg font-medium">Interview Prep</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setInputValue(
+                    'I want to develop my skills and advance my career. What should I focus on?'
+                  );
+                  setTimeout(() => textareaRef.current?.focus(), 100);
+                }}
+                className="flex items-center space-x-4 p-6 bg-[#2a2a2a] hover:bg-[#3a3a3a] border border-[#3a3a3a] hover:border-[#4a4a4a] rounded-2xl transition-colors text-left"
+              >
+                <TrendingUp size={24} className="text-[#ffd93d] flex-shrink-0" />
+                <span className="text-gray-200 text-lg font-medium">Skill Development</span>
+              </button>
             </div>
 
-            <div className="mt-6">
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="text-gray-400 text-sm">Pick a Template</h4>
-                <button className="text-gray-400 hover:text-white">
-                  <ChevronRight size={14} />
+            {/* Pick a Template Section */}
+            <div className="mt-12">
+              <div className="flex items-center justify-between mb-6">
+                <h4 className="text-gray-400 text-lg">Pick a Template</h4>
+                <button className="text-gray-400 hover:text-white transition-colors">
+                  <ChevronRight size={18} />
                 </button>
               </div>
 
-              <div className="space-y-2">
-                <button className="w-full text-left p-3 bg-[#1a1a1a] hover:bg-[#222] border border-gray-800 hover:border-gray-700 rounded-lg transition-colors">
-                  <span className="text-gray-300 text-sm">📄 Resume Review & Optimization</span>
+              <div className="space-y-3">
+                <button
+                  onClick={() => {
+                    setInputValue('Create a professional resume review checklist for my industry');
+                    setTimeout(() => textareaRef.current?.focus(), 100);
+                  }}
+                  className="w-full text-left p-5 bg-[#2a2a2a] hover:bg-[#3a3a3a] border border-[#3a3a3a] hover:border-[#4a4a4a] rounded-xl transition-colors"
+                >
+                  <span className="text-gray-200 text-lg">Resume Review & ATS Optimization</span>
                 </button>
-                <button className="w-full text-left p-3 bg-[#1a1a1a] hover:bg-[#222] border border-gray-800 hover:border-gray-700 rounded-lg transition-colors">
-                  <span className="text-gray-300 text-sm">🎯 Job Search Strategy</span>
+
+                <button
+                  onClick={() => {
+                    setInputValue(
+                      'Help me create a strategic job search plan for the next 90 days'
+                    );
+                    setTimeout(() => textareaRef.current?.focus(), 100);
+                  }}
+                  className="w-full text-left p-5 bg-[#2a2a2a] hover:bg-[#3a3a3a] border border-[#3a3a3a] hover:border-[#4a4a4a] rounded-xl transition-colors"
+                >
+                  <span className="text-gray-200 text-lg">Strategic Job Search Plan</span>
                 </button>
-                <button className="w-full text-left p-3 bg-[#1a1a1a] hover:bg-[#222] border border-gray-800 hover:border-gray-700 rounded-lg transition-colors">
-                  <span className="text-gray-300 text-sm">💼 Interview Preparation</span>
+
+                <button
+                  onClick={() => {
+                    setInputValue(
+                      'Create a comprehensive interview preparation guide for my target role'
+                    );
+                    setTimeout(() => textareaRef.current?.focus(), 100);
+                  }}
+                  className="w-full text-left p-5 bg-[#2a2a2a] hover:bg-[#3a3a3a] border border-[#3a3a3a] hover:border-[#4a4a4a] rounded-xl transition-colors"
+                >
+                  <span className="text-gray-200 text-lg">Interview Mastery Guide</span>
                 </button>
               </div>
             </div>
