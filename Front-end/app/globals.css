@@ -331,6 +331,49 @@
   @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
 }
 
+/* Chat Interface Styles */
+.chat-message {
+  @apply break-words;
+}
+
+.chat-input {
+  @apply resize-none outline-none bg-transparent;
+}
+
+.chat-bubble {
+  @apply rounded-xl px-4 py-3 max-w-3xl;
+}
+
+.chat-bubble-user {
+  @apply bg-blue-600 text-white;
+}
+
+.chat-bubble-assistant {
+  @apply bg-[#161b22] border border-gray-700 text-[#f0f6fc];
+}
+
+/* Sidebar Styles */
+.sidebar {
+  @apply bg-[#161b22] border-r border-gray-800;
+}
+
+/* Loading Animation for AI Response */
+.typing-indicator {
+  @apply flex space-x-1;
+}
+
+.typing-dot {
+  @apply w-2 h-2 bg-gray-400 rounded-full animate-bounce;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
 /* Enhanced Print Styles */
 @media print {
   .no-print {
