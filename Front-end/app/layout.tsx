@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   creator: 'CareerForge AI',
   publisher: 'CareerForge AI',
   robots: 'index, follow',
+  metadataBase: new URL('http://localhost:3000'),
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -49,7 +50,11 @@ export const metadata: Metadata = {
     apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
   manifest: '/manifest.json',
-  viewport: 'width=device-width, initial-scale=1',
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
   themeColor: '#3B82F6',
 };
 
