@@ -183,31 +183,31 @@ export default function ChatInterface() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/ai/chat', {
+      const data = await apiCall('/api/ai/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: inputValue }),
-        // Add timeout and other options for better reliability
-        signal: AbortSignal.timeout(30000), // 30 second timeout
+        timeout: 30000,
+        retries: 2,
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        const assistantMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          content: data.response,
-          role: 'assistant',
-          timestamp: new Date(),
-        };
-        setMessages((prev) => [...prev, assistantMessage]);
-      } else {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: data.response,
+        role: 'assistant',
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
       let errorContent = 'Sorry, I encountered an error. Please try again.';
 
-      if (error instanceof Error) {
+      if (error instanceof FetchError) {
+        if (error.status === 429) {
+          errorContent = 'Too many requests. Please wait a moment and try again.';
+        } else if (error.status && error.status >= 500) {
+          errorContent = 'Server error. Please try again later.';
+        }
+      } else if (error instanceof Error) {
         if (error.name === 'AbortError') {
           errorContent = 'Request timed out. Please try again.';
         } else if (error.message.includes('Failed to fetch')) {
