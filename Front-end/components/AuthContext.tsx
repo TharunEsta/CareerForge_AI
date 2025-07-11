@@ -5,6 +5,7 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 interface SubscriptionType {
   plan: 'free' | 'premium' | 'enterprise';
   status?: string;
+  nextBillingDate?: string;
 }
 
 interface UserType {
