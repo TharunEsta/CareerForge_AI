@@ -47,7 +47,7 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
   const modelIcons: Record<ModelType, React.ReactNode> = {
     'gpt-3.5': <Sparkles size={18} className="text-blue-400" />,
     'gpt-4': <Zap size={18} className="text-purple-400" />,
-    dalle: <Waveform size={18} className="text-green-400" />,
+    dalle: <Zap size={18} className="text-green-400" />,
   };
 
   const templates = useChatStore((s) => s.templates);
