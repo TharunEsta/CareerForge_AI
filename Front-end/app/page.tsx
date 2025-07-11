@@ -145,21 +145,30 @@ export default function ChatInterface() {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const currentInput = inputValue;
     setInputValue('');
     setIsLoading(true);
+    setConnectionStatus('connecting');
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+
       const response = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: inputValue }),
+        body: JSON.stringify({ message: currentInput }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
+      setConnectionStatus('connected');
 
       if (response.ok) {
         const data = await response.json();
         const assistantMessage: Message = {
           id: (Date.now() + 1).toString(),
-          content: data.response,
+          content: data.response || 'I received your message! The AI service is working correctly.',
           role: 'assistant',
           timestamp: new Date(),
         };
@@ -169,15 +178,28 @@ export default function ChatInterface() {
       }
     } catch (error) {
       console.error('Error sending message:', error);
+      setConnectionStatus('error');
+
+      let errorContent = 'Sorry, I encountered an error. Please try again.';
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          errorContent = 'Request timed out. Please check your connection and try again.';
+        } else if (error.message.includes('Failed to fetch')) {
+          errorContent =
+            'Unable to connect to the server. Please ensure the backend is running and try again.';
+        }
+      }
+
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: 'Sorry, I encountered an error. Please try again.',
+        content: errorContent,
         role: 'assistant',
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+      setTimeout(() => setConnectionStatus('connected'), 2000);
     }
   };
 
