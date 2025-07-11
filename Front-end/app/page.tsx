@@ -2,20 +2,22 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  Menu,
-  X,
-  Plus,
-  Settings,
-  Crown,
-  Mic,
-  Upload,
-  Trash2,
-  Send,
+  Search,
+  Sparkles,
   FileText,
   Briefcase,
   User,
-  Bot,
-  MessageSquare,
+  Settings,
+  Plus,
+  Home,
+  MessageCircle,
+  Archive,
+  Upload,
+  Mic,
+  Image,
+  MoreHorizontal,
+  ChevronRight,
+  Crown,
 } from 'lucide-react';
 
 interface Message {
@@ -25,111 +27,11 @@ interface Message {
   timestamp: Date;
 }
 
-interface Chat {
-  id: string;
-  title: string;
-  lastMessage: string;
-  timestamp: Date;
-}
-
-// Logo Component
-function Logo({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
-  const sizeClasses = {
-    sm: 'w-8 h-8 text-sm',
-    md: 'w-10 h-10 text-base',
-    lg: 'w-12 h-12 text-lg',
-  };
-
-  return (
-    <div
-      className={`${sizeClasses[size]} rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0`}
-    >
-      <span className="text-white font-bold">CF</span>
-    </div>
-  );
-}
-
-// Splash Screen Component
-function SplashScreen({ show }: { show: boolean }) {
-  if (!show) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 bg-[#0d1117] flex items-center justify-center">
-      <div className="text-center">
-        <div className="mb-8">
-          <div className="relative mb-6">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center animate-pulse">
-              <span className="text-white font-bold text-xl">CF</span>
-            </div>
-            <h1 className="text-4xl font-bold text-white">CareerForge AI</h1>
-            <p className="text-gray-400 mt-2">Initializing your AI career assistant...</p>
-          </div>
-        </div>
-        <div className="flex justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default function ChatInterface() {
-  const [showSplash, setShowSplash] = useState(true);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(true);
-  const [messages, setMessages] = useState<Message[]>([]);
+export default function CareerForgeInterface() {
   const [inputValue, setInputValue] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'connecting' | 'error'>(
-    'connected'
-  );
-
-  const [chats] = useState<Chat[]>([
-    {
-      id: '1',
-      title: 'Resume Review Help',
-      lastMessage: 'Can you help me improve my resume?',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
-    },
-    {
-      id: '2',
-      title: 'Job Search Strategy',
-      lastMessage: 'What are the best job search strategies?',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24),
-    },
-    {
-      id: '3',
-      title: 'Interview Preparation',
-      lastMessage: 'Help me prepare for a technical interview',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3),
-    },
-  ]);
-
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 2500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      if (typeof window !== 'undefined') {
-        setIsMobile(window.innerWidth < 768);
-      }
-    };
-
-    checkMobile();
-    if (typeof window !== 'undefined') {
-      window.addEventListener('resize', checkMobile);
-      return () => window.removeEventListener('resize', checkMobile);
-    }
-  }, []);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -137,32 +39,6 @@ export default function ChatInterface() {
       textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
     }
   }, [inputValue]);
-
-  const testConnection = async () => {
-    try {
-      setConnectionStatus('connecting');
-      const response = await fetch('/api/test');
-      const data = await response.json();
-      setConnectionStatus('connected');
-
-      const testMessage: Message = {
-        id: Date.now().toString(),
-        content: `✅ Connection Test Successful!\n\nStatus: ${data.status}\nMessage: ${data.message}\nTime: ${data.timestamp}`,
-        role: 'assistant',
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, testMessage]);
-    } catch (error) {
-      setConnectionStatus('error');
-      const errorMessage: Message = {
-        id: Date.now().toString(),
-        content: '❌ Connection test failed. The preview environment may have connectivity issues.',
-        role: 'assistant',
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    }
-  };
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
@@ -178,60 +54,36 @@ export default function ChatInterface() {
     const currentInput = inputValue;
     setInputValue('');
     setIsLoading(true);
-    setConnectionStatus('connecting');
 
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
-
       const response = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: currentInput }),
-        signal: controller.signal,
       });
-
-      clearTimeout(timeoutId);
-      setConnectionStatus('connected');
 
       if (response.ok) {
         const data = await response.json();
         const assistantMessage: Message = {
           id: (Date.now() + 1).toString(),
-          content:
-            data.response ||
-            'I received your message! The AI service is working correctly in the preview environment.',
+          content: data.response || 'I received your message! How can I help with your career?',
           role: 'assistant',
           timestamp: new Date(),
         };
         setMessages((prev) => [...prev, assistantMessage]);
-      } else {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
     } catch (error) {
-      console.error('Error sending message:', error);
-      setConnectionStatus('error');
-
-      let errorContent = 'Sorry, I encountered an error. Please try again.';
-      if (error instanceof Error) {
-        if (error.name === 'AbortError') {
-          errorContent = 'Request timed out. Please check your connection and try again.';
-        } else if (error.message.includes('Failed to fetch')) {
-          errorContent =
-            'Unable to connect to the server. This might be expected in the preview environment. The frontend UI is working correctly!';
-        }
-      }
-
+      console.error('Error:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: errorContent,
+        content:
+          "I'm here to help with your career! While the backend connects, feel free to explore the interface.",
         role: 'assistant',
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
-      setTimeout(() => setConnectionStatus('connected'), 2000);
     }
   };
 
@@ -242,319 +94,259 @@ export default function ChatInterface() {
     }
   };
 
-  const handleNewChat = () => {
-    setMessages([]);
-    setSidebarOpen(false);
-  };
+  const quickActions = [
+    { icon: FileText, label: 'Resume Analysis', color: 'text-blue-400' },
+    { icon: Briefcase, label: 'Job Matching', color: 'text-green-400' },
+    { icon: User, label: 'Interview Prep', color: 'text-purple-400' },
+    { icon: Sparkles, label: 'Career Advice', color: 'text-yellow-400' },
+  ];
 
-  const handleClearChat = () => {
-    setMessages([]);
-  };
-
-  const handleQuickAction = (action: string) => {
-    let message = '';
-    if (action === 'resume') {
-      message =
-        'I need help analyzing and improving my resume. Can you guide me through the process?';
-    } else if (action === 'job-matching') {
-      message =
-        "I'm looking for job opportunities that match my skills and experience. How can you help me find the right roles?";
-    }
-
-    setInputValue(message);
-    setTimeout(() => textareaRef.current?.focus(), 100);
-  };
-
-  return (
-    <div className="flex h-screen bg-[#0d1117] text-[#f0f6fc] overflow-hidden">
-      <SplashScreen show={showSplash} />
-
-      {/* Sidebar */}
-      {(sidebarOpen || !isMobile) && (
-        <div className="fixed md:relative z-40 w-80 h-full bg-[#161b22] border-r border-gray-800 flex flex-col">
-          {/* Sidebar Header */}
-          <div className="p-4 border-b border-gray-800">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <Logo size="md" />
-                <div>
-                  <h1 className="font-semibold text-lg">CareerForge AI</h1>
-                  <p className="text-xs text-gray-400">Your AI Career Assistant</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setSidebarOpen(false)}
-                className="md:hidden p-2 rounded-lg hover:bg-gray-800 transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
+  if (messages.length > 0) {
+    return (
+      <div className="flex h-screen bg-[#0f0f0f] text-gray-100">
+        {/* Sidebar */}
+        <div className="w-16 bg-[#1a1a1a] border-r border-gray-800 flex flex-col items-center py-4 space-y-6">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-sm">CF</span>
           </div>
 
-          {/* New Chat Button */}
-          <div className="p-4">
-            <button
-              onClick={handleNewChat}
-              className="w-full flex items-center space-x-3 px-4 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
-            >
+          <div className="space-y-4">
+            <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
               <Plus size={20} />
-              <span className="font-medium">New Chat</span>
+            </button>
+            <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+              <Home size={20} />
+            </button>
+            <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+              <MessageCircle size={20} />
+            </button>
+            <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+              <Archive size={20} />
             </button>
           </div>
 
-          {/* Chat History */}
-          <div className="flex-1 overflow-y-auto px-4">
-            <h3 className="text-sm font-medium text-gray-400 mb-3">Recent Chats</h3>
-            <div className="space-y-2">
-              {chats.map((chat) => (
-                <button
-                  key={chat.id}
-                  className="w-full text-left p-3 rounded-lg hover:bg-gray-800 transition-colors group"
+          <div className="flex-1"></div>
+
+          <div className="space-y-4">
+            <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+              <User size={20} />
+            </button>
+            <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+              <Settings size={20} />
+            </button>
+          </div>
+        </div>
+
+        {/* Main Chat Area */}
+        <div className="flex-1 flex flex-col">
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-4xl ${message.role === 'user' ? 'bg-blue-600 text-white' : 'bg-[#1a1a1a] border border-gray-800'} rounded-2xl px-6 py-4`}
                 >
-                  <div className="flex items-start space-x-3">
-                    <MessageSquare size={16} className="mt-1 text-gray-400" />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{chat.title}</p>
-                      <p className="text-xs text-gray-400 truncate mt-1">{chat.lastMessage}</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {chat.timestamp.toLocaleDateString()}
-                      </p>
-                    </div>
+                  <p className="whitespace-pre-wrap">{message.content}</p>
+                  <p className="text-xs opacity-70 mt-2">
+                    {message.timestamp.toLocaleTimeString()}
+                  </p>
+                </div>
+              </div>
+            ))}
+
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-[#1a1a1a] border border-gray-800 rounded-2xl px-6 py-4">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                    <div
+                      className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                      style={{ animationDelay: '0.1s' }}
+                    />
+                    <div
+                      className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                      style={{ animationDelay: '0.2s' }}
+                    />
                   </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Input Area */}
+          <div className="p-6 border-t border-gray-800">
+            <div className="max-w-4xl mx-auto">
+              <div className="relative bg-[#1a1a1a] border border-gray-700 rounded-2xl">
+                <textarea
+                  ref={textareaRef}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Ask anything about your career..."
+                  className="w-full bg-transparent text-gray-100 placeholder-gray-400 px-6 py-4 pr-16 resize-none outline-none rounded-2xl min-h-[60px] max-h-32"
+                  rows={1}
+                />
+                <button
+                  onClick={handleSendMessage}
+                  disabled={!inputValue.trim() || isLoading}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-gray-600 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg flex items-center justify-center transition-colors"
+                >
+                  <ChevronRight size={16} className="text-white" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen bg-[#0f0f0f] text-gray-100">
+      {/* Sidebar */}
+      <div className="w-16 bg-[#1a1a1a] border-r border-gray-800 flex flex-col items-center py-4 space-y-6">
+        {/* Logo */}
+        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+          <span className="text-white font-bold text-sm">CF</span>
+        </div>
+
+        {/* Navigation */}
+        <div className="space-y-4">
+          <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+            <Plus size={20} />
+          </button>
+          <button className="p-2 text-blue-400 bg-gray-800 rounded-lg">
+            <Home size={20} />
+          </button>
+          <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+            <MessageCircle size={20} />
+          </button>
+          <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+            <Archive size={20} />
+          </button>
+        </div>
+
+        <div className="flex-1"></div>
+
+        {/* Bottom Navigation */}
+        <div className="space-y-4">
+          <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+            <User size={20} />
+          </button>
+          <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+            <Settings size={20} />
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col items-center justify-center p-6">
+        <div className="w-full max-w-2xl space-y-8">
+          {/* Main Title */}
+          <div className="text-center">
+            <h1 className="text-4xl font-light text-white mb-2">careerforge</h1>
+          </div>
+
+          {/* Search Input */}
+          <div className="relative">
+            <div className="relative bg-[#1a1a1a] border border-gray-700 rounded-2xl hover:border-gray-600 transition-colors">
+              <div className="flex items-center px-6 py-4">
+                <Search size={20} className="text-gray-400 mr-4" />
+                <textarea
+                  ref={textareaRef}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Ask anything about your career or @mention a skill"
+                  className="flex-1 bg-transparent text-gray-100 placeholder-gray-400 resize-none outline-none min-h-[24px] max-h-32"
+                  rows={1}
+                />
+                <div className="flex items-center space-x-2 ml-4">
+                  <button className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors">
+                    <Mic size={16} />
+                  </button>
+                  <button className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors">
+                    <Upload size={16} />
+                  </button>
+                  <button className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors">
+                    <Image size={16} />
+                  </button>
+                  <button className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors">
+                    <MoreHorizontal size={16} />
+                  </button>
+                  <button
+                    onClick={handleSendMessage}
+                    disabled={!inputValue.trim()}
+                    className="ml-2 w-8 h-8 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg flex items-center justify-center transition-colors"
+                  >
+                    <ChevronRight size={16} className="text-white" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Career Features Card */}
+          <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-2xl p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-white font-medium mb-1">Introducing CareerForge Pro</h3>
+                <p className="text-gray-400 text-sm">
+                  AI-powered career optimization and unlimited job matching
+                </p>
+              </div>
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <Crown size={24} className="text-white" />
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-white font-medium">Create your first career plan</h3>
+              <button className="text-gray-400 hover:text-white">
+                <ChevronRight size={16} />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              {quickActions.map((action, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    setInputValue(`Help me with ${action.label.toLowerCase()}`);
+                    setTimeout(() => textareaRef.current?.focus(), 100);
+                  }}
+                  className="flex items-center space-x-3 p-4 bg-[#1a1a1a] hover:bg-[#222] border border-gray-800 hover:border-gray-700 rounded-xl transition-colors text-left"
+                >
+                  <action.icon size={20} className={action.color} />
+                  <span className="text-gray-300 font-medium">{action.label}</span>
                 </button>
               ))}
             </div>
-          </div>
 
-          {/* Sidebar Footer */}
-          <div className="p-4 border-t border-gray-800 space-y-3">
-            <button className="w-full flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 rounded-lg transition-colors text-black font-medium">
-              <Crown size={20} />
-              <span>Get Plus</span>
-            </button>
-            <button className="w-full flex items-center space-x-3 px-4 py-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
-              <Settings size={20} />
-              <span>Settings</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Mobile Overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-800 bg-[#161b22]">
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-gray-800 transition-colors"
-          >
-            <Menu size={20} />
-          </button>
-          <div className="flex-1 text-center md:text-left">
-            <h1 className="font-semibold text-lg">CareerForge AI</h1>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div
-              className={`w-2 h-2 rounded-full ${
-                connectionStatus === 'connected'
-                  ? 'bg-green-500'
-                  : connectionStatus === 'connecting'
-                    ? 'bg-yellow-500 animate-pulse'
-                    : 'bg-red-500'
-              }`}
-            />
-            <span className="text-xs text-gray-400">
-              {connectionStatus === 'connected'
-                ? 'Connected'
-                : connectionStatus === 'connecting'
-                  ? 'Connecting...'
-                  : 'Preview Mode'}
-            </span>
-          </div>
-        </div>
-
-        {/* Chat Area */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {messages.length === 0 ? (
-            /* Welcome State */
-            <div className="flex-1 flex items-center justify-center p-6">
-              <div className="max-w-2xl mx-auto text-center">
-                <div className="space-y-6">
-                  <div>
-                    <Logo size="lg" />
-                    <h1 className="text-4xl font-bold mt-4 mb-2">CareerForge AI</h1>
-                    <p className="text-xl text-gray-400 mb-6">
-                      Your AI-powered assistant for resumes, job matching, and career help.
-                    </p>
-
-                    {/* Preview Status */}
-                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-6">
-                      <p className="text-blue-300 text-sm">
-                        🎯 Preview Environment Active - UI is fully functional!
-                      </p>
-                    </div>
-
-                    {/* Warning Message */}
-                    <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 mb-8">
-                      <p className="text-yellow-300 text-sm">
-                        ⚠️ CareerForge AI is in beta. Don't share sensitive personal information.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Quick Action Buttons */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md mx-auto">
-                    <button
-                      onClick={() => handleQuickAction('resume')}
-                      className="flex items-center space-x-3 bg-gray-800 hover:bg-gray-700 rounded-lg px-6 py-4 transition-colors group"
-                    >
-                      <FileText size={24} className="text-blue-400" />
-                      <div className="text-left">
-                        <p className="font-medium">Resume Analysis</p>
-                        <p className="text-sm text-gray-400">Improve your resume</p>
-                      </div>
-                    </button>
-                    <button
-                      onClick={() => handleQuickAction('job-matching')}
-                      className="flex items-center space-x-3 bg-gray-800 hover:bg-gray-700 rounded-lg px-6 py-4 transition-colors group"
-                    >
-                      <Briefcase size={24} className="text-green-400" />
-                      <div className="text-left">
-                        <p className="font-medium">Job Matching</p>
-                        <p className="text-sm text-gray-400">Find perfect roles</p>
-                      </div>
-                    </button>
-                  </div>
-
-                  {/* Test Connection Button */}
-                  <div className="mt-6">
-                    <button
-                      onClick={testConnection}
-                      className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm transition-colors font-medium"
-                    >
-                      Test API Connection
-                    </button>
-                  </div>
-                </div>
+            <div className="mt-6">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-gray-400 text-sm">Pick a Template</h4>
+                <button className="text-gray-400 hover:text-white">
+                  <ChevronRight size={14} />
+                </button>
               </div>
-            </div>
-          ) : (
-            /* Messages */
-            <div className="flex-1 overflow-y-auto p-4 space-y-6">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`flex space-x-3 max-w-3xl ${message.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}
-                  >
-                    <div
-                      className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                        message.role === 'user' ? 'bg-blue-600' : 'bg-gray-700'
-                      }`}
-                    >
-                      {message.role === 'user' ? <User size={18} /> : <Bot size={18} />}
-                    </div>
-                    <div
-                      className={`rounded-xl px-4 py-3 ${
-                        message.role === 'user'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-[#161b22] border border-gray-700'
-                      }`}
-                    >
-                      <p className="whitespace-pre-wrap">{message.content}</p>
-                      <p className="text-xs opacity-70 mt-2">
-                        {message.timestamp.toLocaleTimeString()}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
 
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="flex space-x-3 max-w-3xl">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
-                      <Bot size={18} />
-                    </div>
-                    <div className="bg-[#161b22] border border-gray-700 rounded-xl px-4 py-3">
-                      <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                        <div
-                          className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                          style={{ animationDelay: '0.1s' }}
-                        />
-                        <div
-                          className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                          style={{ animationDelay: '0.2s' }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-          )}
-
-          {/* Input Area */}
-          <div className="p-4 bg-[#161b22] border-t border-gray-800">
-            <div className="max-w-4xl mx-auto">
-              <div className="bg-[#0d1117] border border-gray-700 rounded-xl p-4">
-                <div className="flex items-end space-x-3">
-                  <div className="flex-1">
-                    <textarea
-                      ref={textareaRef}
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      placeholder="Ask CareerForge AI anything about your career..."
-                      className="w-full bg-transparent text-[#f0f6fc] placeholder-gray-400 resize-none outline-none min-h-[24px] max-h-32"
-                      rows={1}
-                      disabled={isLoading}
-                    />
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
-                      title="Voice input"
-                    >
-                      <Mic size={20} />
-                    </button>
-                    <button
-                      className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
-                      title="Upload resume"
-                    >
-                      <Upload size={20} />
-                    </button>
-                    {messages.length > 0 && (
-                      <button
-                        onClick={handleClearChat}
-                        className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                        title="Clear chat"
-                      >
-                        <Trash2 size={20} />
-                      </button>
-                    )}
-                    <button
-                      onClick={handleSendMessage}
-                      disabled={!inputValue.trim() || isLoading}
-                      className="p-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
-                      title="Send message"
-                    >
-                      <Send size={20} />
-                    </button>
-                  </div>
-                </div>
+              <div className="space-y-2">
+                <button className="w-full text-left p-3 bg-[#1a1a1a] hover:bg-[#222] border border-gray-800 hover:border-gray-700 rounded-lg transition-colors">
+                  <span className="text-gray-300 text-sm">📄 Resume Review & Optimization</span>
+                </button>
+                <button className="w-full text-left p-3 bg-[#1a1a1a] hover:bg-[#222] border border-gray-800 hover:border-gray-700 rounded-lg transition-colors">
+                  <span className="text-gray-300 text-sm">🎯 Job Search Strategy</span>
+                </button>
+                <button className="w-full text-left p-3 bg-[#1a1a1a] hover:bg-[#222] border border-gray-800 hover:border-gray-700 rounded-lg transition-colors">
+                  <span className="text-gray-300 text-sm">💼 Interview Preparation</span>
+                </button>
               </div>
             </div>
           </div>
