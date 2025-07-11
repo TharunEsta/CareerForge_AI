@@ -1,35 +1,23 @@
 'use client';
-import * as React from 'react';
-import { Logo } from '@/components/ui/logo';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+
+import React, { useState, useRef, useEffect } from 'react';
 import {
-  Mic,
+  Menu,
+  X,
   Plus,
-  User,
-  LogOut,
-  Upload,
-  MessageSquare,
-  Home,
-  Globe,
-  Layers,
-  ArrowUpRight,
-  Download,
-  Star,
   Settings,
+  Crown,
+  Mic,
+  Upload,
+  Trash2,
   Send,
   FileText,
   Briefcase,
-  CreditCard,
-  HelpCircle,
+  User,
+  Bot,
+  MessageSquare,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
-import VoiceAssistant from '@/components/VoiceAssistant';
-import { useAuth } from '@/components/AuthContext';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import SubscriptionCards from '@/components/ui/SubscriptionCards';
-import { useSubscription } from '@/hooks/useSubscription';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Message {
   id: string;
@@ -38,79 +26,155 @@ interface Message {
   timestamp: Date;
 }
 
-export default function AppPage() {
-  const { user, logout } = useAuth();
-  const [showVoice, setShowVoice] = React.useState(false);
-  const [showSubWarning, setShowSubWarning] = React.useState(false);
-  const [messages, setMessages] = React.useState<Message[]>([]);
-  const [input, setInput] = React.useState('');
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [showSubscriptionCards, setShowSubscriptionCards] = React.useState(false);
-  
-  const {
-    currentPlan,
-    usageSummary,
-    trackUsage,
-    canUseFeature,
-    getRemainingUsage,
-    getCurrentUsage,
-    getLimit,
-    upgradeSubscription,
-    isLoading: subscriptionLoading,
-    error: subscriptionError
-  } = useSubscription();
+interface Chat {
+  id: string;
+  title: string;
+  lastMessage: string;
+  timestamp: Date;
+}
 
-  // TODO: Replace with real subscription check
-  const hasVoiceSubscription =
-    user?.subscription?.plan === 'premium' || user?.subscription?.plan === 'enterprise';
+// Animated Splash Screen Component
+function SplashScreen({ show }: { show: boolean }) {
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.div
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+          className="fixed inset-0 z-50 bg-[#0d1117] flex items-center justify-center"
+        >
+          <div className="text-center">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+              className="mb-8"
+            >
+              {/* CareerForge AI Logo */}
+              <div className="relative mb-6">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                  className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center"
+                >
+                  <span className="text-white font-bold text-xl">CF</span>
+                </motion.div>
+                <motion.h1
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.3, duration: 0.6 }}
+                  className="text-4xl font-bold text-white"
+                >
+                  CareerForge AI
+                </motion.h1>
+                <motion.p
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.5, duration: 0.6 }}
+                  className="text-gray-400 mt-2"
+                >
+                  Initializing your AI career assistant...
+                </motion.p>
+              </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8, duration: 0.4 }}
+              className="flex justify-center"
+            >
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            </motion.div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
 
-  const handleVoiceClick = () => {
-    if (!hasVoiceSubscription) {
-      setShowSubWarning(true);
-    } else {
-      setShowVoice(true);
-    }
+// Logo Component
+function Logo({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
+  const sizeClasses = {
+    sm: 'w-8 h-8 text-sm',
+    md: 'w-10 h-10 text-base',
+    lg: 'w-12 h-12 text-lg',
   };
 
-  const handleSendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+  return (
+    <div
+      className={`${sizeClasses[size]} rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0`}
+    >
+      <span className="text-white font-bold">CF</span>
+    </div>
+  );
+}
 
-    // Check if user can use AI chat feature
-    if (!canUseFeature('ai_chats')) {
-      setShowSubscriptionCards(true);
-      return;
+export default function ChatInterface() {
+  const [showSplash, setShowSplash] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputValue, setInputValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [chats, setChats] = useState<Chat[]>([
+    {
+      id: '1',
+      title: 'Resume Review Help',
+      lastMessage: 'Can you help me improve my resume?',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
+    },
+    {
+      id: '2',
+      title: 'Job Search Strategy',
+      lastMessage: 'What are the best job search strategies?',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24),
+    },
+    {
+      id: '3',
+      title: 'Interview Preparation',
+      lastMessage: 'Help me prepare for a technical interview',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3),
+    },
+  ]);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSplash(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
     }
+  }, [inputValue]);
+
+  const handleSendMessage = async () => {
+    if (!inputValue.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      content: input,
+      content: inputValue,
       role: 'user',
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
+    setMessages((prev) => [...prev, userMessage]);
+    setInputValue('');
     setIsLoading(true);
 
     try {
-      // Track usage first
-      const usageTracked = await trackUsage('ai_chats');
-      if (!usageTracked) {
-        setShowSubscriptionCards(true);
-        setIsLoading(false);
-        return;
-      }
-
-      // Send message to AI
       const response = await fetch('/api/ai/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: input,
-          userId: 'user123', // Replace with actual user ID
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: inputValue }),
       });
 
       if (response.ok) {
@@ -119,21 +183,19 @@ export default function AppPage() {
           id: (Date.now() + 1).toString(),
           content: data.response,
           role: 'assistant',
-          timestamp: new Date()
+          timestamp: new Date(),
         };
-        setMessages(prev => [...prev, assistantMessage]);
-      } else {
-        throw new Error('Failed to get response');
+        setMessages((prev) => [...prev, assistantMessage]);
       }
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Error:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: 'Sorry, I encountered an error. Please try again.',
         role: 'assistant',
-        timestamp: new Date()
+        timestamp: new Date(),
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
@@ -146,276 +208,309 @@ export default function AppPage() {
     }
   };
 
-  const handleFeatureClick = async (feature: string) => {
-    if (!canUseFeature(feature)) {
-      setShowSubscriptionCards(true);
-      return;
-    }
-
-    // Track usage and show appropriate UI
-    const usageTracked = await trackUsage(feature);
-    if (!usageTracked) {
-      setShowSubscriptionCards(true);
-      return;
-    }
-
-    // Handle different features
-    switch (feature) {
-      case 'resume_parsing':
-        // Handle resume upload
-        break;
-      case 'job_matching':
-        // Handle job matching
-        break;
-      case 'voice_assistant':
-        // Handle voice assistant
-        break;
-      default:
-        break;
-    }
+  const handleNewChat = () => {
+    setMessages([]);
+    setSidebarOpen(false);
   };
 
-  const handleUpgrade = async (planId: string) => {
-    const success = await upgradeSubscription(planId);
-    if (success) {
-      setShowSubscriptionCards(false);
+  const handleClearChat = () => {
+    setMessages([]);
+  };
+
+  const handleQuickAction = (action: string) => {
+    let message = '';
+    if (action === 'resume') {
+      message =
+        'I need help analyzing and improving my resume. Can you guide me through the process?';
+    } else if (action === 'job-matching') {
+      message =
+        "I'm looking for job opportunities that match my skills and experience. How can you help me find the right roles?";
     }
+
+    setInputValue(message);
+    setTimeout(() => textareaRef.current?.focus(), 100);
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-gray-900">
-      {/* Vercel-style Sidebar */}
-      <div className="w-64 bg-black/90 border-r border-gray-800 flex flex-col">
-        {/* Logo */}
-        <div className="p-6 border-b border-gray-800">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">CF</span>
-            </div>
-            <span className="text-white font-semibold text-lg">CareerForge</span>
-          </div>
-        </div>
+    <div className="flex h-screen bg-[#0d1117] text-[#f0f6fc] overflow-hidden">
+      <SplashScreen show={showSplash} />
 
-        {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
-          <a href="/" className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
-            <Home className="w-5 h-5" />
-            <span>Home</span>
-          </a>
-          <a href="/dashboard" className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
-            <Briefcase className="w-5 h-5" />
-            <span>Dashboard</span>
-          </a>
-          <a href="/pricing" className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
-            <CreditCard className="w-5 h-5" />
-            <span>Pricing</span>
-          </a>
-          <a href="/settings" className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
-            <Settings className="w-5 h-5" />
-            <span>Settings</span>
-          </a>
-          <a href="/help" className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
-            <HelpCircle className="w-5 h-5" />
-            <span>Help</span>
-          </a>
-        </nav>
+      {/* Sidebar */}
+      <AnimatePresence>
+        {(sidebarOpen || window.innerWidth >= 768) && (
+          <motion.div
+            initial={{ x: -320, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -320, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="fixed md:relative z-40 w-80 h-full bg-[#161b22] border-r border-gray-800 flex flex-col"
+          >
+            {/* Sidebar Header */}
+            <div className="p-4 border-b border-gray-800">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Logo size="md" />
+                  <div>
+                    <h1 className="font-semibold text-lg">CareerForge AI</h1>
+                    <p className="text-xs text-gray-400">Your AI Career Assistant</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSidebarOpen(false)}
+                  className="md:hidden p-2 rounded-lg hover:bg-gray-800 transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
 
-        {/* User Info */}
-        <div className="p-4 border-t border-gray-800">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm">U</span>
+            {/* New Chat Button */}
+            <div className="p-4">
+              <button
+                onClick={handleNewChat}
+                className="w-full flex items-center space-x-3 px-4 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <Plus size={20} />
+                <span className="font-medium">New Chat</span>
+              </button>
             </div>
-            <div className="flex-1">
-              <p className="text-white text-sm font-medium">User</p>
-              <p className="text-gray-400 text-xs">{currentPlan.toUpperCase()} Plan</p>
+
+            {/* Chat History */}
+            <div className="flex-1 overflow-y-auto px-4">
+              <h3 className="text-sm font-medium text-gray-400 mb-3">Recent Chats</h3>
+              <div className="space-y-2">
+                {chats.map((chat) => (
+                  <button
+                    key={chat.id}
+                    className="w-full text-left p-3 rounded-lg hover:bg-gray-800 transition-colors group"
+                  >
+                    <div className="flex items-start space-x-3">
+                      <MessageSquare size={16} className="mt-1 text-gray-400" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">{chat.title}</p>
+                        <p className="text-xs text-gray-400 truncate mt-1">{chat.lastMessage}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {chat.timestamp.toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
-            <button className="text-gray-400 hover:text-white">
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
+
+            {/* Sidebar Footer */}
+            <div className="p-4 border-t border-gray-800 space-y-3">
+              <button className="w-full flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 rounded-lg transition-colors text-black font-medium">
+                <Crown size={20} />
+                <span>Get Plus</span>
+              </button>
+              <button className="w-full flex items-center space-x-3 px-4 py-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+                <Settings size={20} />
+                <span>Settings</span>
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-800">
-          <h1 className="text-xl font-semibold text-white">CareerForge AI</h1>
-          {usageSummary && (
-            <div className="flex items-center space-x-4 text-sm text-gray-400">
-              <span>{getCurrentUsage('ai_chats')}/{getLimit('ai_chats')} chats</span>
-            </div>
-          )}
+        <div className="flex items-center justify-between p-4 border-b border-gray-800 bg-[#161b22]">
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="md:hidden p-2 rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            <Menu size={20} />
+          </button>
+          <div className="flex-1 text-center md:text-left">
+            <h1 className="font-semibold text-lg">CareerForge AI</h1>
+          </div>
         </div>
 
         {/* Chat Area */}
-        <div className="flex-1 flex flex-col">
-          {/* Messages */}
-          <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${messages.length > 0 ? '' : 'flex items-center justify-center'}`}>
-            {messages.length === 0 ? (
-              <div className="text-center text-gray-400 max-w-md">
-                <MessageSquare className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <h2 className="text-2xl font-semibold mb-2">Welcome to CareerForge AI</h2>
-                <p className="text-gray-500 mb-6">
-                  Your AI-powered career assistant. Ask me anything about resumes, job matching, or career advice.
-                </p>
-                <div className="grid grid-cols-2 gap-4">
-                  <button 
-                    onClick={() => handleFeatureClick('resume_parsing')}
-                    className="p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors text-left"
-                  >
-                    <FileText className="w-6 h-6 mb-2 text-blue-400" />
-                    <h3 className="font-medium text-white">Resume Analysis</h3>
-                    <p className="text-sm text-gray-400">Upload and analyze your resume</p>
-                  </button>
-                  <button 
-                    onClick={() => handleFeatureClick('job_matching')}
-                    className="p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors text-left"
-                  >
-                    <Briefcase className="w-6 h-6 mb-2 text-green-400" />
-                    <h3 className="font-medium text-white">Job Matching</h3>
-                    <p className="text-sm text-gray-400">Find matching job opportunities</p>
-                  </button>
-                </div>
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {messages.length === 0 ? (
+            /* Welcome State */
+            <div className="flex-1 flex items-center justify-center p-6">
+              <div className="max-w-2xl mx-auto text-center">
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.6 }}
+                  className="space-y-6"
+                >
+                  <div>
+                    <Logo size="lg" />
+                    <h1 className="text-4xl font-bold mt-4 mb-2">CareerForge AI</h1>
+                    <p className="text-xl text-gray-400 mb-6">
+                      Your AI-powered assistant for resumes, job matching, and career help.
+                    </p>
+
+                    {/* Warning Message */}
+                    <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 mb-8">
+                      <p className="text-yellow-300 text-sm">
+                        ⚠️ CareerForge AI is in beta. Don't share sensitive personal information.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Quick Action Buttons */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md mx-auto">
+                    <button
+                      onClick={() => handleQuickAction('resume')}
+                      className="flex items-center space-x-3 bg-gray-800 hover:bg-gray-700 rounded-lg px-6 py-4 transition-colors group"
+                    >
+                      <FileText size={24} className="text-blue-400" />
+                      <div className="text-left">
+                        <p className="font-medium">Resume Analysis</p>
+                        <p className="text-sm text-gray-400">Improve your resume</p>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => handleQuickAction('job-matching')}
+                      className="flex items-center space-x-3 bg-gray-800 hover:bg-gray-700 rounded-lg px-6 py-4 transition-colors group"
+                    >
+                      <Briefcase size={24} className="text-green-400" />
+                      <div className="text-left">
+                        <p className="font-medium">Job Matching</p>
+                        <p className="text-sm text-gray-400">Find perfect roles</p>
+                      </div>
+                    </button>
+                  </div>
+                </motion.div>
               </div>
-            ) : (
-              messages.map((message) => (
-                <div
+            </div>
+          ) : (
+            /* Messages */
+            <div className="flex-1 overflow-y-auto p-4 space-y-6">
+              {messages.map((message) => (
+                <motion.div
                   key={message.id}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.3 }}
                   className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                      message.role === 'user'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-800 text-gray-100'
-                    }`}
+                    className={`flex space-x-3 max-w-3xl ${message.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}
                   >
-                    {message.content}
+                    <div
+                      className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                        message.role === 'user' ? 'bg-blue-600' : 'bg-gray-700'
+                      }`}
+                    >
+                      {message.role === 'user' ? <User size={18} /> : <Bot size={18} />}
+                    </div>
+                    <div
+                      className={`rounded-xl px-4 py-3 ${
+                        message.role === 'user'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-[#161b22] border border-gray-700'
+                      }`}
+                    >
+                      <p className="whitespace-pre-wrap">{message.content}</p>
+                      <p className="text-xs opacity-70 mt-2">
+                        {message.timestamp.toLocaleTimeString()}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))
-            )}
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-gray-800 text-gray-100 px-4 py-2 rounded-lg">
-                  <div className="flex items-center space-x-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400"></div>
-                    <span>Thinking...</span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+                </motion.div>
+              ))}
 
-          {/* Feature Icons */}
-          {messages.length > 0 && (
-            <div className="flex justify-center space-x-4 p-4 border-t border-gray-800">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleFeatureClick('resume_parsing')}
-                className="text-gray-400 hover:text-white"
-                disabled={!canUseFeature('resume_parsing')}
-              >
-                <FileText className="w-5 h-5 mr-2" />
-                Resume
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleFeatureClick('job_matching')}
-                className="text-gray-400 hover:text-white"
-                disabled={!canUseFeature('job_matching')}
-              >
-                <Briefcase className="w-5 h-5 mr-2" />
-                Jobs
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleFeatureClick('voice_assistant')}
-                className="text-gray-400 hover:text-white"
-                disabled={!canUseFeature('voice_assistant')}
-              >
-                <Mic className="w-5 h-5 mr-2" />
-                Voice
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-400 hover:text-white"
-              >
-                <Upload className="w-5 h-5 mr-2" />
-                Upload
-              </Button>
+              {isLoading && (
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  className="flex justify-start"
+                >
+                  <div className="flex space-x-3 max-w-3xl">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
+                      <Bot size={18} />
+                    </div>
+                    <div className="bg-[#161b22] border border-gray-700 rounded-xl px-4 py-3">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                        <div
+                          className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                          style={{ animationDelay: '0.1s' }}
+                        />
+                        <div
+                          className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                          style={{ animationDelay: '0.2s' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+              <div ref={messagesEndRef} />
             </div>
           )}
 
-          {/* Chat Input */}
-          <div className="p-4 border-t border-gray-800">
-            <div className="flex space-x-2">
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder={messages.length === 0 ? "Start a conversation..." : "Ask CareerForge AI anything..."}
-                className="flex-1 bg-gray-800 border-gray-700 text-white placeholder-gray-400"
-                disabled={isLoading}
-              />
-              <Button
-                onClick={handleSendMessage}
-                disabled={isLoading || !input.trim()}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                <Send className="w-4 h-4" />
-              </Button>
+          {/* Input Area */}
+          <div className="p-4 bg-[#161b22] border-t border-gray-800">
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-[#0d1117] border border-gray-700 rounded-xl p-4">
+                <div className="flex items-end space-x-3">
+                  <div className="flex-1">
+                    <textarea
+                      ref={textareaRef}
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Ask CareerForge AI anything about your career..."
+                      className="w-full bg-transparent text-[#f0f6fc] placeholder-gray-400 resize-none outline-none min-h-[24px] max-h-32"
+                      rows={1}
+                      disabled={isLoading}
+                    />
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+                      title="Voice input"
+                    >
+                      <Mic size={20} />
+                    </button>
+                    <button
+                      className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+                      title="Upload resume"
+                    >
+                      <Upload size={20} />
+                    </button>
+                    {messages.length > 0 && (
+                      <button
+                        onClick={handleClearChat}
+                        className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                        title="Clear chat"
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    )}
+                    <button
+                      onClick={handleSendMessage}
+                      disabled={!inputValue.trim() || isLoading}
+                      className="p-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                      title="Send message"
+                    >
+                      <Send size={20} />
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Subscription Cards Overlay */}
-      {showSubscriptionCards && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-white mb-2">
-                  Upgrade Your Plan
-                </h2>
-                <p className="text-gray-400">
-                  You've reached your usage limit. Upgrade to continue using CareerForge AI.
-                </p>
-              </div>
-              
-              <SubscriptionCards
-                currentPlan={currentPlan}
-                onUpgrade={handleUpgrade}
-                isLoading={subscriptionLoading}
-              />
-              
-              <div className="text-center mt-6">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowSubscriptionCards(false)}
-                  className="text-gray-400 hover:text-white"
-                >
-                  Maybe Later
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Error Toast */}
-      {subscriptionError && (
-        <div className="fixed bottom-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg">
-          {subscriptionError}
-        </div>
-      )}
     </div>
   );
 }
