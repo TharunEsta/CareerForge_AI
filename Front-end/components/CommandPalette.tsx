@@ -2,14 +2,12 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-<<<<<<< HEAD
 import { Sun, Moon, Plus, History, UserCircle, Cog, Zap, Home, DollarSign, Upload, Briefcase, Settings } from 'lucide-react';
-=======
 import { Sun, Moon, Plus, History, UserCircle, Cog, Zap, Home, DollarSign, Search, X, Briefcase, CreditCard, Settings, HelpCircle } from 'lucide-react';
->>>>>>> 302f3f2770197901b6cc30f3e45f07976c933ba4
 import { useTheme } from 'next-themes';
 import { AnimatePresence, motion } from 'framer-motion';
 import * as Cmdk from 'cmdk';
+
 
 const actions = [
   { label: 'Home', icon: <Home size={18} />, action: (router: any) => router.push('/') },
@@ -29,7 +27,6 @@ const commands = [
   { label: 'Settings', icon: <Settings size={18} />, action: () => window.location.href = '/settings' },
 ];
 
-<<<<<<< HEAD
 export const CommandPalette: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -48,8 +45,8 @@ export const CommandPalette: React.FC = () => {
       setOpen(false);
     }
   }, [router, setTheme, theme]);
-=======
 interface CommandItem {
+interface CommandItemType {
   id: string;
   title: string;
   description: string;
@@ -61,7 +58,6 @@ export function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const router = useRouter();
->>>>>>> 302f3f2770197901b6cc30f3e45f07976c933ba4
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -69,7 +65,6 @@ export function CommandPalette() {
         e.preventDefault();
         setIsOpen(true);
       }
-<<<<<<< HEAD
       if (open) {
         if (e.key === 'ArrowDown') {
           setHighlighted((h) => Math.min(h + 1, filtered.length - 1));
@@ -80,18 +75,16 @@ export function CommandPalette() {
         } else if (e.key === 'Escape') {
           setOpen(false);
         }
-=======
       if (e.key === 'Escape') {
         setIsOpen(false);
->>>>>>> 302f3f2770197901b6cc30f3e45f07976c933ba4
-      }
+    }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const commands: CommandItem[] = [
+  const commands: CommandItemType[] = [
     {
       id: 'home',
       title: 'Go to Home',
@@ -213,8 +206,5 @@ export function CommandPalette() {
       )}
     </AnimatePresence>
   );
-<<<<<<< HEAD
-}; 
-=======
+};
 } 
->>>>>>> 302f3f2770197901b6cc30f3e45f07976c933ba4

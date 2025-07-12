@@ -2,41 +2,12 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import ClientLayout from './ClientLayout';
-
-<<<<<<< HEAD
-const inter = Inter({ subsets: ['latin'] });
-=======
 import React from 'react';
 import { Inter } from 'next/font/google';
-import { useTheme } from 'next-themes';
-import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Home, 
-  Briefcase, 
-  CreditCard, 
-  Settings, 
-  HelpCircle, 
-  LogOut, 
-  UserCircle, 
-  Plus, 
-  History, 
-  Cog, 
-  Menu,
-  X,
-  Sun,
-  Moon,
-  Zap
-} from 'lucide-react';
-import { SidebarWithLogo, SidebarNav, SidebarNavItem, SidebarNavItemIcon, SidebarNavItemText, SidebarFooter } from '@/components/ui/sidebar';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { CommandPalette } from '@/components/CommandPalette';
-import { SplashScreen } from '@/components/SplashScreen';
-import { Providers } from '@/components/Providers';
-import type { Metadata } from 'next'
+import type { Metadata } from 'next';
+import ClientLayout from './ClientLayout';
 
 const inter = Inter({ subsets: ['latin'] })
->>>>>>> 302f3f2770197901b6cc30f3e45f07976c933ba4
 
 export const metadata: Metadata = {
   title: 'CareerForge AI - AI-Powered Career Optimization',
@@ -87,16 +58,15 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-<<<<<<< HEAD
+
   verification: {
     google: 'your-google-verification-code',
   },
 };
-=======
   manifest: '/manifest.json',
   viewport: 'width=device-width, initial-scale=1',
   themeColor: '#3B82F6',
-}
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -158,8 +128,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     router.push('/pricing');
     setSidebarOpen(false);
   };
->>>>>>> 302f3f2770197901b6cc30f3e45f07976c933ba4
-
 export default function RootLayout({
   children,
 }: {
@@ -167,12 +135,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-<<<<<<< HEAD
+
       <body className={inter.className}>
         <ClientLayout>
           {children}
         </ClientLayout>
-=======
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -181,6 +148,7 @@ export default function RootLayout({
         <meta name="msapplication-TileColor" content="#18181b" />
       </head>
       <body className={inter.className + " bg-[#18181b] min-h-screen flex flex-row overflow-hidden"}>
+
         <Providers>
           {showSplash && <SplashScreen />}
           <ErrorBoundary>
@@ -329,7 +297,9 @@ export default function RootLayout({
             </div>
           </ErrorBoundary>
         </Providers>
->>>>>>> 302f3f2770197901b6cc30f3e45f07976c933ba4
+        <ClientLayout>
+          {children}
+        </ClientLayout>
       </body>
     </html>
   );
