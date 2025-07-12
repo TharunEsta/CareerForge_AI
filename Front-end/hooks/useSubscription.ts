@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/components/AuthContext';
+import { User } from '@/types';
 
 interface UsageInfo {
   current_usage: number;

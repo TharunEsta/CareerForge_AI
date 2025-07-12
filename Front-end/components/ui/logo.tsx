@@ -6,12 +6,13 @@
 
 import React from 'react';
 
-export const Logo: React.FC<{ size?: 'sm' | 'md' | 'lg' | number; className?: string }> = ({ size = 'md', className = '' }) => {
+export const Logo: React.FC<{ size?: 'sm' | 'md' | 'lg' | 'xl' | number; className?: string }> = ({ size = 'md', className = '' }) => {
   // Size mapping
   const sizeMap: Record<string, string> = {
     sm: 'w-8 h-8',
     md: 'w-12 h-12',
     lg: 'w-20 h-20',
+    xl: 'w-24 h-24',
   };
   const svgSize = typeof size === 'number' ? { width: size, height: size } : {};
   return (

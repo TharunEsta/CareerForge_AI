@@ -14,12 +14,6 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-<<<<<<< Updated upstream
-    "types": ["react", "react-dom"],
-    
-=======
-
->>>>>>> Stashed changes
     "plugins": [
       {
         "name": "next"

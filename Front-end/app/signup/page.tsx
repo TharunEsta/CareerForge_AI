@@ -1,16 +1,8 @@
-<<<<<<< Updated upstream
+"use client";
+
 import React, { useState } from "react";
 import { useAuth } from "@/components/AuthContext";
 
-=======
-"use client";
-
-"use client";
-
-"use client";
-
-import React from 'react';
->>>>>>> Stashed changes
 export default function SignupPage() {
   const { register, loading } = useAuth();
   const [name, setName] = useState("");
@@ -24,7 +16,7 @@ export default function SignupPage() {
     setError("");
     setSuccess(false);
     const result = await register(email, password, name);
-    if (!result) {
+    if (result === false) {
       setError("Registration failed. Please try again.");
     } else {
       setSuccess(true);

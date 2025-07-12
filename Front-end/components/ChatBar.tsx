@@ -18,9 +18,9 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   let recognition: any;
 
-  const model = useChatStore((s) => s.model);
-  const setModel = useChatStore((s) => s.setModel);
-  const userPlan = useChatStore((s) => s.userPlan);
+  const model = useChatStore((s: ChatState) => s.model);
+  const setModel = useChatStore((s: ChatState) => s.setModel);
+  const userPlan = useChatStore((s: ChatState) => s.userPlan);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const modelLabels: Record<ModelType, string> = {
     'gpt-3.5': 'GPT-3.5',
@@ -33,9 +33,9 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
     'dalle': <AudioLines size={18} className="text-green-400" />,
   };
 
-  const templates = useChatStore((s) => s.templates);
-  const addTemplate = useChatStore((s) => s.addTemplate);
-  const removeTemplate = useChatStore((s) => s.removeTemplate);
+  const templates = useChatStore((s: ChatState) => s.templates);
+  const addTemplate = useChatStore((s: ChatState) => s.addTemplate);
+  const removeTemplate = useChatStore((s: ChatState) => s.removeTemplate);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [templateName, setTemplateName] = useState('');
 
@@ -172,7 +172,7 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
             {templates.length === 0 ? (
               <DropdownMenuItem disabled>No templates</DropdownMenuItem>
             ) : (
-              templates.map((t) => (
+              templates.map((t: PromptTemplate) => (
                 <DropdownMenuItem key={t.name} onClick={() => handleInsertTemplate(t.prompt)}>
                   <span className="flex-1">{t.name}</span>
                   <button className="ml-2 text-xs text-red-500 hover:underline" onClick={e => { e.stopPropagation(); removeTemplate(t.name); }}>Delete</button>

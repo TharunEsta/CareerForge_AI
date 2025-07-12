@@ -1,10 +1,11 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface SubscriptionType {
   plan: 'free' | 'premium' | 'enterprise';
   status?: string;
+  nextBillingDate?: string;
 }
 
 interface UserType {
@@ -17,26 +18,20 @@ interface UserType {
 
 interface AuthContextType {
   user: UserType | null;
-  login: (userData: UserType) => void;
-  logout: () => void;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => Promise<void>;
+  register: (email: string, password: string, name: string) => Promise<boolean>;
+  updateProfile: (data: Partial<UserType>) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserType | null>(null);
-
-<<<<<<< Updated upstream
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing session
     const checkAuth = async () => {
       try {
         const token = localStorage.getItem('auth_token');
@@ -127,7 +122,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const updateProfile = async (data: Partial<User>): Promise<void> => {
+  const updateProfile = async (data: Partial<UserType>): Promise<void> => {
     try {
       setLoading(true);
       const token = localStorage.getItem('auth_token');
@@ -151,21 +146,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const value: AuthContextType = {
-    user,
-    loading,
-    login,
-    logout,
-    register,
-    updateProfile
-  };
-=======
-  const login = (userData: UserType) => setUser(userData);
-  const logout = () => setUser(null);
->>>>>>> Stashed changes
-
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, register, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

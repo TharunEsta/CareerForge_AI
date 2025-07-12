@@ -1,10 +1,10 @@
 "use client";
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sun, Moon, Plus, History, UserCircle, Cog, Zap, Home, DollarSign } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { motion, AnimatePresence } from 'framer-motion';
-import * as Cmdk from '@cmdk/core';
+import { Command, CommandInput, CommandList, CommandItem } from 'cmdk';
 
 const actions = [
   { label: 'Home', icon: <Home size={18} />, action: (router: any) => router.push('/') },
@@ -32,6 +32,16 @@ export const CommandPalette: React.FC = () => {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [filtered, setFiltered] = useState(commands);
+
+  const handleAction = useCallback((action: { label: string; icon: React.ReactNode; action: () => void }) => {
+    if (!action) return;
+    if (action.label === 'Toggle Theme') {
+      action.action(router, setTheme, theme);
+    } else {
+      action.action(router, setTheme, theme);
+      setOpen(false);
+    }
+  }, [router, setTheme, theme]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -71,16 +81,6 @@ export const CommandPalette: React.FC = () => {
       )
     );
   }, [query]);
-
-  const handleAction = (action: any) => {
-    if (!action) return;
-    if (action.label === 'Toggle Theme') {
-      action.action(router, setTheme, theme);
-    } else {
-      action.action(router, setTheme, theme);
-      setOpen(false);
-    }
-  };
 
   return (
     <AnimatePresence>

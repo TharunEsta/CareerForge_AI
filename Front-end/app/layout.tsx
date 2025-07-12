@@ -18,7 +18,7 @@ const inter = Inter({ subsets: ['latin'] })
 function SplashScreen() {
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black text-white">
-      <Logo size="xl" className="mb-6" />
+      <Logo size="lg" className="mb-6" />
       <h1 className="text-3xl font-bold mb-2">CareerForge AI</h1>
       <p className="text-lg text-gray-300">Loading your career tools...</p>
     </div>

@@ -99,20 +99,3 @@ export const SidebarWithLogo: React.FC<SidebarProps> = ({
   </Sidebar>
 );
 
-{/* Sidebar Drawer/Overlay */}
-<AnimatePresence>
-  {isSidebarOpen && (
-    <motion.div
-      key="sidebar"
-      initial={{ x: -300, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: -300, opacity: 0 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      className="fixed inset-y-0 left-0 z-40 w-64 bg-gray-900 text-white shadow-lg flex flex-col"
-    >
-      {/* ...sidebar content... */}
-      { /* Place the rest of your sidebar content here as before */ }
-    </motion.div>
-  )}
-</AnimatePresence>
-

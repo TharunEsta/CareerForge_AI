@@ -78,27 +78,27 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
     setIsAnalyzing(true);
     const formData = new FormData();
     formData.append('file', uploadedFile);
-    resumeParser.mutate(formData, {
-      onSuccess: (result: any) => {
+    try {
+      await resumeParser.parseResume(uploadedFile);
+      if (resumeParser.parsedData) {
         onAnalysis({
-          skills: result.skills,
-          experience: result.experience?.join(', ') || '',
-          education: result.education || '',
-          recommendations: result.recommendations || [],
+          skills: resumeParser.parsedData.skills || [],
+          experience: resumeParser.parsedData.experience?.join(', ') || '',
+          education: resumeParser.parsedData.education || '',
+          recommendations: resumeParser.parsedData.recommendations || [],
         });
-        setIsAnalyzing(false);
         const newCount = usageCount + 1;
         setUsageCount(newCount);
         localStorage.setItem('resume_usage', newCount.toString());
         if (newCount >= FREE_LIMIT) {
           setShowGetPlus(true);
         }
-      },
-      onError: () => {
-        setIsAnalyzing(false);
-        alert('Failed to analyze resume. Please try again.');
-      },
-    });
+      }
+    } catch (error) {
+      alert('Failed to analyze resume. Please try again.');
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   return (
@@ -229,7 +229,7 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
           </div>
         </div>
 
-        {resumeParser.isError && (
+        {resumeParser.error && (
           <div className="text-red-600 text-center text-sm mt-2">Failed to parse resume. Please try again.</div>
         )}
       </CardContent>

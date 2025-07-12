@@ -3,6 +3,7 @@
 import React from 'react';
 import SubscriptionCards from '@/components/ui/SubscriptionCards';
 import { useAuth } from '@/components/AuthContext';
+import { User } from '@/types';
 
 export default function PricingPage() {
   const { user } = useAuth();

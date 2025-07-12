@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
 } from './dropdown-menu';
 import { useAuth } from '@/components/AuthContext';
+import { User } from '@/types';
 
 export default function MicroDashboardMenu() {
   const { user, logout } = useAuth();

@@ -1,16 +1,8 @@
-<<<<<<< Updated upstream
+"use client";
+
 import React, { useState } from "react";
 import { useAuth } from "@/components/AuthContext";
 
-=======
-"use client";
-
-"use client";
-
-"use client";
-
-import React from 'react';
->>>>>>> Stashed changes
 export default function LoginPage() {
   const { login, loading } = useAuth();
   const [email, setEmail] = useState("");

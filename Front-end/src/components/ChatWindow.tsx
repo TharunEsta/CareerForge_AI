@@ -53,19 +53,19 @@ export function ChatWindow() {
     setInput("");
     setFreeCount((c) => c + 1);
     setThinking(true);
-    chatMutation.mutate(
-      { messages: newMessages },
-      {
-        onSuccess: (data: any) => {
-          setMessages((msgs) => [...msgs, { role: "ai", content: data.response }]);
-          setThinking(false);
-        },
-        onError: (err: any) => {
-          setMessages((msgs) => [...msgs, { role: "ai", content: "Sorry, something went wrong. Please try again." }]);
-          setThinking(false);
-        },
+    try {
+      await chatMutation.sendMessage(content);
+      if (chatMutation.messages.length > messages.length) {
+        const newAIResponse = chatMutation.messages[chatMutation.messages.length - 1];
+        if (newAIResponse && newAIResponse.role === 'ai') {
+          setMessages((msgs) => [...msgs, newAIResponse]);
+        }
       }
-    );
+    } catch (error) {
+      setMessages((msgs) => [...msgs, { role: "ai", content: "Sorry, something went wrong. Please try again." }]);
+    } finally {
+      setThinking(false);
+    }
   };
 
   const handleRegenerate = () => {
@@ -117,7 +117,7 @@ export function ChatWindow() {
                 </div>
               </div>
             )}
-            {chatMutation.isError && (
+            {chatMutation.error && (
               <div className="w-full max-w-2xl mx-auto mb-2 text-red-600 text-center text-sm">Failed to get AI response. Please try again.</div>
             )}
             <div ref={chatEndRef} />
