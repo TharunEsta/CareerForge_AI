@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sun, Moon, Plus, History, UserCircle, Cog, Zap, Home, DollarSign } from 'lucide-react';
+import { Sun, Moon, Plus, History, UserCircle, Cog, Zap, Home, DollarSign, Search, X, Briefcase, CreditCard, Settings, HelpCircle } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Command, CommandInput, CommandList, CommandItem } from 'cmdk';
@@ -24,103 +24,154 @@ const commands = [
   { label: 'Settings', action: () => window.location.href = '/settings' },
 ];
 
-export const CommandPalette: React.FC = () => {
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState('');
-  const [highlighted, setHighlighted] = useState(0);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
-  const { theme, setTheme } = useTheme();
-  const [filtered, setFiltered] = useState(commands);
+interface CommandItem {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  action: () => void;
+}
 
-  const handleAction = useCallback((action: { label: string; icon: React.ReactNode; action: () => void }) => {
-    if (!action) return;
-    if (action.label === 'Toggle Theme') {
-      action.action(router, setTheme, theme);
-    } else {
-      action.action(router, setTheme, theme);
-      setOpen(false);
-    }
-  }, [router, setTheme, theme]);
+export function CommandPalette() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        setOpen((o) => !o);
+        setIsOpen(true);
       }
-      if (open) {
-        if (e.key === 'ArrowDown') {
-          setHighlighted((h) => Math.min(h + 1, filtered.length - 1));
-        } else if (e.key === 'ArrowUp') {
-          setHighlighted((h) => Math.max(h - 1, 0));
-        } else if (e.key === 'Enter') {
-          handleAction(filtered[highlighted]);
-        } else if (e.key === 'Escape') {
-          setOpen(false);
-        }
+      if (e.key === 'Escape') {
+        setIsOpen(false);
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, highlighted, query, filtered, handleAction]);
 
-  useEffect(() => {
-    if (open) {
-      setTimeout(() => inputRef.current?.focus(), 50);
-    } else {
-      setQuery('');
-      setHighlighted(0);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const commands: CommandItem[] = [
+    {
+      id: 'home',
+      title: 'Go to Home',
+      description: 'Navigate to the home page',
+      icon: <Home size={16} />,
+      action: () => {
+        router.push('/');
+        setIsOpen(false);
+      }
+    },
+    {
+      id: 'dashboard',
+      title: 'Go to Dashboard',
+      description: 'Open the main dashboard',
+      icon: <Briefcase size={16} />,
+      action: () => {
+        router.push('/dashboard');
+        setIsOpen(false);
+      }
+    },
+    {
+      id: 'pricing',
+      title: 'View Pricing',
+      description: 'See subscription plans',
+      icon: <CreditCard size={16} />,
+      action: () => {
+        router.push('/pricing');
+        setIsOpen(false);
+      }
+    },
+    {
+      id: 'settings',
+      title: 'Open Settings',
+      description: 'Manage your account settings',
+      icon: <Settings size={16} />,
+      action: () => {
+        router.push('/settings');
+        setIsOpen(false);
+      }
+    },
+    {
+      id: 'help',
+      title: 'Get Help',
+      description: 'View help and documentation',
+      icon: <HelpCircle size={16} />,
+      action: () => {
+        router.push('/help');
+        setIsOpen(false);
+      }
     }
-  }, [open]);
+  ];
 
-  useEffect(() => {
-    setFiltered(
-      commands.filter(cmd =>
-        cmd.label.toLowerCase().includes(query.toLowerCase())
-      )
-    );
-  }, [query]);
+  const filteredCommands = commands.filter(command =>
+    command.title.toLowerCase().includes(query.toLowerCase()) ||
+    command.description.toLowerCase().includes(query.toLowerCase())
+  );
 
   return (
     <AnimatePresence>
-      {open && (
+      {isOpen && (
         <motion.div
-          key="cmdk"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-black/30"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          onClick={() => setIsOpen(false)}
         >
-          <Cmdk.Command
-            label="Command Palette"
-            className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-md p-4"
-            value={query}
-            onValueChange={setQuery}
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            className="bg-gray-900 rounded-2xl p-6 w-full max-w-md mx-4 border border-gray-700"
+            onClick={(e) => e.stopPropagation()}
           >
-            <Cmdk.CommandInput
-              placeholder="Type a command or search..."
-              autoFocus
-              className="w-full p-2 rounded border mb-2"
-            />
-            <Cmdk.CommandList>
-              {filtered.map((cmd, i) => (
-                <Cmdk.CommandItem
-                  key={cmd.label}
-                  onSelect={() => {
-                    setOpen(false);
-                    cmd.action();
-                  }}
-                  className="p-2 rounded hover:bg-blue-100 dark:hover:bg-blue-900 cursor-pointer"
+            <div className="flex items-center space-x-3 mb-4">
+              <Search className="w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search commands..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="flex-1 bg-transparent text-white placeholder-gray-400 outline-none"
+                autoFocus
+              />
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {filteredCommands.map((command) => (
+                <button
+                  key={command.id}
+                  onClick={command.action}
+                  className="flex items-center space-x-3 w-full p-3 text-left text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
                 >
-                  {cmd.label}
-                </Cmdk.CommandItem>
+                  <div className="flex-shrink-0 text-gray-400">
+                    {command.icon}
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium">{command.title}</div>
+                    <div className="text-sm text-gray-500">{command.description}</div>
+                  </div>
+                </button>
               ))}
-            </Cmdk.CommandList>
-          </Cmdk.Command>
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-gray-700 text-xs text-gray-500">
+              <div className="flex items-center justify-center space-x-4">
+                <span>Press ⌘K to open</span>
+                <span>Press Esc to close</span>
+              </div>
+            </div>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
   );
-}; 
+} 

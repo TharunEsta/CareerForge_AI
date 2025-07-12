@@ -1,5 +1,6 @@
 "use client";
 import React, { useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Mic, Send, Paperclip, Loader2, Search, RefreshCw, Sparkles, Globe, AudioLines } from 'lucide-react';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuItem } from './ui/dropdown-menu';
 import { useChatStore, ModelType } from '@/app/context/ChatStore';
@@ -56,7 +57,9 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
     recognition.onresult = (event: any) => {
-      setInput((prev) => prev + event.results[0][0].transcript);
+      const text = event.results[0][0].transcript;
+      setInput(text);
+      onSend(text, file);
       setListening(false);
     };
     recognition.onerror = () => setListening(false);
@@ -66,32 +69,66 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
   };
 
   const handleSend = () => {
-    if (input.trim() || file) {
-      onSend(input.trim(), file || undefined);
-      setInput('');
-      setFile(null);
-      if (inputRef.current) inputRef.current.focus();
+    if (!input.trim() && !file) return;
+    onSend(input.trim(), file);
+    setInput('');
+    setFile(null);
+    if (inputRef.current) inputRef.current.focus();
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+    const file = e.target.files?.[0];
+    if (file) {
+      setFile(file);
+      // Auto-send file upload message
+      onSend(`Uploaded file: ${file.name}`, file);
     }
   };
 
-  // Placeholder handlers for rephrase, suggestions, language/settings
+  // Implement rephrase logic
   const handleRephrase = () => {
-    // TODO: Implement rephrase logic
-    alert('Rephrase/Rewrite feature coming soon!');
+    if (!input.trim()) {
+      alert('Please enter some text to rephrase.');
+      return;
+    }
+    
+    // Add rephrase prompt to input
+    const rephrasePrompt = `Please rephrase the following text in a clear and professional way: "${input}"`;
+    setInput(rephrasePrompt);
+    if (inputRef.current) inputRef.current.focus();
   };
   const handleSuggestions = () => {
-    // TODO: Implement prompt suggestions
-    alert('Prompt suggestions coming soon!');
+    // Show prompt suggestions modal
+    const suggestions = [
+      'Help me write a professional cover letter for a software engineering position',
+      'Analyze my resume and suggest improvements for ATS optimization',
+      'Help me prepare for a technical interview',
+      'Write a follow-up email after a job interview',
+      'Help me negotiate a job offer',
+      'Create a LinkedIn profile summary',
+      'Help me answer "Tell me about yourself" in an interview',
+      'Write a resignation letter'
+    ];
+    
+    const randomSuggestion = suggestions[Math.floor(Math.random() * suggestions.length)];
+    setInput(randomSuggestion);
+    if (inputRef.current) inputRef.current.focus();
   };
   const handleLanguage = () => {
-    // TODO: Implement language/settings
-    alert('Language/settings coming soon!');
+    // Show language/settings modal
+    const languages = ['English', 'Spanish', 'French', 'German', 'Chinese', 'Japanese'];
+    const currentLang = localStorage.getItem('preferred-language') || 'English';
+    const nextLang = languages[(languages.indexOf(currentLang) + 1) % languages.length];
+    
+    localStorage.setItem('preferred-language', nextLang);
+    alert(`Language changed to ${nextLang}`);
   };
 
   const handleModelChange = (val: string) => {
@@ -118,7 +155,150 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 w-full md:w-[calc(100%-16rem)] md:left-64 bg-black/80 border-t border-gray-800 p-4 flex items-center gap-2 z-40 shadow-2xl">
+    <motion.div
+      initial={{ y: 20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      className="relative"
+    >
+      <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl border border-gray-700 p-4 shadow-xl">
+        <div className="flex items-center space-x-3">
+          {/* File Upload */}
+          <button
+            className="p-2 rounded-xl hover:bg-gray-700/50 transition-colors text-gray-400 hover:text-white"
+            onClick={() => fileInputRef.current?.click()}
+            aria-label="Attach file"
+            type="button"
+          >
+            <Paperclip size={20} />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.doc,.docx"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+          </button>
+
+          {/* Text Input */}
+          <div className="flex-1 relative">
+            <input
+              ref={inputRef}
+              type="text"
+              className="w-full bg-gray-700/50 text-white placeholder-gray-400 px-4 py-3 rounded-xl border border-gray-600 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+              placeholder="Ask me anything about your career..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyPress}
+              disabled={loading}
+            />
+            
+            {/* File indicator */}
+            {file && (
+              <div className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                📎
+              </div>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center space-x-2">
+            {/* Rephrase */}
+            <button
+              className="p-2 rounded-xl hover:bg-gray-700/50 transition-colors text-gray-400 hover:text-white"
+              onClick={handleRephrase}
+              aria-label="Rephrase"
+              type="button"
+            >
+              <RefreshCw size={20} />
+            </button>
+
+            {/* Suggestions */}
+            <button
+              className="p-2 rounded-xl hover:bg-gray-700/50 transition-colors text-gray-400 hover:text-white"
+              onClick={handleSuggestions}
+              aria-label="Prompt suggestions"
+              type="button"
+            >
+              <Sparkles size={20} />
+            </button>
+
+            {/* Language */}
+            <button
+              className="p-2 rounded-xl hover:bg-gray-700/50 transition-colors text-gray-400 hover:text-white"
+              onClick={handleLanguage}
+              aria-label="Language or settings"
+              type="button"
+            >
+              <Globe size={20} />
+            </button>
+
+            {/* Voice Input */}
+            <button
+              className={`p-2 rounded-xl transition-colors ${
+                listening 
+                  ? 'bg-blue-600 text-white' 
+                  : 'hover:bg-gray-700/50 text-gray-400 hover:text-white'
+              }`}
+              onClick={handleMicClick}
+              aria-label="Voice input"
+              type="button"
+            >
+              <Mic size={20} className={listening ? 'animate-pulse' : ''} />
+            </button>
+
+            {/* Send Button */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`p-3 rounded-xl transition-all duration-200 ${
+                loading || (!input.trim() && !file)
+                  ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl'
+              }`}
+              onClick={handleSend}
+              disabled={loading || (!input.trim() && !file)}
+              aria-label="Send message"
+              type="button"
+            >
+              {loading ? (
+                <Loader2 size={20} className="animate-spin" />
+              ) : (
+                <Send size={20} />
+              )}
+            </motion.button>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        {!input.trim() && !file && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-center space-x-4 mt-3 pt-3 border-t border-gray-700"
+          >
+            <button
+              onClick={() => setInput('Help me optimize my resume for ATS')}
+              className="text-xs text-gray-400 hover:text-white transition-colors"
+            >
+              Resume Optimization
+            </button>
+            <span className="text-gray-600">•</span>
+            <button
+              onClick={() => setInput('Write a cover letter for a software engineer position')}
+              className="text-xs text-gray-400 hover:text-white transition-colors"
+            >
+              Cover Letter
+            </button>
+            <span className="text-gray-600">•</span>
+            <button
+              onClick={() => setInput('Help me prepare for a technical interview')}
+              className="text-xs text-gray-400 hover:text-white transition-colors"
+            >
+              Interview Prep
+            </button>
+          </motion.div>
+        )}
+      </div>
       <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} />
       {/* Model Selector Dropdown */}
       <DropdownMenu>
@@ -135,121 +315,26 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
-      {/* Search Icon */}
-      <button
-        className="p-2 rounded-full hover:bg-gray-700 transition text-gray-400"
-        aria-label="Search"
-        type="button"
-      >
-        <Search size={22} />
-      </button>
-      {/* File Upload */}
-      <button
-        className="p-2 rounded-full hover:bg-gray-700 transition text-gray-400"
-        onClick={() => fileInputRef.current?.click()}
-        aria-label="Attach file"
-        type="button"
-      >
-        <Paperclip size={22} />
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".pdf,.doc,.docx"
-          className="hidden"
-          onChange={handleFileChange}
-        />
-      </button>
-      {/* Text Field with embedded actions */}
-      <div className="flex-1 flex items-center bg-gray-900 rounded-lg px-2 py-1">
-        {/* Templates Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="p-2 rounded-full hover:bg-gray-800 transition text-gray-400" aria-label="Templates" type="button">
-              <Sparkles size={20} />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            {templates.length === 0 ? (
-              <DropdownMenuItem disabled>No templates</DropdownMenuItem>
-            ) : (
-              templates.map((t: PromptTemplate) => (
-                <DropdownMenuItem key={t.name} onClick={() => handleInsertTemplate(t.prompt)}>
-                  <span className="flex-1">{t.name}</span>
-                  <button className="ml-2 text-xs text-red-500 hover:underline" onClick={e => { e.stopPropagation(); removeTemplate(t.name); }}>Delete</button>
-                </DropdownMenuItem>
-              ))
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <input
-          ref={inputRef}
-          type="text"
-          className="flex-1 bg-transparent text-white px-2 py-2 focus:outline-none focus:ring-0"
-          placeholder="Type your message..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') handleSend(); }}
-          disabled={loading}
-        />
-        {/* Save as Template Button */}
-        {input.trim() && (
-          <button
-            className="p-2 rounded-full hover:bg-green-700 transition text-green-400"
-            onClick={handleSaveTemplate}
-            aria-label="Save as template"
-            type="button"
-          >
-            <span className="hidden sm:inline">Save</span>
+      {/* Templates Dropdown */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="p-2 rounded-full hover:bg-gray-800 transition text-gray-400" aria-label="Templates" type="button">
             <Sparkles size={20} />
           </button>
-        )}
-        {/* Rephrase/Rewrite */}
-        <button
-          className="p-2 rounded-full hover:bg-gray-800 transition text-gray-400"
-          onClick={handleRephrase}
-          aria-label="Rephrase"
-          type="button"
-        >
-          <RefreshCw size={20} />
-        </button>
-        {/* Prompt Suggestions/Insights */}
-        <button
-          className="p-2 rounded-full hover:bg-gray-800 transition text-gray-400"
-          onClick={handleSuggestions}
-          aria-label="Prompt suggestions"
-          type="button"
-        >
-          <Sparkles size={20} />
-        </button>
-        {/* Language/Settings */}
-        <button
-          className="p-2 rounded-full hover:bg-gray-800 transition text-gray-400"
-          onClick={handleLanguage}
-          aria-label="Language or settings"
-          type="button"
-        >
-          <Globe size={20} />
-        </button>
-      </div>
-      {/* Microphone */}
-      <button
-        className={`p-2 rounded-full hover:bg-gray-700 transition ${listening ? 'bg-blue-600 text-white' : 'text-gray-400'}`}
-        onClick={handleMicClick}
-        aria-label="Voice input"
-        type="button"
-      >
-        <Mic size={22} className={listening ? 'animate-pulse' : ''} />
-      </button>
-      {/* Blue Waveform Button (Submit/Start Chat) */}
-      <button
-        className="p-2 rounded-full bg-blue-600 hover:bg-blue-700 transition text-white disabled:opacity-50 shadow-lg"
-        onClick={handleSend}
-        aria-label="Submit or Start Chat"
-        type="button"
-        disabled={loading || (!input.trim() && !file)}
-      >
-        {loading ? <Loader2 size={22} className="animate-spin" /> : <AudioLines size={22} />}
-      </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          {templates.length === 0 ? (
+            <DropdownMenuItem disabled>No templates</DropdownMenuItem>
+          ) : (
+            templates.map((t: PromptTemplate) => (
+              <DropdownMenuItem key={t.name} onClick={() => handleInsertTemplate(t.prompt)}>
+                <span className="flex-1">{t.name}</span>
+                <button className="ml-2 text-xs text-red-500 hover:underline" onClick={e => { e.stopPropagation(); removeTemplate(t.name); }}>Delete</button>
+              </DropdownMenuItem>
+            ))
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
       {/* Save Template Modal */}
       {showTemplateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
@@ -274,6 +359,6 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }; 

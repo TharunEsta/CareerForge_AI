@@ -27,42 +27,111 @@ interface UsageSummary {
 interface SubscriptionPlan {
   id: string;
   name: string;
-  price_monthly: number;
-  price_yearly: number;
-  description: string;
-  features: Array<{
-    name: string;
-    description: string;
-    available: boolean;
-  }>;
-  limits: Record<string, number>;
-  popular: boolean;
-  savings_percentage: number;
+  price: number;
+  currency: string;
+  interval: string;
+  features: string[];
+  limits: {
+    ai_chats: number;
+    resume_parsing: number;
+    job_matching: number;
+  };
+}
+
+interface UserSubscription {
+  userId: string;
+  plan: string;
+  status: string;
+  currentUsage: {
+    ai_chats: number;
+    resume_parsing: number;
+    job_matching: number;
+  };
+  nextBillingDate: string | null;
+  createdAt: string;
 }
 
 export function useSubscription() {
   const { user } = useAuth();
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
-  const [currentPlan, setCurrentPlan] = useState<string>('free');
+  const [userSubscription, setUserSubscription] = useState<UserSubscription | null>(null);
+  const [loading, setLoading] = useState(true);
   const [usageSummary, setUsageSummary] = useState<UsageSummary | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch subscription plans
-  const fetchPlans = useCallback(async () => {
+  useEffect(() => {
+    if (user) {
+      fetchSubscriptionData();
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
+
+  const fetchSubscriptionData = async () => {
     try {
-      const response = await fetch('/api/subscription/plans');
+      const response = await fetch(`/api/subscriptions?userId=${user?.id || 'anonymous'}`);
       if (response.ok) {
         const data = await response.json();
-        setPlans(data);
-      } else {
-        setError('Failed to fetch subscription plans');
+        setPlans(data.plans);
+        setUserSubscription(data.userSubscription);
       }
-    } catch (err) {
-      setError('Error fetching subscription plans');
-      console.error('Error fetching plans:', err);
+    } catch (error) {
+      console.error('Error fetching subscription data:', error);
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  };
+
+  const currentPlan = userSubscription?.plan || 'free';
+
+  const canUseFeature = (feature: 'ai_chats' | 'resume_parsing' | 'job_matching'): boolean => {
+    if (!userSubscription) return false;
+    
+    const plan = plans.find(p => p.id === currentPlan);
+    if (!plan) return false;
+
+    const limit = plan.limits[feature];
+    const usage = userSubscription.currentUsage[feature];
+
+    // Unlimited features
+    if (limit === -1) return true;
+
+    return usage < limit;
+  };
+
+  const getCurrentUsage = (feature: 'ai_chats' | 'resume_parsing' | 'job_matching'): number => {
+    return userSubscription?.currentUsage[feature] || 0;
+  };
+
+  const getLimit = (feature: 'ai_chats' | 'resume_parsing' | 'job_matching'): number => {
+    const plan = plans.find(p => p.id === currentPlan);
+    return plan?.limits[feature] || 0;
+  };
+
+  const upgradePlan = async (planId: string): Promise<boolean> => {
+    try {
+      const response = await fetch('/api/subscriptions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user?.id || 'anonymous',
+          planId
+        }),
+      });
+
+      if (response.ok) {
+        await fetchSubscriptionData();
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error upgrading plan:', error);
+      return false;
+    }
+  };
 
   // Fetch usage summary
   const fetchUsageSummary = useCallback(async () => {
@@ -133,99 +202,12 @@ export function useSubscription() {
     }
   }, [user?.id, currentPlan, fetchUsageSummary]);
 
-  // Upgrade subscription
-  const upgradeSubscription = useCallback(async (planId: string, billingCycle: 'monthly' | 'yearly' = 'monthly') => {
-    if (!user?.id) {
-      setError('User not authenticated');
-      return false;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch('/api/subscription/upgrade', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          plan: planId,
-          userId: user.id,
-          billing_cycle: billingCycle,
-          user_email: user.email || '',
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.checkoutUrl) {
-          // Redirect to PayPal checkout
-          window.location.href = data.checkoutUrl;
-          return true;
-        } else {
-          // Plan updated successfully
-          setCurrentPlan(planId);
-          await fetchUsageSummary();
-          return true;
-        }
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Upgrade failed');
-        return false;
-      }
-    } catch (err) {
-      setError('Upgrade failed. Please try again.');
-      console.error('Error upgrading subscription:', err);
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user?.id, user?.email, fetchUsageSummary]);
-
-  // Check if user can use a feature
-  const canUseFeature = useCallback((feature: string): boolean => {
-    if (!usageSummary) return false;
-    
-    const featureInfo = usageSummary.features[feature];
-    return featureInfo?.allowed || false;
-  }, [usageSummary]);
-
-  // Get remaining usage for a feature
-  const getRemainingUsage = useCallback((feature: string): number => {
-    if (!usageSummary) return 0;
-    
-    const featureInfo = usageSummary.features[feature];
-    return featureInfo?.remaining || 0;
-  }, [usageSummary]);
-
-  // Get current usage for a feature
-  const getCurrentUsage = useCallback((feature: string): number => {
-    if (!usageSummary) return 0;
-    
-    const featureInfo = usageSummary.features[feature];
-    return featureInfo?.current_usage || 0;
-  }, [usageSummary]);
-
-  // Get limit for a feature
-  const getLimit = useCallback((feature: string): number => {
-    if (!usageSummary) return 0;
-    
-    const featureInfo = usageSummary.features[feature];
-    return featureInfo?.limit || 0;
-  }, [usageSummary]);
-
   // Initialize subscription data
   useEffect(() => {
     if (user?.subscription?.plan) {
       setCurrentPlan(user.subscription.plan);
     }
   }, [user?.subscription?.plan]);
-
-  // Fetch plans on mount
-  useEffect(() => {
-    fetchPlans();
-  }, [fetchPlans]);
 
   // Fetch usage summary when user or plan changes
   useEffect(() => {
@@ -235,27 +217,21 @@ export function useSubscription() {
   }, [user?.id, currentPlan, fetchUsageSummary]);
 
   return {
-    // State
     plans,
+    userSubscription,
     currentPlan,
+    loading,
     usageSummary,
     isLoading,
     error,
-    
-    // Actions
-    fetchPlans,
+    canUseFeature,
+    getCurrentUsage,
+    getLimit,
+    upgradePlan,
     fetchUsageSummary,
     checkUsage,
     trackUsage,
-    upgradeSubscription,
-    
-    // Utility functions
-    canUseFeature,
-    getRemainingUsage,
-    getCurrentUsage,
-    getLimit,
-    
-    // Clear error
+    refresh: fetchSubscriptionData,
     clearError: () => setError(null),
   };
 } 
