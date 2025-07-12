@@ -2,19 +2,23 @@
 
 import React, { useState } from "react";
 import { useAuth } from "@/components/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const { login, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    const success = await login(email, password);
-    if (!success) {
-      setError("Invalid email or password. Please try again.");
+    try {
+      await login(email, password);
+      router.push('/dashboard');
+    } catch (error) {
+      setError("Login failed. Please try again.");
     }
   };
 
@@ -48,7 +52,7 @@ export default function LoginPage() {
         </button>
       </form>
       <div className="mt-4 text-gray-400 text-sm">
-        Don&apos;t have an account? <a href="/signup" className="text-blue-400 hover:underline">Sign up</a>
+        Don't have an account? <a href="/signup" className="text-blue-400 hover:underline">Sign up</a>
       </div>
     </div>
   );

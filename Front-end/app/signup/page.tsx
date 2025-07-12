@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useAuth } from "@/components/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
   const { register, loading } = useAuth();
@@ -10,16 +11,20 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess(false);
-    const result = await register(email, password, name);
-    if (result === false) {
-      setError("Registration failed. Please try again.");
-    } else {
+    try {
+      await register(email, password, name);
       setSuccess(true);
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 2000);
+    } catch (error) {
+      setError("Registration failed. Please try again.");
     }
   };
 
@@ -52,7 +57,7 @@ export default function SignupPage() {
           required
         />
         {error && <div className="text-red-500 text-sm">{error}</div>}
-        {success && <div className="text-green-500 text-sm">Registration successful! You can now <a href="/login" className="underline">sign in</a>.</div>}
+        {success && <div className="text-green-500 text-sm">Registration successful! Redirecting to dashboard...</div>}
         <button
           type="submit"
           className="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition"
