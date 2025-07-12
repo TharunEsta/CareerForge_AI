@@ -2,7 +2,7 @@
 import React, { useRef, useState } from 'react';
 import { Mic, Send, Paperclip, Loader2, Search, RefreshCw, Sparkles, Globe, AudioLines } from 'lucide-react';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuItem } from './ui/dropdown-menu';
-import { useChatStore, ModelType } from '@/app/context/ChatStore';
+import { ChatState, useChatStore, ModelType, PromptTemplate } from '@/app/context/ChatStore';
 import { UpgradeModal } from './UpgradeModal';
 
 interface ChatBarProps {

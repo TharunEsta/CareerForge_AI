@@ -82,10 +82,10 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
       await resumeParser.parseResume(uploadedFile);
       if (resumeParser.parsedData) {
         onAnalysis({
-          skills: resumeParser.parsedData.skills || [],
-          experience: resumeParser.parsedData.experience?.join(', ') || '',
-          education: resumeParser.parsedData.education || '',
-          recommendations: resumeParser.parsedData.recommendations || [],
+          skills: resumeParser.parsedData?.skills || [],
+          experience: resumeParser.parsedData?.experience?.join(', ') || '',
+          education: resumeParser.parsedData?.education || '',
+          recommendations: resumeParser.parsedData?.recommendations || [],
         });
         const newCount = usageCount + 1;
         setUsageCount(newCount);

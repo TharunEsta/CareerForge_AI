@@ -1,10 +1,11 @@
-"use client";
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+'use client';
+
+import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sun, Moon, Plus, History, UserCircle, Cog, Zap, Home, DollarSign } from 'lucide-react';
+import { Sun, Moon, Plus, History, UserCircle, Cog, Zap, Home, DollarSign, Upload, Briefcase, Settings } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Command, CommandInput, CommandList, CommandItem } from 'cmdk';
+import { AnimatePresence, motion } from 'framer-motion';
+import * as Cmdk from 'cmdk';
 
 const actions = [
   { label: 'Home', icon: <Home size={18} />, action: (router: any) => router.push('/') },
@@ -18,17 +19,17 @@ const actions = [
 ];
 
 const commands = [
-  { label: 'New Chat', action: () => window.location.href = '/chat' },
-  { label: 'Resume Upload', action: () => window.location.href = '/resume-upload' },
-  { label: 'Job Matches', action: () => window.location.href = '/job-matches' },
-  { label: 'Settings', action: () => window.location.href = '/settings' },
+  { label: 'New Chat', icon: <Plus size={18} />, action: () => window.location.href = '/chat' },
+  { label: 'Resume Upload', icon: <Upload size={18} />, action: () => window.location.href = '/resume-upload' },
+  { label: 'Job Matches', icon: <Briefcase size={18} />, action: () => window.location.href = '/job-matches' },
+  { label: 'Settings', icon: <Settings size={18} />, action: () => window.location.href = '/settings' },
 ];
 
 export const CommandPalette: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [highlighted, setHighlighted] = useState(0);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [filtered, setFiltered] = useState(commands);
@@ -36,9 +37,9 @@ export const CommandPalette: React.FC = () => {
   const handleAction = useCallback((action: { label: string; icon: React.ReactNode; action: () => void }) => {
     if (!action) return;
     if (action.label === 'Toggle Theme') {
-      action.action(router, setTheme, theme);
+      action.action();
     } else {
-      action.action(router, setTheme, theme);
+      action.action();
       setOpen(false);
     }
   }, [router, setTheme, theme]);
@@ -55,7 +56,7 @@ export const CommandPalette: React.FC = () => {
         } else if (e.key === 'ArrowUp') {
           setHighlighted((h) => Math.max(h - 1, 0));
         } else if (e.key === 'Enter') {
-          handleAction(filtered[highlighted]);
+          if (filtered[highlighted]) handleAction(filtered[highlighted]);
         } else if (e.key === 'Escape') {
           setOpen(false);
         }

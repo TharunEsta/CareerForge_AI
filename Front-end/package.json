@@ -16,7 +16,7 @@
     "@radix-ui/react-tabs": "^1.1.12",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
-    "cmdk": "^0.2.0",
+    "cmdk": "^0.2.1",
     "date-fns": "^2.30.0",
     "framer-motion": "^10.18.0",
     "lucide-react": "^0.294.0",
@@ -31,7 +31,8 @@
     "tailwind-merge": "^2.0.0",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.8.0",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@types/node": "^20",
