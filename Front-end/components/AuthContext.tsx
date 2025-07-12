@@ -25,14 +25,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing user session
-    const savedUser = localStorage.getItem('careerforge-user');
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (error) {
-        console.error('Error parsing saved user:', error);
-        localStorage.removeItem('careerforge-user');
+    // Check for existing user session only on client side
+    if (typeof window !== 'undefined') {
+      const savedUser = localStorage.getItem('careerforge-user');
+      if (savedUser) {
+        try {
+          setUser(JSON.parse(savedUser));
+        } catch (error) {
+          console.error('Error parsing saved user:', error);
+          localStorage.removeItem('careerforge-user');
+        }
       }
     }
     setLoading(false);
@@ -53,7 +55,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
       
       setUser(mockUser);
-      localStorage.setItem('careerforge-user', JSON.stringify(mockUser));
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('careerforge-user', JSON.stringify(mockUser));
+      }
     } catch (error) {
       console.error('Login error:', error);
       throw new Error('Login failed');
@@ -64,7 +68,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('careerforge-user');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('careerforge-user');
+    }
   };
 
   const register = async (email: string, password: string, name: string) => {
@@ -82,7 +88,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
       
       setUser(mockUser);
-      localStorage.setItem('careerforge-user', JSON.stringify(mockUser));
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('careerforge-user', JSON.stringify(mockUser));
+      }
     } catch (error) {
       console.error('Registration error:', error);
       throw new Error('Registration failed');

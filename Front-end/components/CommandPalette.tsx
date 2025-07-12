@@ -6,25 +6,7 @@ import { useTheme } from 'next-themes';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Command, CommandInput, CommandList, CommandItem } from 'cmdk';
 
-const actions = [
-  { label: 'Home', icon: <Home size={18} />, action: (router: any) => router.push('/') },
-  { label: 'Dashboard', icon: <History size={18} />, action: (router: any) => router.push('/dashboard') },
-  { label: 'New Chat', icon: <Plus size={18} />, action: (router: any) => router.push('/dashboard') },
-  { label: 'Account', icon: <UserCircle size={18} />, action: (router: any) => router.push('/account') },
-  { label: 'Settings', icon: <Cog size={18} />, action: (router: any) => router.push('/settings') },
-  { label: 'Pricing', icon: <DollarSign size={18} />, action: (router: any) => router.push('/pricing') },
-  { label: 'Get Plus', icon: <Zap size={18} />, action: (router: any) => router.push('/pricing') },
-  { label: 'Toggle Theme', icon: <Sun size={18} />, action: (_: any, setTheme: any, theme: string) => setTheme(theme === 'dark' ? 'light' : 'dark') },
-];
-
-const commands = [
-  { label: 'New Chat', action: () => window.location.href = '/chat' },
-  { label: 'Resume Upload', action: () => window.location.href = '/resume-upload' },
-  { label: 'Job Matches', action: () => window.location.href = '/job-matches' },
-  { label: 'Settings', action: () => window.location.href = '/settings' },
-];
-
-interface CommandItem {
+interface CommandItemType {
   id: string;
   title: string;
   description: string;
@@ -52,7 +34,7 @@ export function CommandPalette() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const commands: CommandItem[] = [
+  const commands: CommandItemType[] = [
     {
       id: 'home',
       title: 'Go to Home',
