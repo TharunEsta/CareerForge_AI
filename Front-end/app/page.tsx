@@ -22,6 +22,7 @@ import {
   Briefcase,
   CreditCard,
   HelpCircle,
+  Sparkles,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import VoiceAssistant from '@/components/VoiceAssistant';
@@ -30,6 +31,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import SubscriptionCards from '@/components/ui/SubscriptionCards';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useRouter } from 'next/navigation';
 
 interface Message {
   id: string;
@@ -60,9 +62,10 @@ export default function AppPage() {
     error: subscriptionError
   } = useSubscription();
 
-  // TODO: Replace with real subscription check
-  const hasVoiceSubscription =
-    user?.subscription?.plan === 'premium' || user?.subscription?.plan === 'enterprise';
+  const router = useRouter();
+
+  // Real subscription check using the subscription system
+  const hasVoiceSubscription = canUseFeature('voice_assistant');
 
   const handleVoiceClick = () => {
     if (!hasVoiceSubscription) {
@@ -181,6 +184,15 @@ export default function AppPage() {
       setShowSubscriptionCards(false);
     }
   };
+
+  React.useEffect(() => {
+    // Redirect to dashboard after a brief delay
+    const timer = setTimeout(() => {
+      router.push('/dashboard');
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [router]);
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-gray-900">

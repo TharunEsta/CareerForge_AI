@@ -3,6 +3,12 @@
 import * as React from 'react';
 import { motion } from 'framer-motion';
 import { cva, type VariantProps } from 'class-variance-authority';
+<<<<<<< HEAD
+=======
+import { motion, AnimatePresence } from 'framer-motion';
+import { Home, LayoutDashboard, DollarSign, Settings, HelpCircle, User } from 'lucide-react';
+
+>>>>>>> 302f3f2770197901b6cc30f3e45f07976c933ba4
 import { cn } from '@/lib/utils';
 import { Logo } from './logo';
 
@@ -118,3 +124,64 @@ export const SidebarWithLogo: React.FC<SidebarProps> = ({
     {children}
   </Sidebar>
 );
+<<<<<<< HEAD
+=======
+
+export default function Sidebar({ collapsed, onToggle, open }: { collapsed: boolean; onToggle: () => void; open: boolean }) {
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.aside
+          initial={{ x: -300, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: -300, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          className={`fixed md:static left-0 top-0 z-50 flex flex-col h-screen bg-[#18181b] text-white border-r border-gray-800 transition-all duration-300 ${collapsed ? 'w-20 p-2' : 'w-64 p-6'}`}
+        >
+          {/* Collapse/Expand button (desktop only) */}
+          <button
+            className="hidden md:block absolute top-4 right-2 z-50 p-1 rounded hover:bg-gray-700 transition"
+            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            onClick={onToggle}
+            type="button"
+          >
+            {collapsed ? <LayoutDashboard size={18} /> : <Home size={18} />}
+          </button>
+          {/* Logo and Brand */}
+          <div className="flex items-center gap-3 mb-8">
+            <Logo size="md" />
+            {!collapsed && <span className="font-bold text-xl">CareerForge</span>}
+          </div>
+          {/* Navigation */}
+          <nav className="flex flex-col gap-2">
+            <SidebarLink icon={<Home />} label="Home" href="/" collapsed={collapsed} />
+            <SidebarLink icon={<LayoutDashboard />} label="Dashboard" href="/dashboard" collapsed={collapsed} />
+            <SidebarLink icon={<DollarSign />} label="Pricing" href="/pricing" collapsed={collapsed} />
+            <SidebarLink icon={<Settings />} label="Settings" href="/settings" collapsed={collapsed} />
+            <SidebarLink icon={<HelpCircle />} label="Help" href="/help" collapsed={collapsed} />
+          </nav>
+          {/* User Section */}
+          <div className="mt-auto flex flex-col items-center gap-2 py-6">
+            <div className="bg-gray-700 rounded-full w-12 h-12 flex items-center justify-center text-lg">U</div>
+            {!collapsed && <span>User</span>}
+            {!collapsed && <span className="bg-blue-700 text-xs px-3 py-1 rounded-full mt-1">FREE Plan</span>}
+          </div>
+        </motion.aside>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function SidebarLink({ icon, label, href, collapsed }: { icon: React.ReactNode; label: string; href: string; collapsed: boolean }) {
+  return (
+    <a
+      href={href}
+      className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-600 transition-all ${collapsed ? 'justify-center' : ''}`}
+    >
+      {icon}
+      {!collapsed && <span>{label}</span>}
+    </a>
+  );
+}
+
+>>>>>>> 302f3f2770197901b6cc30f3e45f07976c933ba4
