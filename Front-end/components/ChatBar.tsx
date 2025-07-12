@@ -69,17 +69,19 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
   };
 
   const handleSend = () => {
-    if (!input.trim() && !file) return;
-    onSend(input.trim(), file);
-    setInput('');
-    setFile(null);
-    if (inputRef.current) inputRef.current.focus();
+    if (input.trim()) {
+      onSend(input.trim(), file || undefined);
+      setInput('');
+      setFile(null);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      onSend(input.trim(), file || undefined);
+      setInput('');
+      setFile(null);
     }
   };
 
