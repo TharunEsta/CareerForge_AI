@@ -28,7 +28,6 @@ from fastapi import (
     Header,
     HTTPException,
     Path,
-    Query,
     Request,
     UploadFile,
     status,
@@ -49,11 +48,9 @@ from fastapi.responses import JSONResponse
 
 # Local application imports
 from models import RevokedToken, SessionLocal
-from payment_router import router as payment_router
 from realtime_router import router as realtime_router
 from schemas import User as UserModel
 from skills_jobs_router import router as skills_jobs_router
-from subscription_router import router as subscription_router
 from utils import (
     allowed_file,
     parse_resume,
@@ -61,11 +58,11 @@ from utils import (
     setup_logging,
 )
 from usage_tracker import usage_tracker
-from paypal_webhook import router as webhook_router
 
 # Load environment variables (must come *after* all imports)
 load_dotenv("key.env")
 load_dotenv(".env")
+load_dotenv(".env.local")
 
 # Setup uploads directory
 uploads_dir = "uploads"
@@ -108,11 +105,8 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(payment_router, prefix="/api/payment", tags=["payment"])
 app.include_router(skills_jobs_router, prefix="/api/skills-jobs", tags=["skills-jobs"])
 app.include_router(realtime_router, prefix="/api/realtime", tags=["realtime"])
-app.include_router(subscription_router, prefix="/api/subscription", tags=["subscription"])
-app.include_router(webhook_router, prefix="/api/paypal-webhook", tags=["paypal-webhook"])
 
 # Security & Config
 SECRET_KEY = os.getenv("SECRET_KEY", "secret")
@@ -488,22 +482,7 @@ async def get_parsed_resume(current_user: User = Depends(get_current_user)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/search_subscriptions")
-def search_subscriptions(query: str = Query(...)):
-    results = []
-    for email, data in users_db.items():
-        if (
-            query.lower() in email.lower()
-            or query.lower() in data.get("plan", "").lower()
-            or query.lower() in data.get("full_name", "").lower()
-        ):
-            results.append({
-                "email": email,
-                "full_name": data.get("full_name", ""),
-                "plan": data.get("plan", ""),
-                "credits": data.get("credits", 0)
-            })
-    return results
+
 
 @app.post("/signup", response_model=User)
 async def signup(email: str = None, password: str = None, full_name: str = None):
@@ -690,31 +669,6 @@ async def chat_with_resume(prompt: str = None, resume_text: str = None, current_
         raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e
-
-@app.get("/api/user/plan")
-def get_user_plan(current_user: dict = None):
-    if current_user is None:
-        current_user = Depends(get_current_user)
-    email = current_user.get("email")
-    user = users_db.get(email)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return {"plan": user.get("plan", "free")}
-
-@app.post("/api/user/upgrade")
-def upgrade_user_plan(plan: str = None, current_user: dict = None):
-    if plan is None:
-        plan = Body(..., embed=True)
-    if current_user is None:
-        current_user = Depends(get_current_user)
-    email = current_user.get("email")
-    user = users_db.get(email)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    if plan not in ["free", "basic", "premium"]:
-        raise HTTPException(status_code=400, detail="Invalid plan")
-    user["plan"] = plan
-    return {"message": f"Plan upgraded to {plan}"}
 
 @app.post("/cover-letter-rewrite")
 async def cover_letter_rewrite(resume_data: dict = None, job_description: str = None, original_cover_letter: str = None):

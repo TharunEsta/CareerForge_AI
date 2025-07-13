@@ -54,16 +54,7 @@ export function CommandPalette() {
         setIsOpen(false);
       }
     },
-    {
-      id: 'pricing',
-      title: 'View Pricing',
-      description: 'See subscription plans',
-      icon: <CreditCard size={16} />,
-      action: () => {
-        router.push('/pricing');
-        setIsOpen(false);
-      }
-    },
+
     {
       id: 'settings',
       title: 'Open Settings',

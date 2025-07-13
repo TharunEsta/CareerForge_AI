@@ -4,16 +4,13 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { User, Mail, Calendar, Shield, CreditCard, Download, Trash2 } from 'lucide-react';
 import { useAuth } from '@/components/AuthContext';
-import { useSubscription } from '@/hooks/useSubscription';
 
 export default function AccountPage() {
   const { user, logout } = useAuth();
-  const { currentPlan, userSubscription } = useSubscription();
   const [activeTab, setActiveTab] = useState('overview');
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: User },
-    { id: 'billing', label: 'Billing', icon: CreditCard },
     { id: 'security', label: 'Security', icon: Shield },
   ];
 
@@ -149,80 +146,6 @@ export default function AccountPage() {
                           </div>
                           <div className="text-gray-400 text-sm">Job Matches</div>
                         </div>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {activeTab === 'billing' && (
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="space-y-6"
-                >
-                  <div>
-                    <h2 className="text-2xl font-bold text-white mb-6">Billing & Subscription</h2>
-                    
-                    <div className="space-y-6">
-                      {/* Current Plan */}
-                      <div className="bg-gray-700/50 rounded-xl p-6">
-                        <h3 className="text-lg font-semibold text-white mb-4">Current Plan</h3>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="text-xl font-bold text-white">{currentPlan.toUpperCase()} Plan</div>
-                            <div className="text-gray-400 text-sm">
-                              {currentPlan === 'free' ? 'Free forever' : '$19/month'}
-                            </div>
-                          </div>
-                          <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-                            {currentPlan === 'free' ? 'Upgrade Plan' : 'Change Plan'}
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Payment Method */}
-                      <div className="bg-gray-700/50 rounded-xl p-6">
-                        <h3 className="text-lg font-semibold text-white mb-4">Payment Method</h3>
-                        {currentPlan === 'free' ? (
-                          <p className="text-gray-400">No payment method required for free plan</p>
-                        ) : (
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                              <div className="w-8 h-8 bg-blue-500 rounded flex items-center justify-center">
-                                <CreditCard className="w-4 h-4 text-white" />
-                              </div>
-                              <div>
-                                <div className="text-white font-medium">•••• •••• •••• 4242</div>
-                                <div className="text-gray-400 text-sm">Expires 12/25</div>
-                              </div>
-                            </div>
-                            <button className="text-blue-400 hover:text-blue-300 text-sm">
-                              Update
-                            </button>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Billing History */}
-                      <div className="bg-gray-700/50 rounded-xl p-6">
-                        <h3 className="text-lg font-semibold text-white mb-4">Billing History</h3>
-                        {currentPlan === 'free' ? (
-                          <p className="text-gray-400">No billing history for free plan</p>
-                        ) : (
-                          <div className="space-y-3">
-                            <div className="flex items-center justify-between py-2 border-b border-gray-600">
-                              <div>
-                                <div className="text-white font-medium">Plus Plan - Monthly</div>
-                                <div className="text-gray-400 text-sm">January 2024</div>
-                              </div>
-                              <div className="text-right">
-                                <div className="text-white font-medium">$19.00</div>
-                                <div className="text-green-400 text-sm">Paid</div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>

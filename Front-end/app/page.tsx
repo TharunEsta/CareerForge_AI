@@ -1,6 +1,40 @@
+<<<<<<< HEAD
 "use client";
 
 import React, { useState, useEffect } from 'react';
+=======
+'use client';
+import * as React from 'react';
+import { Logo } from '@/components/ui/logo';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import {
+  Mic,
+  Plus,
+  User,
+  LogOut,
+  Upload,
+  MessageSquare,
+  Home,
+  Globe,
+  Layers,
+  ArrowUpRight,
+  Download,
+  Star,
+  Settings,
+  Send,
+  FileText,
+  Briefcase,
+  CreditCard,
+  HelpCircle,
+  Sparkles,
+} from 'lucide-react';
+import { motion } from 'framer-motion';
+import VoiceAssistant from '@/components/VoiceAssistant';
+import { useAuth } from '@/components/AuthContext';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+>>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -81,10 +115,10 @@ export default function HomePage() {
   } = useSubscription();
 
   const [showVoice, setShowVoice] = React.useState(false);
-  const [showSubWarning, setShowSubWarning] = React.useState(false);
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [input, setInput] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
+<<<<<<< HEAD
   const [showSubscriptionCards, setShowSubscriptionCards] = React.useState(false);
 
   // Mock usage data for now
@@ -92,14 +126,25 @@ export default function HomePage() {
     ai_chats: { used: 5, limit: 10 },
     resume_parsing: { used: 2, limit: 5 },
     job_matching: { used: 1, limit: 3 }
+=======
+  
+  const router = useRouter();
+
+  const handleVoiceClick = () => {
+    setShowVoice(true);
+>>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
   };
 
   const hasVoiceSubscription = subscriptionCanUseFeature('ai_chats');
 
+<<<<<<< HEAD
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
 
     const newMessage: Message = {
+=======
+    const userMessage: Message = {
+>>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
       id: Date.now().toString(),
       content,
       role: 'user',
@@ -110,9 +155,40 @@ export default function HomePage() {
     setInput('');
     setIsLoading(true);
 
+<<<<<<< HEAD
     // Mock AI response
     setTimeout(() => {
       const aiResponse: Message = {
+=======
+    try {
+      // Send message to AI
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: input,
+          userId: 'user123', // Replace with actual user ID
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          content: data.response,
+          role: 'assistant',
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, assistantMessage]);
+      } else {
+        throw new Error('Failed to get response');
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      const errorMessage: Message = {
+>>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
         id: (Date.now() + 1).toString(),
         content: `I understand you said: "${content}". How can I help you with your career goals?`,
         role: 'assistant',
@@ -130,14 +206,32 @@ export default function HomePage() {
     }
   };
 
+<<<<<<< HEAD
   const checkFeatureAccess = (feature: 'ai_chats' | 'resume_parsing' | 'job_matching') => {
     if (!subscriptionCanUseFeature(feature)) {
       setShowSubWarning(true);
       return false;
+=======
+  const handleFeatureClick = async (feature: string) => {
+    // Handle different features
+    switch (feature) {
+      case 'resume_parsing':
+        // Handle resume upload
+        break;
+      case 'job_matching':
+        // Handle job matching
+        break;
+      case 'voice_assistant':
+        // Handle voice assistant
+        break;
+      default:
+        break;
+>>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
     }
     return true;
   };
 
+<<<<<<< HEAD
   const features = [
     {
       id: 'ai_chats',
@@ -185,6 +279,16 @@ export default function HomePage() {
       color: 'text-orange-500'
     }
   ];
+=======
+  React.useEffect(() => {
+    // Redirect to dashboard after a brief delay
+    const timer = setTimeout(() => {
+      router.push('/dashboard');
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [router]);
+>>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -220,6 +324,7 @@ export default function HomePage() {
         </div>
       </header>
 
+<<<<<<< HEAD
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}
@@ -243,10 +348,48 @@ export default function HomePage() {
               className="px-8 py-3 rounded-lg border border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white transition-colors"
             >
               View Plans
+=======
+        {/* Navigation */}
+        <nav className="flex-1 p-4 space-y-2">
+          <a href="/" className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+            <Home className="w-5 h-5" />
+            <span>Home</span>
+          </a>
+          <a href="/dashboard" className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+            <Briefcase className="w-5 h-5" />
+            <span>Dashboard</span>
+          </a>
+          <a href="/pricing" className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+            <CreditCard className="w-5 h-5" />
+            <span>Pricing</span>
+          </a>
+          <a href="/settings" className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+            <Settings className="w-5 h-5" />
+            <span>Settings</span>
+          </a>
+          <a href="/help" className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+            <HelpCircle className="w-5 h-5" />
+            <span>Help</span>
+          </a>
+        </nav>
+
+        {/* User Info */}
+        <div className="p-4 border-t border-gray-800">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
+              <span className="text-white text-sm">U</span>
+            </div>
+            <div className="flex-1">
+              <p className="text-white text-sm font-medium">User</p>
+            </div>
+            <button className="text-gray-400 hover:text-white">
+              <LogOut className="w-4 h-4" />
+>>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
             </button>
           </div>
         </div>
 
+<<<<<<< HEAD
         {/* Features Grid */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           {features.map((feature) => (
@@ -266,6 +409,13 @@ export default function HomePage() {
               </div>
             </motion.div>
           ))}
+=======
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-800">
+          <h1 className="text-xl font-semibold text-white">CareerForge AI</h1>
+>>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
         </div>
 
         {/* Usage Stats */}
@@ -320,6 +470,7 @@ export default function HomePage() {
             )}
           </div>
 
+<<<<<<< HEAD
           {/* Input */}
           <div className="flex space-x-4">
             <input
@@ -408,6 +559,47 @@ export default function HomePage() {
                 </div>
               </motion.div>
             </motion.div>
+=======
+          {/* Feature Icons */}
+          {messages.length > 0 && (
+            <div className="flex justify-center space-x-4 p-4 border-t border-gray-800">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleFeatureClick('resume_parsing')}
+                className="text-gray-400 hover:text-white"
+              >
+                <FileText className="w-5 h-5 mr-2" />
+                Resume
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleFeatureClick('job_matching')}
+                className="text-gray-400 hover:text-white"
+              >
+                <Briefcase className="w-5 h-5 mr-2" />
+                Jobs
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleFeatureClick('voice_assistant')}
+                className="text-gray-400 hover:text-white"
+              >
+                <Mic className="w-5 h-5 mr-2" />
+                Voice
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-gray-400 hover:text-white"
+              >
+                <Upload className="w-5 h-5 mr-2" />
+                Upload
+              </Button>
+            </div>
+>>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
           )}
         </AnimatePresence>
 
@@ -428,6 +620,7 @@ export default function HomePage() {
                 className="bg-gray-900 rounded-2xl p-8 max-w-md w-full"
                 onClick={(e) => e.stopPropagation()}
               >
+<<<<<<< HEAD
                 <div className="text-center">
                   <AlertCircle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
                   <h3 className="text-2xl font-bold mb-4">Upgrade Required</h3>
@@ -459,6 +652,14 @@ export default function HomePage() {
       </main>
 
       <CommandPalette />
+=======
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+>>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
     </div>
   );
 }

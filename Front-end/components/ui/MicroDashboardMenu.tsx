@@ -40,7 +40,7 @@ export default function MicroDashboardMenu() {
             <span className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-1">
               {'FREE'} PLAN
             </span>
-          </DropdownMenuLabel>
+           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <a href="/profile" className="w-full block text-sm">
