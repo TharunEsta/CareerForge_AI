@@ -59,7 +59,7 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
     recognition.onresult = (event: any) => {
       const text = event.results[0][0].transcript;
       setInput(text);
-      onSend(text, file);
+      onSend(text, file || undefined);
       setListening(false);
     };
     recognition.onerror = () => setListening(false);
@@ -85,15 +85,14 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFile(file);
-      // Auto-send file upload message
-      onSend(`Uploaded file: ${file.name}`, file);
-    }
-  };
-
+  // Fix the file handling
+const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const selectedFile = e.target.files?.[0];
+  if (selectedFile) {
+    setFile(selectedFile);
+    onSend(`Uploaded file: ${selectedFile.name}`, selectedFile);
+  }
+};
   // Implement rephrase logic
   const handleRephrase = () => {
     if (!input.trim()) {
@@ -253,12 +252,12 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className={`p-3 rounded-xl transition-all duration-200 ${
-                loading || (!input.trim() && !file)
+                loading || (!input.trim() && !file || undefined)
                   ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                   : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl'
               }`}
               onClick={handleSend}
-              disabled={loading || (!input.trim() && !file)}
+              disabled={loading || (!input.trim() && !file || undefined)}
               aria-label="Send message"
               type="button"
             >

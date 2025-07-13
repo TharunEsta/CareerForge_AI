@@ -1,24 +1,6 @@
 "use client";
 
 import React from 'react';
-import { ThemeProvider } from 'next-themes';
-import { AuthProvider } from '@/components/AuthContext';
-import { CommandPalette } from '@/components/CommandPalette';
-
-export default function ClientLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <AuthProvider>
-        {children}
-        <CommandPalette />
-      </AuthProvider>
-    </ThemeProvider>
-  );
-
-import React from 'react'
-import { AuthProvider } from '@/context/AuthContext'
-import SplashScreen from '@/components/SplashScreen'
-import React from 'react';
 import { useTheme } from 'next-themes';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -68,51 +50,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     };
   }, [sidebarOpen]);
 
-  // Handler for New Chat
-  const handleNewChat = () => {
-    // Reset chat state by clearing messages and redirecting to dashboard
-    if (typeof window !== 'undefined') {
-      // Clear chat store
-      const chatStore = JSON.parse(localStorage.getItem('chat-storage') || '{}');
-      chatStore.messages = [];
-      localStorage.setItem('chat-storage', JSON.stringify(chatStore));
-    }
-    router.push('/dashboard');
-    setSidebarOpen(false);
-  };
-
-  // Handler for Previous Chats
-  const handlePreviousChats = () => {
-    // Open chat history by navigating to dashboard with history parameter
-    router.push('/dashboard?history=1');
-    setSidebarOpen(false);
-  };
-
-  // Handler for Account
-  const handleAccount = () => {
-    router.push('/account');
-    setSidebarOpen(false);
-  };
-
-  // Handler for Settings
-  const handleSettings = () => {
-    router.push('/settings');
-    setSidebarOpen(false);
-  };
-
-  // Handler for Get Plus
-  const handleGetPlus = () => {
-    router.push('/pricing');
-    setSidebarOpen(false);
-  };
-
   return (
-
-    <>
-      <SplashScreen />
-      <AuthProvider>{children}</AuthProvider>
-    </>
-  )
     <Providers>
       {showSplash && <SplashScreen />}
       <ErrorBoundary>
@@ -171,28 +109,30 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                 </div>
 
                 {/* Navigation */}
-                <SidebarNav className="flex-1">
-                  <SidebarNavItem onClick={() => { router.push('/'); setSidebarOpen(false); }}>
-                    <SidebarNavItemIcon><Home size={20} /></SidebarNavItemIcon>
-                    <SidebarNavItemText>Home</SidebarNavItemText>
-                  </SidebarNavItem>
-                  <SidebarNavItem onClick={() => { router.push('/dashboard'); setSidebarOpen(false); }}>
-                    <SidebarNavItemIcon><Briefcase size={20} /></SidebarNavItemIcon>
-                    <SidebarNavItemText>Dashboard</SidebarNavItemText>
-                  </SidebarNavItem>
-                  <SidebarNavItem onClick={() => { router.push('/pricing'); setSidebarOpen(false); }}>
-                    <SidebarNavItemIcon><CreditCard size={20} /></SidebarNavItemIcon>
-                    <SidebarNavItemText>Pricing</SidebarNavItemText>
-                  </SidebarNavItem>
-                  <SidebarNavItem onClick={() => { router.push('/settings'); setSidebarOpen(false); }}>
-                    <SidebarNavItemIcon><Settings size={20} /></SidebarNavItemIcon>
-                    <SidebarNavItemText>Settings</SidebarNavItemText>
-                  </SidebarNavItem>
-                  <SidebarNavItem onClick={() => { router.push('/help'); setSidebarOpen(false); }}>
-                    <SidebarNavItemIcon><HelpCircle size={20} /></SidebarNavItemIcon>
-                    <SidebarNavItemText>Help</SidebarNavItemText>
-                  </SidebarNavItem>
-                </SidebarNav>
+                <div className="flex-1">
+                  <SidebarNav>
+                    <SidebarNavItem onClick={() => { router.push('/'); setSidebarOpen(false); }}>
+                      <SidebarNavItemIcon><Home size={20} /></SidebarNavItemIcon>
+                      <SidebarNavItemText>Home</SidebarNavItemText>
+                    </SidebarNavItem>
+                    <SidebarNavItem onClick={() => { router.push('/dashboard'); setSidebarOpen(false); }}>
+                      <SidebarNavItemIcon><Briefcase size={20} /></SidebarNavItemIcon>
+                      <SidebarNavItemText>Dashboard</SidebarNavItemText>
+                    </SidebarNavItem>
+                    <SidebarNavItem onClick={() => { router.push('/pricing'); setSidebarOpen(false); }}>
+                      <SidebarNavItemIcon><CreditCard size={20} /></SidebarNavItemIcon>
+                      <SidebarNavItemText>Pricing</SidebarNavItemText>
+                    </SidebarNavItem>
+                    <SidebarNavItem onClick={() => { router.push('/settings'); setSidebarOpen(false); }}>
+                      <SidebarNavItemIcon><Settings size={20} /></SidebarNavItemIcon>
+                      <SidebarNavItemText>Settings</SidebarNavItemText>
+                    </SidebarNavItem>
+                    <SidebarNavItem onClick={() => { router.push('/help'); setSidebarOpen(false); }}>
+                      <SidebarNavItemIcon><HelpCircle size={20} /></SidebarNavItemIcon>
+                      <SidebarNavItemText>Help</SidebarNavItemText>
+                    </SidebarNavItem>
+                  </SidebarNav>
+                </div>
 
                 {/* User Section */}
                 <div className="border-t border-gray-800 pt-6">

@@ -1,37 +1,43 @@
-'use client';
-import * as React from 'react';
-import { Logo } from '@/components/ui/logo';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import {
-  Mic,
-  Plus,
-  User,
-  LogOut,
-  Upload,
-  MessageSquare,
-  Home,
-  Globe,
-  Layers,
-  ArrowUpRight,
-  Download,
-  Star,
-  Settings,
-  Send,
-  FileText,
-  Briefcase,
-  CreditCard,
-  HelpCircle,
-  Sparkles,
-} from 'lucide-react';
-import { motion } from 'framer-motion';
-import VoiceAssistant from '@/components/VoiceAssistant';
-import { useAuth } from '@/components/AuthContext';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import SubscriptionCards from '@/components/ui/SubscriptionCards';
-import { useSubscription } from '@/hooks/useSubscription';
+"use client";
+
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Home, 
+  Briefcase, 
+  CreditCard, 
+  Settings, 
+  HelpCircle, 
+  LogOut, 
+  UserCircle, 
+  Plus, 
+  History, 
+  Cog, 
+  Menu,
+  X,
+  Sun,
+  Moon,
+  Zap,
+  MessageSquare,
+  FileText,
+  Search,
+  Mic,
+  Upload,
+  Sparkles,
+  Shield,
+  Globe,
+  Clock,
+  TrendingUp,
+  Users,
+  Star,
+  CheckCircle,
+  AlertCircle,
+  Info
+} from 'lucide-react';
+import { useSubscription } from '@/hooks/useSubscription';
+import { useAuth } from '@/components/AuthContext';
+import { CommandPalette } from '@/components/CommandPalette';
 
 interface Message {
   id: string;
@@ -40,394 +46,419 @@ interface Message {
   timestamp: Date;
 }
 
-export default function AppPage() {
-  const { user, logout } = useAuth();
+interface SubscriptionPlan {
+  id: string;
+  name: string;
+  price: number;
+  features: string[];
+  popular?: boolean;
+}
+
+interface UserSubscription {
+  plan: string;
+  status: string;
+  nextBillingDate: string;
+}
+
+interface UsageSummary {
+  ai_chats: { used: number; limit: number };
+  resume_parsing: { used: number; limit: number };
+  job_matching: { used: number; limit: number };
+}
+
+export default function HomePage() {
+  const router = useRouter();
+  const { user } = useAuth();
+  const {
+    plans,
+    userSubscription,
+    currentPlan,
+    loading,
+    usageSummary,
+    error,
+    canUseFeature: subscriptionCanUseFeature,
+    clearError,
+  } = useSubscription();
+
   const [showVoice, setShowVoice] = React.useState(false);
   const [showSubWarning, setShowSubWarning] = React.useState(false);
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [input, setInput] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
   const [showSubscriptionCards, setShowSubscriptionCards] = React.useState(false);
-  
-  const {
-    currentPlan,
-    usageSummary,
-    trackUsage,
-    canUseFeature,
-    getRemainingUsage,
-    getCurrentUsage,
-    getLimit,
-    upgradeSubscription,
-    isLoading: subscriptionLoading,
-    error: subscriptionError
-  } = useSubscription();
 
-  const router = useRouter();
-
-  // Real subscription check using the subscription system
-  const hasVoiceSubscription = canUseFeature('voice_assistant');
-
-  const handleVoiceClick = () => {
-    if (!hasVoiceSubscription) {
-      setShowSubWarning(true);
-    } else {
-      setShowVoice(true);
-    }
+  // Mock usage data for now
+  const mockUsage = {
+    ai_chats: { used: 5, limit: 10 },
+    resume_parsing: { used: 2, limit: 5 },
+    job_matching: { used: 1, limit: 3 }
   };
 
-  const handleSendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+  const hasVoiceSubscription = subscriptionCanUseFeature('ai_chats');
 
-    // Check if user can use AI chat feature
-    if (!canUseFeature('ai_chats')) {
-      setShowSubscriptionCards(true);
-      return;
-    }
+  const handleSendMessage = async (content: string) => {
+    if (!content.trim()) return;
 
-    const userMessage: Message = {
+    const newMessage: Message = {
       id: Date.now().toString(),
-      content: input,
+      content,
       role: 'user',
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages(prev => [...prev, newMessage]);
     setInput('');
     setIsLoading(true);
 
-    try {
-      // Track usage first
-      const usageTracked = await trackUsage('ai_chats');
-      if (!usageTracked) {
-        setShowSubscriptionCards(true);
-        setIsLoading(false);
-        return;
-      }
-
-      // Send message to AI
-      const response = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: input,
-          userId: 'user123', // Replace with actual user ID
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const assistantMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          content: data.response,
-          role: 'assistant',
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, assistantMessage]);
-      } else {
-        throw new Error('Failed to get response');
-      }
-    } catch (error) {
-      console.error('Error sending message:', error);
-      const errorMessage: Message = {
+    // Mock AI response
+    setTimeout(() => {
+      const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
-        content: 'Sorry, I encountered an error. Please try again.',
+        content: `I understand you said: "${content}". How can I help you with your career goals?`,
         role: 'assistant',
         timestamp: new Date()
       };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
+      setMessages(prev => [...prev, aiResponse]);
       setIsLoading(false);
-    }
+    }, 1000);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      handleSendMessage(input);
     }
   };
 
-  const handleFeatureClick = async (feature: string) => {
-    if (!canUseFeature(feature)) {
-      setShowSubscriptionCards(true);
-      return;
+  const checkFeatureAccess = (feature: 'ai_chats' | 'resume_parsing' | 'job_matching') => {
+    if (!subscriptionCanUseFeature(feature)) {
+      setShowSubWarning(true);
+      return false;
     }
-
-    // Track usage and show appropriate UI
-    const usageTracked = await trackUsage(feature);
-    if (!usageTracked) {
-      setShowSubscriptionCards(true);
-      return;
-    }
-
-    // Handle different features
-    switch (feature) {
-      case 'resume_parsing':
-        // Handle resume upload
-        break;
-      case 'job_matching':
-        // Handle job matching
-        break;
-      case 'voice_assistant':
-        // Handle voice assistant
-        break;
-      default:
-        break;
-    }
+    return true;
   };
 
-  const handleUpgrade = async (planId: string) => {
-    const success = await upgradeSubscription(planId);
-    if (success) {
-      setShowSubscriptionCards(false);
+  const features = [
+    {
+      id: 'ai_chats',
+      title: 'AI Career Chat',
+      description: 'Get personalized career advice and guidance',
+      icon: <MessageSquare className="w-6 h-6" />,
+      color: 'from-blue-500 to-purple-600',
+      usage: mockUsage.ai_chats
+    },
+    {
+      id: 'resume_parsing',
+      title: 'Resume Analysis',
+      description: 'Upload and analyze your resume for improvements',
+      icon: <FileText className="w-6 h-6" />,
+      color: 'from-green-500 to-teal-600',
+      usage: mockUsage.resume_parsing
+    },
+    {
+      id: 'job_matching',
+      title: 'Job Matching',
+      description: 'Find jobs that match your skills and experience',
+      icon: <Search className="w-6 h-6" />,
+      color: 'from-orange-500 to-red-600',
+      usage: mockUsage.job_matching
     }
-  };
+  ];
 
-  React.useEffect(() => {
-    // Redirect to dashboard after a brief delay
-    const timer = setTimeout(() => {
-      router.push('/dashboard');
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [router]);
+  const stats = [
+    {
+      label: 'AI Chats Used',
+      value: `${mockUsage.ai_chats.used}/${mockUsage.ai_chats.limit}`,
+      icon: <MessageSquare className="w-4 h-4" />,
+      color: 'text-blue-500'
+    },
+    {
+      label: 'Resume Analysis',
+      value: `${mockUsage.resume_parsing.used}/${mockUsage.resume_parsing.limit}`,
+      icon: <FileText className="w-4 h-4" />,
+      color: 'text-green-500'
+    },
+    {
+      label: 'Job Matches',
+      value: `${mockUsage.job_matching.used}/${mockUsage.job_matching.limit}`,
+      icon: <Search className="w-4 h-4" />,
+      color: 'text-orange-500'
+    }
+  ];
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-gray-900">
-      {/* Vercel-style Sidebar */}
-      <div className="w-64 bg-black/90 border-r border-gray-800 flex flex-col">
-        {/* Logo */}
-        <div className="p-6 border-b border-gray-800">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">CF</span>
+    <div className="min-h-screen bg-gray-900 text-white">
+      {/* Header */}
+      <header className="border-b border-gray-800 bg-gray-900/95 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-4">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <span className="text-white font-bold text-lg">CF</span>
+              </div>
+              <h1 className="text-xl font-semibold">CareerForge AI</h1>
             </div>
-            <span className="text-white font-semibold text-lg">CareerForge</span>
+            
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setShowVoice(true)}
+                disabled={!hasVoiceSubscription}
+                className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <Mic className="w-4 h-4" />
+                <span>Voice Assistant</span>
+              </button>
+              
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors"
+              >
+                Dashboard
+              </button>
+            </div>
           </div>
         </div>
+      </header>
 
-        {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
-          <a href="/" className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
-            <Home className="w-5 h-5" />
-            <span>Home</span>
-          </a>
-          <a href="/dashboard" className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
-            <Briefcase className="w-5 h-5" />
-            <span>Dashboard</span>
-          </a>
-          <a href="/pricing" className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
-            <CreditCard className="w-5 h-5" />
-            <span>Pricing</span>
-          </a>
-          <a href="/settings" className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
-            <Settings className="w-5 h-5" />
-            <span>Settings</span>
-          </a>
-          <a href="/help" className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
-            <HelpCircle className="w-5 h-5" />
-            <span>Help</span>
-          </a>
-        </nav>
-
-        {/* User Info */}
-        <div className="p-4 border-t border-gray-800">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm">U</span>
-            </div>
-            <div className="flex-1">
-              <p className="text-white text-sm font-medium">User</p>
-              <p className="text-gray-400 text-xs">{currentPlan.toUpperCase()} Plan</p>
-            </div>
-            <button className="text-gray-400 hover:text-white">
-              <LogOut className="w-4 h-4" />
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Hero Section */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+            Transform Your Career with AI
+          </h1>
+          <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+            Get personalized career advice, optimize your resume, and find the perfect job matches with our AI-powered platform.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="px-8 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              Get Started
+            </button>
+            <button
+              onClick={() => setShowSubscriptionCards(true)}
+              className="px-8 py-3 rounded-lg border border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white transition-colors"
+            >
+              View Plans
             </button>
           </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-800">
-          <h1 className="text-xl font-semibold text-white">CareerForge AI</h1>
-          {usageSummary && (
-            <div className="flex items-center space-x-4 text-sm text-gray-400">
-              <span>{getCurrentUsage('ai_chats')}/{getLimit('ai_chats')} chats</span>
-            </div>
-          )}
+        {/* Features Grid */}
+        <div className="grid md:grid-cols-3 gap-6 mb-12">
+          {features.map((feature) => (
+            <motion.div
+              key={feature.id}
+              whileHover={{ scale: 1.02 }}
+              className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-gray-600 transition-colors"
+            >
+              <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4`}>
+                {feature.icon}
+              </div>
+              <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+              <p className="text-gray-400 mb-4">{feature.description}</p>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-500">Usage</span>
+                <span className="text-gray-300">{feature.usage.used}/{feature.usage.limit}</span>
+              </div>
+            </motion.div>
+          ))}
         </div>
 
-        {/* Chat Area */}
-        <div className="flex-1 flex flex-col">
-          {/* Messages */}
-          <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${messages.length > 0 ? '' : 'flex items-center justify-center'}`}>
-            {messages.length === 0 ? (
-              <div className="text-center text-gray-400 max-w-md">
-                <MessageSquare className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <h2 className="text-2xl font-semibold mb-2">Welcome to CareerForge AI</h2>
-                <p className="text-gray-500 mb-6">
-                  Your AI-powered career assistant. Ask me anything about resumes, job matching, or career advice.
-                </p>
-                <div className="grid grid-cols-2 gap-4">
-                  <button 
-                    onClick={() => handleFeatureClick('resume_parsing')}
-                    className="p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors text-left"
-                  >
-                    <FileText className="w-6 h-6 mb-2 text-blue-400" />
-                    <h3 className="font-medium text-white">Resume Analysis</h3>
-                    <p className="text-sm text-gray-400">Upload and analyze your resume</p>
-                  </button>
-                  <button 
-                    onClick={() => handleFeatureClick('job_matching')}
-                    className="p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors text-left"
-                  >
-                    <Briefcase className="w-6 h-6 mb-2 text-green-400" />
-                    <h3 className="font-medium text-white">Job Matching</h3>
-                    <p className="text-sm text-gray-400">Find matching job opportunities</p>
-                  </button>
+        {/* Usage Stats */}
+        <div className="bg-gray-800 rounded-xl p-6 mb-12">
+          <h2 className="text-2xl font-semibold mb-6">Your Usage</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {stats.map((stat, index) => (
+              <div key={index} className="flex items-center space-x-3">
+                <div className={`${stat.color}`}>
+                  {stat.icon}
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm">{stat.label}</p>
+                  <p className="text-white font-semibold">{stat.value}</p>
                 </div>
               </div>
-            ) : (
-              messages.map((message) => (
+            ))}
+          </div>
+        </div>
+
+        {/* Chat Interface */}
+        <div className="bg-gray-800 rounded-xl p-6 mb-12">
+          <h2 className="text-2xl font-semibold mb-6">AI Career Assistant</h2>
+          
+          {/* Messages */}
+          <div className="space-y-4 mb-6 max-h-96 overflow-y-auto">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
                 <div
-                  key={message.id}
-                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                    message.role === 'user'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-700 text-gray-200'
+                  }`}
                 >
-                  <div
-                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                      message.role === 'user'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-800 text-gray-100'
-                    }`}
-                  >
-                    {message.content}
-                  </div>
+                  {message.content}
                 </div>
-              ))
-            )}
+              </div>
+            ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-gray-800 text-gray-100 px-4 py-2 rounded-lg">
+                <div className="bg-gray-700 text-gray-200 px-4 py-2 rounded-lg">
                   <div className="flex items-center space-x-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400"></div>
-                    <span>Thinking...</span>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span>AI is thinking...</span>
                   </div>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Feature Icons */}
-          {messages.length > 0 && (
-            <div className="flex justify-center space-x-4 p-4 border-t border-gray-800">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleFeatureClick('resume_parsing')}
-                className="text-gray-400 hover:text-white"
-                disabled={!canUseFeature('resume_parsing')}
+          {/* Input */}
+          <div className="flex space-x-4">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Ask me about your career..."
+              className="flex-1 px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              onClick={() => handleSendMessage(input)}
+              disabled={!input.trim() || isLoading}
+              className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Send
+            </button>
+          </div>
+        </div>
+
+        {/* Subscription Plans */}
+        <AnimatePresence>
+          {showSubscriptionCards && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              onClick={() => setShowSubscriptionCards(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="bg-gray-900 rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
               >
-                <FileText className="w-5 h-5 mr-2" />
-                Resume
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleFeatureClick('job_matching')}
-                className="text-gray-400 hover:text-white"
-                disabled={!canUseFeature('job_matching')}
-              >
-                <Briefcase className="w-5 h-5 mr-2" />
-                Jobs
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleFeatureClick('voice_assistant')}
-                className="text-gray-400 hover:text-white"
-                disabled={!canUseFeature('voice_assistant')}
-              >
-                <Mic className="w-5 h-5 mr-2" />
-                Voice
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-400 hover:text-white"
-              >
-                <Upload className="w-5 h-5 mr-2" />
-                Upload
-              </Button>
-            </div>
+                <div className="flex justify-between items-center mb-8">
+                  <h2 className="text-3xl font-bold">Choose Your Plan</h2>
+                  <button
+                    onClick={() => setShowSubscriptionCards(false)}
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-6">
+                  {plans.map((plan) => (
+                    <div
+                      key={plan.id}
+                      className={`bg-gray-800 rounded-xl p-6 border-2 ${
+                        plan.popular
+                          ? 'border-blue-500 bg-gray-800/50'
+                          : 'border-gray-700'
+                      }`}
+                    >
+                      {plan.popular && (
+                        <div className="bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full inline-block mb-4">
+                          MOST POPULAR
+                        </div>
+                      )}
+                      <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+                      <p className="text-4xl font-bold mb-6">
+                        ${plan.price}
+                        <span className="text-lg text-gray-400">/month</span>
+                      </p>
+                      <ul className="space-y-3 mb-8">
+                        {plan.features.map((feature, index) => (
+                          <li key={index} className="flex items-center space-x-3">
+                            <CheckCircle className="w-5 h-5 text-green-500" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <button
+                        onClick={() => {
+                          setShowSubscriptionCards(false);
+                        }}
+                        className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors font-semibold"
+                      >
+                        Get Started
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            </motion.div>
           )}
+        </AnimatePresence>
 
-          {/* Chat Input */}
-          <div className="p-4 border-t border-gray-800">
-            <div className="flex space-x-2">
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder={messages.length === 0 ? "Start a conversation..." : "Ask CareerForge AI anything..."}
-                className="flex-1 bg-gray-800 border-gray-700 text-white placeholder-gray-400"
-                disabled={isLoading}
-              />
-              <Button
-                onClick={handleSendMessage}
-                disabled={isLoading || !input.trim()}
-                className="bg-blue-600 hover:bg-blue-700"
+        {/* Subscription Warning */}
+        <AnimatePresence>
+          {showSubWarning && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              onClick={() => setShowSubWarning(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="bg-gray-900 rounded-2xl p-8 max-w-md w-full"
+                onClick={(e) => e.stopPropagation()}
               >
-                <Send className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+                <div className="text-center">
+                  <AlertCircle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
+                  <h3 className="text-2xl font-bold mb-4">Upgrade Required</h3>
+                  <p className="text-gray-400 mb-6">
+                    This feature requires a premium subscription. Upgrade to access all features.
+                  </p>
+                  <div className="flex space-x-4">
+                    <button
+                      onClick={() => setShowSubWarning(false)}
+                      className="flex-1 py-2 rounded-lg border border-gray-600 text-gray-300 hover:text-white transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowSubWarning(false);
+                        setShowSubscriptionCards(true);
+                      }}
+                      className="flex-1 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors"
+                    >
+                      Upgrade
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
 
-      {/* Subscription Cards Overlay */}
-      {showSubscriptionCards && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-white mb-2">
-                  Upgrade Your Plan
-                </h2>
-                <p className="text-gray-400">
-                  You've reached your usage limit. Upgrade to continue using CareerForge AI.
-                </p>
-              </div>
-              
-              <SubscriptionCards
-                currentPlan={currentPlan}
-                onUpgrade={handleUpgrade}
-                isLoading={subscriptionLoading}
-              />
-              
-              <div className="text-center mt-6">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowSubscriptionCards(false)}
-                  className="text-gray-400 hover:text-white"
-                >
-                  Maybe Later
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Error Toast */}
-      {subscriptionError && (
-        <div className="fixed bottom-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg">
-          {subscriptionError}
-        </div>
-      )}
+      <CommandPalette />
     </div>
   );
 }

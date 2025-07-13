@@ -23,8 +23,8 @@ export default function MicroDashboardMenu() {
         <DropdownMenuTrigger asChild>
           <button className="focus:outline-none">
             <Avatar>
-              <AvatarImage src={user.avatarUrl || '/placeholder-user.jpg'} alt={user.name} />
-              <AvatarFallback>{user.name?.[0] || 'U'}</AvatarFallback>
+            <AvatarImage src="/placeholder-user.jpg" alt={user.name} />
+            <AvatarFallback>{user.name?.[0] || 'U'}</AvatarFallback>
             </Avatar>
           </button>
         </DropdownMenuTrigger>
@@ -38,7 +38,7 @@ export default function MicroDashboardMenu() {
             </span>
             <span className="text-xs text-gray-500 dark:text-gray-400">{user.email}</span>
             <span className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-1">
-              {user.subscription?.plan?.toUpperCase() || 'FREE'} PLAN
+              {'FREE'} PLAN
             </span>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />

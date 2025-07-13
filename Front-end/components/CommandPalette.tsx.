@@ -1,22 +1,40 @@
-"use client";
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Sun, Moon, Plus, History, UserCircle, Cog, Zap, Home, DollarSign, Search, X, Briefcase, CreditCard, Settings, HelpCircle } from 'lucide-react';
-import { useTheme } from 'next-themes';
-import { motion, AnimatePresence } from 'framer-motion';
+'use client';
 
-interface CommandItemType {
+import React, { useState, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useTheme } from 'next-themes';
+import {
+  Home,
+  History,
+  Plus,
+  UserCircle,
+  Cog,
+  DollarSign,
+  Zap,
+  Sun,
+  Upload,
+  Briefcase,
+  Settings,
+  HelpCircle,
+  CreditCard,
+  Search,
+  X,
+} from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+
+type CommandItem = {
   id: string;
   title: string;
   description: string;
-  icon: React.ReactNode;
+  icon: JSX.Element;
   action: () => void;
-}
+};
 
-export function CommandPalette() {
+const CommandPalette = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -33,7 +51,7 @@ export function CommandPalette() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const commands: CommandItemType[] = [
+  const commands: CommandItem[] = [
     {
       id: 'home',
       title: 'Go to Home',
@@ -82,6 +100,15 @@ export function CommandPalette() {
       action: () => {
         router.push('/help');
         setIsOpen(false);
+      }
+    },
+    {
+      id: 'toggle-theme',
+      title: 'Toggle Theme',
+      description: 'Switch between light and dark mode',
+      icon: <Sun size={16} />,
+      action: () => {
+        setTheme(theme === 'dark' ? 'light' : 'dark');
       }
     }
   ];
@@ -155,4 +182,7 @@ export function CommandPalette() {
       )}
     </AnimatePresence>
   );
-}
+};
+
+export default CommandPalette;
+

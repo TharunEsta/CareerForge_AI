@@ -67,13 +67,10 @@ export function useSubscription() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (user) {
-      fetchSubscriptionData();
-    } else {
-      setLoading(false);
-    }
-  }, [user]);
+  // Remove the problematic useEffect
+    useEffect(() => {
+      setCurrentPlan('free'); // Default to free plan
+       }, []);
 
   const fetchSubscriptionData = async () => {
     try {
