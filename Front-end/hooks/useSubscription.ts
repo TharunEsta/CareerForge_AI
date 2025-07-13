@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/components/AuthContext';
 import { User } from '@/types';
 
@@ -36,6 +36,13 @@ interface SubscriptionPlan {
     resume_parsing: number;
     job_matching: number;
   };
+  popular?: boolean;
+  selected?: boolean;
+  yearlyPrice?: string;
+  yearlySavings?: string;
+  description?: string;
+  buttonText?: string;
+  icon?: React.ReactNode;
 }
 
 interface UserSubscription {
@@ -88,7 +95,7 @@ export function useSubscription() {
   const canUseFeature = (feature: 'ai_chats' | 'resume_parsing' | 'job_matching'): boolean => {
     if (!userSubscription) return false;
     
-    const plan = plans.find(p => p.id === currentPlan);
+    const plan = plans.find((p: SubscriptionPlan) => p.id === currentPlan);
     if (!plan) return false;
 
     const limit = plan.limits[feature];
@@ -105,7 +112,7 @@ export function useSubscription() {
   };
 
   const getLimit = (feature: 'ai_chats' | 'resume_parsing' | 'job_matching'): number => {
-    const plan = plans.find(p => p.id === currentPlan);
+    const plan = plans.find((p: SubscriptionPlan) => p.id === currentPlan);
     return plan?.limits[feature] || 0;
   };
 
@@ -205,7 +212,7 @@ export function useSubscription() {
   // Initialize subscription data
   useEffect(() => {
     if (user?.subscription?.plan) {
-      setCurrentPlan(user.subscription.plan);
+      // Plan is already set via currentPlan variable
     }
   }, [user?.subscription?.plan]);
 
