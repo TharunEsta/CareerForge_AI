@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import RazorpayPayment from '@/components/ui/RazorpayPayment';
 import { useAuth } from '@/components/AuthContext';
+import PayButton from '@/components/ui/PayButton';
 
 interface Plan {
   id: string;
@@ -325,6 +326,9 @@ export default function PricingPage() {
             </Card>
           </div>
         </motion.div>
+
+        <h2>Test Payment</h2>
+        <PayButton />
       </div>
     </div>
   );

@@ -23,6 +23,11 @@ import {
   CreditCard,
   HelpCircle,
   Sparkles,
+  Search,
+  Shuffle,
+  Lightbulb,
+  Paperclip,
+  Waveform,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import VoiceAssistant from '@/components/VoiceAssistant';
@@ -30,6 +35,7 @@ import { useAuth } from '@/components/AuthContext';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
+import WaveformVisualizer from '@/components/ui/WaveformVisualizer';
 
 interface Message {
   id: string;
@@ -38,12 +44,36 @@ interface Message {
   timestamp: Date;
 }
 
+function TypingAnimation() {
+  return (
+    <div className="flex items-center gap-1 mt-2">
+      <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+      <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '100ms' }}></span>
+      <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></span>
+      <span className="ml-2 text-xs text-gray-400">Thinking...</span>
+    </div>
+  );
+}
+
+const userAvatar = 'https://randomuser.me/api/portraits/men/32.jpg';
+const assistantAvatar = 'https://api.dicebear.com/7.x/bottts/svg?seed=ai';
+
+function formatTime(date: Date) {
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
 export default function AppPage() {
   const { user, logout } = useAuth();
   const [showVoice, setShowVoice] = React.useState(false);
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [input, setInput] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
+  const [showChat, setShowChat] = React.useState(false);
+  const [isThinking, setIsThinking] = React.useState(false);
+  const [isRecording, setIsRecording] = React.useState(false);
+  const [isPlaying, setIsPlaying] = React.useState(false);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const chatEndRef = React.useRef<HTMLDivElement>(null);
   
   const router = useRouter();
 
@@ -64,6 +94,7 @@ export default function AppPage() {
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+    setShowChat(true);
 
     try {
       // Send message to AI
@@ -136,6 +167,42 @@ export default function AppPage() {
 
     return () => clearTimeout(timer);
   }, [router]);
+
+  React.useEffect(() => {
+    if (showChat && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [showChat]);
+
+  React.useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isThinking]);
+
+  const handleVoiceInput = () => {
+    setIsRecording(true);
+    setTimeout(() => {
+      setIsRecording(false);
+      setInput('Hello, how are you today?');
+    }, 2000);
+  };
+
+  // Group consecutive messages from the same sender
+  function groupMessages(msgs: typeof messages) {
+    const groups: { role: 'user' | 'assistant'; messages: { text: string; timestamp: Date }[] }[] = [];
+    for (let i = 0; i < msgs.length; i++) {
+      const msg = msgs[i];
+      if (groups.length === 0 || groups[groups.length - 1].role !== msg.role) {
+        groups.push({ role: msg.role, messages: [{ text: msg.content, timestamp: msg.timestamp }] });
+      } else {
+        groups[groups.length - 1].messages.push({ text: msg.content, timestamp: msg.timestamp });
+      }
+    }
+    return groups;
+  }
+
+  const grouped = groupMessages(messages);
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-gray-900">
@@ -229,19 +296,22 @@ export default function AppPage() {
                 </div>
               </div>
             ) : (
-              messages.map((message) => (
+              grouped.map((group, i) => (
                 <div
-                  key={message.id}
-                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  key={i}
+                  className={`flex ${group.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
                     className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                      message.role === 'user'
+                      group.role === 'user'
                         ? 'bg-blue-600 text-white'
                         : 'bg-gray-800 text-gray-100'
                     }`}
                   >
-                    {message.content}
+                    {group.messages.map((msg, j) => (
+                      <div key={j}>{msg.text}</div>
+                    ))}
+                    <span className="text-xs text-gray-500 mt-1 ml-1">{formatTime(group.messages[group.messages.length - 1].timestamp)}</span>
                   </div>
                 </div>
               ))
@@ -303,6 +373,7 @@ export default function AppPage() {
           <div className="p-4 border-t border-gray-800">
             <div className="flex space-x-2">
               <Input
+                ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}

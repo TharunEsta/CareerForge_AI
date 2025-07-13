@@ -34,7 +34,10 @@ export interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
-  ({ className, children, variant, ...props }, ref) => (
+  (
+    { className, children, variant, ...props }: SidebarProps,
+    ref: React.ForwardedRef<HTMLDivElement>
+  ) => (
     <motion.div
       ref={ref}
       className={cn(SidebarVariants({ variant }), className)}
@@ -54,28 +57,42 @@ export const SidebarFooter = ({ children }: { children?: React.ReactNode }) => (
   <div className="mt-auto">{children}</div>
 );
 
-export const SidebarNav = ({ children }: { children?: React.ReactNode }) => (
-  <div className="space-y-1">{children}</div>
+interface SidebarNavProps {
+  children?: React.ReactNode;
+  className?: string;
+}
+export const SidebarNav = ({ children, className }: SidebarNavProps) => (
+  <div className={cn('space-y-1', className)}>{children}</div>
 );
 
-export const SidebarNavItem = ({ children, onClick }: { children?: React.ReactNode; onClick?: () => void }) => (
+interface SidebarNavItemProps {
+  children?: React.ReactNode;
+  onClick?: () => void;
+}
+export const SidebarNavItem = ({ children, onClick }: SidebarNavItemProps) => (
   <div className="flex items-center space-x-2 px-2 py-1 hover:bg-accent rounded-md cursor-pointer" onClick={onClick} style={{ cursor: onClick ? 'pointer' : undefined }}>
     {children}
   </div>
 );
 
-export const SidebarNavItemIcon = ({ children }: { children?: React.ReactNode }) => (
+interface SidebarNavItemIconProps {
+  children?: React.ReactNode;
+}
+export const SidebarNavItemIcon = ({ children }: SidebarNavItemIconProps) => (
   <span className="text-muted-foreground">{children}</span>
 );
 
-export const SidebarNavItemText = ({ children }: { children?: React.ReactNode }) => (
+interface SidebarNavItemTextProps {
+  children?: React.ReactNode;
+}
+export const SidebarNavItemText = ({ children }: SidebarNavItemTextProps) => (
   <span className="text-sm font-medium">{children}</span>
 );
 
-export const SidebarNavItemBadge = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
+interface SidebarNavItemBadgeProps extends React.HTMLAttributes<HTMLDivElement> {
+  className?: string;
+}
+export const SidebarNavItemBadge = React.forwardRef<HTMLDivElement, SidebarNavItemBadgeProps>(({ className, ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
@@ -100,7 +117,12 @@ export const SidebarWithLogo: React.FC<SidebarProps> = ({
   </Sidebar>
 );
 
-export default function Sidebar({ collapsed, onToggle, open }: { collapsed: boolean; onToggle: () => void; open: boolean }) {
+interface SidebarCollapsibleProps {
+  collapsed: boolean;
+  onToggle: () => void;
+  open: boolean;
+}
+export function SidebarCollapsible({ collapsed, onToggle, open }: SidebarCollapsibleProps) {
   return (
     <AnimatePresence>
       {open && (
@@ -145,7 +167,13 @@ export default function Sidebar({ collapsed, onToggle, open }: { collapsed: bool
   );
 }
 
-function SidebarLink({ icon, label, href, collapsed }: { icon: React.ReactNode; label: string; href: string; collapsed: boolean }) {
+interface SidebarLinkProps {
+  icon: React.ReactNode;
+  label: string;
+  href: string;
+  collapsed: boolean;
+}
+function SidebarLink({ icon, label, href, collapsed }: SidebarLinkProps) {
   return (
     <a
       href={href}

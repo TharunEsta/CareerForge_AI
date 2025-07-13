@@ -2,6 +2,9 @@ import React from 'react';
 import { Inter } from 'next/font/google';
 import type { Metadata } from 'next';
 import ClientLayout from './ClientLayout';
+import './globals.css';
+import SidebarPerplexity from '@/components/ui/SidebarPerplexity';
+import SplashScreenPerplexity from '@/components/ui/SplashScreenPerplexity';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -56,9 +59,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="msapplication-TileColor" content="#18181b" />
       </head>
       <body className={inter.className + " bg-[#18181b] min-h-screen flex flex-row overflow-hidden"}>
-        <ClientLayout>
-          {children}
-        </ClientLayout>
+        <SplashScreenPerplexity />
+        <SidebarPerplexity />
+        <main className="ml-16 md:ml-64 min-h-screen flex flex-col items-center justify-center transition-all duration-300">
+          <ClientLayout>
+            {children}
+          </ClientLayout>
+        </main>
       </body>
     </html>
   );

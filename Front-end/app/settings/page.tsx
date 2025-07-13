@@ -6,9 +6,11 @@ import { User, Shield, Bell, Palette, Download, Trash2, Save } from 'lucide-reac
 import { useAuth } from '@/components/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
 
+const currentPlan = 'free'; // Placeholder, replace with real value if needed
+
 export default function SettingsPage() {
   const { user, logout } = useAuth();
-  const { currentPlan, userSubscription } = useSubscription();
+  const { currentPlan: subscriptionPlan, userSubscription } = useSubscription();
   const [activeTab, setActiveTab] = useState('profile');
   const [saving, setSaving] = useState(false);
 
@@ -104,7 +106,7 @@ export default function SettingsPage() {
                         </label>
                         <div className="flex items-center space-x-3">
                           <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-sm font-medium">
-                            {currentPlan.toUpperCase()}
+                            {subscriptionPlan.toUpperCase()}
                           </span>
                           <button className="text-blue-400 hover:text-blue-300 text-sm">
                             Upgrade Plan

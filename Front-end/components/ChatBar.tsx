@@ -19,9 +19,11 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   let recognition: any;
 
-  const model = useChatStore((s: ChatState) => s.model);
-  const setModel = useChatStore((s: ChatState) => s.setModel);
-  const userPlan = useChatStore((s: ChatState) => s.userPlan);
+  const [userPlan, setUserPlan] = useState('free');
+  const [model, setModel] = useState('gpt-3.5');
+  const [templates, setTemplates] = useState<any[]>([]);
+  const addTemplate = (template: any) => setTemplates([...templates, template]);
+  const removeTemplate = (name: string) => setTemplates(templates.filter(t => t.name !== name));
   const [showUpgrade, setShowUpgrade] = useState(false);
   const modelLabels: Record<ModelType, string> = {
     'gpt-3.5': 'GPT-3.5',
@@ -34,9 +36,6 @@ export const ChatBar: React.FC<ChatBarProps> = ({ onSend, loading }) => {
     'dalle': <AudioLines size={18} className="text-green-400" />,
   };
 
-  const templates = useChatStore((s: ChatState) => s.templates);
-  const addTemplate = useChatStore((s: ChatState) => s.addTemplate);
-  const removeTemplate = useChatStore((s: ChatState) => s.removeTemplate);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [templateName, setTemplateName] = useState('');
 

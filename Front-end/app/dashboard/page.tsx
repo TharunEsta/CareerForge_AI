@@ -230,7 +230,7 @@ export default function DashboardPage() {
             Your AI-powered career assistant. Ask me anything about resumes, job matching, or career advice.
           </p>
         </div>
-      </div>
+          </div>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -256,12 +256,12 @@ export default function DashboardPage() {
                     <div className="flex items-center space-x-4">
                       <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
                         <FileText className="w-6 h-6 text-blue-400" />
-                      </div>
+                </div>
                       <div>
                         <h3 className="text-lg font-semibold text-white mb-1">Resume Analysis</h3>
                         <p className="text-gray-400 text-sm">Upload and analyze your resume for ATS optimization</p>
-                      </div>
-                    </div>
+                </div>
+              </div>
                   </motion.div>
                   
                   <motion.div
@@ -273,12 +273,12 @@ export default function DashboardPage() {
                     <div className="flex items-center space-x-4">
                       <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
                         <Briefcase className="w-6 h-6 text-green-400" />
-                      </div>
+                </div>
                       <div>
                         <h3 className="text-lg font-semibold text-white mb-1">Job Matching</h3>
                         <p className="text-gray-400 text-sm">Find matching job opportunities based on your skills</p>
-                      </div>
-                    </div>
+                </div>
+              </div>
                   </motion.div>
                 </div>
 
@@ -323,9 +323,9 @@ export default function DashboardPage() {
                                 <Copy size={16} />
                               </button>
                             )}
-                          </div>
-                        </div>
-                      </div>
+                </div>
+              </div>
+            </div>
                     </motion.div>
                   ))}
                 </AnimatePresence>
@@ -342,13 +342,13 @@ export default function DashboardPage() {
                           <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" />
                           <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-150" />
                           <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-300" />
-                        </div>
+                    </div>
                         <span className="text-gray-400 text-sm">Thinking...</span>
-                      </div>
+                  </div>
                     </div>
                   </motion.div>
                 )}
-              </div>
+                  </div>
             )}
 
             {/* Resume Data Display */}
@@ -383,8 +383,8 @@ export default function DashboardPage() {
                     <div className="space-y-1">
                       {resumeData.experience.slice(0, 3).map((exp, index) => (
                         <p key={index} className="text-gray-400 text-xs">{exp}</p>
-                      ))}
-                    </div>
+                ))}
+              </div>
                   </div>
                 </div>
               </motion.div>
@@ -411,21 +411,21 @@ export default function DashboardPage() {
                             <span className="ml-2 text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full">
                               {job.matchScore}%
                             </span>
-                          </div>
-                        </div>
+                  </div>
+                </div>
                         <button className="text-blue-400 hover:text-blue-300 text-sm">
                           View Details
                         </button>
-                      </div>
-                    </div>
+              </div>
+                  </div>
                   ))}
                 </div>
               </motion.div>
             )}
 
             <div ref={chatEndRef} />
-          </div>
-        </div>
+              </div>
+            </div>
 
         {/* Chat Bar */}
         <div className="border-t border-gray-800 p-4">
