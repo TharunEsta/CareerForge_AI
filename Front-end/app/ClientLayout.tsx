@@ -26,6 +26,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { CommandPalette } from '@/components/CommandPalette';
 import SplashScreen from '@/components/SplashScreen';
 import { Providers } from '@/components/Providers';
+import Footer from '@/components/Footer';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -210,6 +211,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         {/* Main Content */}
         <main className="flex-1 flex flex-col overflow-hidden">
           {children}
+          <Footer />
         </main>
       </ErrorBoundary>
     </Providers>
