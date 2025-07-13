@@ -32,11 +32,6 @@ const faqs: FAQItem[] = [
     category: "Billing"
   },
   {
-    question: "What's included in the free plan?",
-    answer: "The free plan includes 5 AI chats per month, basic resume analysis, and community support. Perfect for getting started!",
-    category: "Billing"
-  },
-  {
     question: "How do I cancel my subscription?",
     answer: "You can cancel your subscription anytime from your account settings. You'll continue to have access until the end of your billing period.",
     category: "Billing"

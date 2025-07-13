@@ -37,9 +37,6 @@ export default function MicroDashboardMenu() {
               {user.name}
             </span>
             <span className="text-xs text-gray-500 dark:text-gray-400">{user.email}</span>
-            <span className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-1">
-              {user.subscription?.plan?.toUpperCase() || 'FREE'} PLAN
-            </span>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>

@@ -29,8 +29,6 @@ import VoiceAssistant from '@/components/VoiceAssistant';
 import { useAuth } from '@/components/AuthContext';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import SubscriptionCards from '@/components/ui/SubscriptionCards';
-import { useSubscription } from '@/hooks/useSubscription';
 import { useRouter } from 'next/navigation';
 
 interface Message {
@@ -43,46 +41,18 @@ interface Message {
 export default function AppPage() {
   const { user, logout } = useAuth();
   const [showVoice, setShowVoice] = React.useState(false);
-  const [showSubWarning, setShowSubWarning] = React.useState(false);
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [input, setInput] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
-  const [showSubscriptionCards, setShowSubscriptionCards] = React.useState(false);
   
-  const {
-    currentPlan,
-    usageSummary,
-    trackUsage,
-    canUseFeature,
-    getRemainingUsage,
-    getCurrentUsage,
-    getLimit,
-    upgradeSubscription,
-    isLoading: subscriptionLoading,
-    error: subscriptionError
-  } = useSubscription();
-
   const router = useRouter();
 
-  // Real subscription check using the subscription system
-  const hasVoiceSubscription = canUseFeature('voice_assistant');
-
   const handleVoiceClick = () => {
-    if (!hasVoiceSubscription) {
-      setShowSubWarning(true);
-    } else {
-      setShowVoice(true);
-    }
+    setShowVoice(true);
   };
 
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading) return;
-
-    // Check if user can use AI chat feature
-    if (!canUseFeature('ai_chats')) {
-      setShowSubscriptionCards(true);
-      return;
-    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -96,14 +66,6 @@ export default function AppPage() {
     setIsLoading(true);
 
     try {
-      // Track usage first
-      const usageTracked = await trackUsage('ai_chats');
-      if (!usageTracked) {
-        setShowSubscriptionCards(true);
-        setIsLoading(false);
-        return;
-      }
-
       // Send message to AI
       const response = await fetch('/api/ai/chat', {
         method: 'POST',
@@ -150,18 +112,6 @@ export default function AppPage() {
   };
 
   const handleFeatureClick = async (feature: string) => {
-    if (!canUseFeature(feature)) {
-      setShowSubscriptionCards(true);
-      return;
-    }
-
-    // Track usage and show appropriate UI
-    const usageTracked = await trackUsage(feature);
-    if (!usageTracked) {
-      setShowSubscriptionCards(true);
-      return;
-    }
-
     // Handle different features
     switch (feature) {
       case 'resume_parsing':
@@ -175,13 +125,6 @@ export default function AppPage() {
         break;
       default:
         break;
-    }
-  };
-
-  const handleUpgrade = async (planId: string) => {
-    const success = await upgradeSubscription(planId);
-    if (success) {
-      setShowSubscriptionCards(false);
     }
   };
 
@@ -240,7 +183,6 @@ export default function AppPage() {
             </div>
             <div className="flex-1">
               <p className="text-white text-sm font-medium">User</p>
-              <p className="text-gray-400 text-xs">{currentPlan.toUpperCase()} Plan</p>
             </div>
             <button className="text-gray-400 hover:text-white">
               <LogOut className="w-4 h-4" />
@@ -254,11 +196,6 @@ export default function AppPage() {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-800">
           <h1 className="text-xl font-semibold text-white">CareerForge AI</h1>
-          {usageSummary && (
-            <div className="flex items-center space-x-4 text-sm text-gray-400">
-              <span>{getCurrentUsage('ai_chats')}/{getLimit('ai_chats')} chats</span>
-            </div>
-          )}
         </div>
 
         {/* Chat Area */}
@@ -329,7 +266,6 @@ export default function AppPage() {
                 size="sm"
                 onClick={() => handleFeatureClick('resume_parsing')}
                 className="text-gray-400 hover:text-white"
-                disabled={!canUseFeature('resume_parsing')}
               >
                 <FileText className="w-5 h-5 mr-2" />
                 Resume
@@ -339,7 +275,6 @@ export default function AppPage() {
                 size="sm"
                 onClick={() => handleFeatureClick('job_matching')}
                 className="text-gray-400 hover:text-white"
-                disabled={!canUseFeature('job_matching')}
               >
                 <Briefcase className="w-5 h-5 mr-2" />
                 Jobs
@@ -349,7 +284,6 @@ export default function AppPage() {
                 size="sm"
                 onClick={() => handleFeatureClick('voice_assistant')}
                 className="text-gray-400 hover:text-white"
-                disabled={!canUseFeature('voice_assistant')}
               >
                 <Mic className="w-5 h-5 mr-2" />
                 Voice
@@ -387,47 +321,6 @@ export default function AppPage() {
           </div>
         </div>
       </div>
-
-      {/* Subscription Cards Overlay */}
-      {showSubscriptionCards && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-white mb-2">
-                  Upgrade Your Plan
-                </h2>
-                <p className="text-gray-400">
-                  You've reached your usage limit. Upgrade to continue using CareerForge AI.
-                </p>
-              </div>
-              
-              <SubscriptionCards
-                currentPlan={currentPlan}
-                onUpgrade={handleUpgrade}
-                isLoading={subscriptionLoading}
-              />
-              
-              <div className="text-center mt-6">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowSubscriptionCards(false)}
-                  className="text-gray-400 hover:text-white"
-                >
-                  Maybe Later
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Error Toast */}
-      {subscriptionError && (
-        <div className="fixed bottom-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg">
-          {subscriptionError}
-        </div>
-      )}
     </div>
   );
 }

@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, Briefcase, Upload, Search, Sparkles, MessageSquare, Copy, Check } from 'lucide-react';
 import { ChatBar } from '@/components/ChatBar';
 import { useAuth } from '@/components/AuthContext';
-import { useSubscription } from '@/hooks/useSubscription';
 
 interface Message {
   id: string;
@@ -33,13 +32,11 @@ interface JobMatch {
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { currentPlan, canUseFeature, getCurrentUsage, getLimit } = useSubscription();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
   const [jobMatches, setJobMatches] = useState<JobMatch[]>([]);
-  const [showSubscriptionCards, setShowSubscriptionCards] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -68,12 +65,6 @@ export default function DashboardPage() {
 
   const handleSendMessage = async (message: string) => {
     if (!message.trim()) return;
-
-    // Check if user can use AI chat feature
-    if (!canUseFeature('ai_chats')) {
-      setShowSubscriptionCards(true);
-      return;
-    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -139,11 +130,6 @@ export default function DashboardPage() {
   };
 
   const handleResumeUpload = async (file: File) => {
-    if (!canUseFeature('resume_parsing')) {
-      setShowSubscriptionCards(true);
-      return;
-    }
-
     const formData = new FormData();
     formData.append('file', file);
 
@@ -189,11 +175,6 @@ export default function DashboardPage() {
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
-      return;
-    }
-
-    if (!canUseFeature('job_matching')) {
-      setShowSubscriptionCards(true);
       return;
     }
 
@@ -249,15 +230,6 @@ export default function DashboardPage() {
             Your AI-powered career assistant. Ask me anything about resumes, job matching, or career advice.
           </p>
         </div>
-        
-        {currentPlan && (
-          <div className="flex items-center space-x-4 text-sm text-gray-400">
-            <span>{getCurrentUsage('ai_chats')}/{getLimit('ai_chats')} chats</span>
-            <span className="px-2 py-1 bg-gray-800 rounded-full text-xs">
-              {currentPlan.toUpperCase()} Plan
-            </span>
-          </div>
-        )}
       </div>
 
       {/* Main Content */}
@@ -462,76 +434,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-
-      {/* Subscription Cards Modal */}
-      {showSubscriptionCards && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-          onClick={() => setShowSubscriptionCards(false)}
-        >
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-gray-900 rounded-2xl p-8 max-w-2xl w-full mx-4 border border-gray-700"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 className="text-2xl font-bold text-white mb-4">Upgrade Your Plan</h2>
-            <p className="text-gray-400 mb-6">
-              Unlock unlimited access to all features and get more AI chats, resume analysis, and job matching.
-            </p>
-            
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
-                <h3 className="text-lg font-semibold text-white mb-2">Free</h3>
-                <p className="text-2xl font-bold text-white mb-2">$0</p>
-                <ul className="text-gray-400 text-sm space-y-1">
-                  <li>• 5 AI chats/month</li>
-                  <li>• Basic features</li>
-                </ul>
-              </div>
-              
-              <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl p-4 border border-blue-500">
-                <h3 className="text-lg font-semibold text-white mb-2">Plus</h3>
-                <p className="text-2xl font-bold text-white mb-2">$19</p>
-                <ul className="text-white text-sm space-y-1">
-                  <li>• 100 AI chats/month</li>
-                  <li>• Resume analysis</li>
-                  <li>• Job matching</li>
-                </ul>
-              </div>
-              
-              <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
-                <h3 className="text-lg font-semibold text-white mb-2">Pro</h3>
-                <p className="text-2xl font-bold text-white mb-2">$49</p>
-                <ul className="text-gray-400 text-sm space-y-1">
-                  <li>• Unlimited usage</li>
-                  <li>• All features</li>
-                  <li>• Priority support</li>
-                </ul>
-              </div>
-            </div>
-            
-            <div className="flex justify-end mt-6">
-              <button
-                onClick={() => setShowSubscriptionCards(false)}
-                className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
-              >
-                Maybe Later
-              </button>
-              <button
-                onClick={() => window.location.href = '/pricing'}
-                className="ml-4 px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-all duration-200"
-              >
-                Upgrade Now
-              </button>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
     </div>
   );
 }
