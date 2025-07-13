@@ -110,88 +110,55 @@
   }
 
   h1 {
-    @apply text-4xl md:text-5xl lg:text-6xl;
+    @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl;
   }
 
   h2 {
-    @apply text-3xl md:text-4xl;
+    @apply text-2xl sm:text-3xl md:text-4xl;
   }
 
   h3 {
-    @apply text-2xl md:text-3xl;
+    @apply text-xl sm:text-2xl md:text-3xl;
   }
 
   h4 {
-    @apply text-xl md:text-2xl;
+    @apply text-lg sm:text-xl md:text-2xl;
   }
 
   h5 {
-    @apply text-lg md:text-xl;
+    @apply text-base sm:text-lg md:text-xl;
   }
 
   h6 {
-    @apply text-base md:text-lg;
+    @apply text-sm sm:text-base md:text-lg;
   }
 
-  /* Enhanced Focus States */
-  *:focus-visible {
-    @apply outline-none ring-2 ring-gray-200 ring-offset-2 ring-offset-background;
+  /* Mobile-First Responsive Utilities */
+  .mobile-container {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+  
+  .mobile-text {
+    @apply text-sm sm:text-base lg:text-lg;
+  }
+  
+  .mobile-padding {
+    @apply p-4 sm:p-6 lg:p-8;
+  }
+  
+  .mobile-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6;
   }
 
-  /* Enhanced Selection */
-  ::selection {
-    @apply bg-primary/20 text-primary-foreground;
-  }
-}
-
-@layer components {
-  /* Enhanced Cards */
-  .card-modern {
-    @apply bg-card border border-gray-200/50 shadow-sm hover:shadow-md transition-all duration-300 rounded-xl backdrop-blur-sm;
+  .mobile-sidebar {
+    @apply fixed lg:static left-0 top-0 z-50 transform transition-transform duration-300;
   }
 
-  .card-glass {
-    @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/20 dark:border-gray-800/20 shadow-xl;
-  }
-
-  /* Enhanced Buttons */
-  .btn-gradient {
-    @apply bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-medium px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg;
-  }
-
-  .btn-outline-modern {
-    @apply border-2 border-primary/20 bg-transparent hover:bg-primary/5 text-primary font-medium px-6 py-3 rounded-lg transition-all duration-300;
-  }
-
-  /* Enhanced Inputs */
-  .input-modern {
-    @apply bg-background border border-gray-200/50 focus:border-primary/50 rounded-lg px-4 py-3 transition-all duration-300 focus:ring-2 focus:ring-primary/20;
-  }
-
-  /* Enhanced Sidebar */
-  .sidebar-modern {
-    @apply bg-card/50 backdrop-blur-xl border-r border-gray-200/50;
-  }
-
-  /* Loading States */
-  .loading-shimmer {
-    @apply animate-pulse bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 bg-[length:200%_100%] animate-shimmer;
+  .mobile-overlay {
+    @apply fixed inset-0 bg-black/50 z-40 lg:hidden;
   }
 
   /* Enhanced Animations */
-  .animate-shimmer {
-    animation: shimmer 2s infinite;
-  }
-
-  @keyframes shimmer {
-    0% {
-      background-position: -200% 0;
-    }
-    100% {
-      background-position: 200% 0;
-    }
-  }
-
   .animate-fade-in {
     animation: fadeIn 0.5s ease-out;
   }
@@ -254,7 +221,7 @@
 
   /* Enhanced Spacing */
   .section-padding {
-    @apply py-16 px-4 sm:px-6 lg:px-8;
+    @apply py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8;
   }
 
   .container-modern {
@@ -263,7 +230,7 @@
 
   /* Enhanced Grid */
   .grid-modern {
-    @apply grid gap-6 md:gap-8 lg:gap-10;
+    @apply grid gap-4 sm:gap-6 md:gap-8 lg:gap-10;
   }
 
   /* Enhanced Text */

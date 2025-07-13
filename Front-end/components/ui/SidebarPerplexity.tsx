@@ -14,7 +14,9 @@ export default function SidebarPerplexity() {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <aside className={`h-screen bg-[#18181b] text-white flex flex-col transition-all duration-300 border-r border-gray-800 ${collapsed ? 'w-16' : 'w-64'} fixed left-0 top-0 z-40`}> 
+    <aside className={`h-screen bg-[#18181b] text-white flex flex-col transition-all duration-300 border-r border-gray-800 ${
+      collapsed ? 'w-16' : 'w-64'
+    } fixed left-0 top-0 z-40 hidden lg:flex`}> 
       <div className="flex items-center justify-between px-4 py-4 border-b border-gray-800">
         <span className="font-bold text-xl tracking-wide flex items-center gap-2">
           <svg width="28" height="28" viewBox="0 0 32 32" fill="none"><path d="M16 2L20.09 11.26L30 12.27L22 19.14L24.18 29.02L16 23.77L7.82 29.02L10 19.14L2 12.27L11.91 11.26L16 2Z" fill="#fff"/></svg>
