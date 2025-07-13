@@ -35,9 +35,7 @@ import VoiceAssistant from '@/components/VoiceAssistant';
 import { useAuth } from '@/components/AuthContext';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
->>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
 import { useRouter } from 'next/navigation';
-<<<<<<< HEAD
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Home, 
