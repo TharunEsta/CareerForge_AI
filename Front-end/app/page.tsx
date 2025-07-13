@@ -1,10 +1,6 @@
-<<<<<<< HEAD
 "use client";
 
 import React, { useState, useEffect } from 'react';
-=======
-'use client';
-import * as React from 'react';
 import { Logo } from '@/components/ui/logo';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -28,6 +24,11 @@ import {
   CreditCard,
   HelpCircle,
   Sparkles,
+  Search,
+  Shuffle,
+  Lightbulb,
+  Paperclip,
+  Waveform,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import VoiceAssistant from '@/components/VoiceAssistant';
@@ -36,6 +37,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 >>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
 import { useRouter } from 'next/navigation';
+<<<<<<< HEAD
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Home, 
@@ -72,6 +74,8 @@ import {
 import { useSubscription } from '@/hooks/useSubscription';
 import { useAuth } from '@/components/AuthContext';
 import { CommandPalette } from '@/components/CommandPalette';
+import WaveformVisualizer from '@/components/ui/WaveformVisualizer';
+
 
 interface Message {
   id: string;
@@ -79,6 +83,7 @@ interface Message {
   role: 'user' | 'assistant';
   timestamp: Date;
 }
+
 
 interface SubscriptionPlan {
   id: string;
@@ -114,11 +119,31 @@ export default function HomePage() {
     clearError,
   } = useSubscription();
 
+
+function TypingAnimation() {
+  return (
+    <div className="flex items-center gap-1 mt-2">
+      <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+      <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '100ms' }}></span>
+      <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></span>
+      <span className="ml-2 text-xs text-gray-400">Thinking...</span>
+    </div>
+  );
+}
+
+const userAvatar = 'https://randomuser.me/api/portraits/men/32.jpg';
+const assistantAvatar = 'https://api.dicebear.com/7.x/bottts/svg?seed=ai';
+
+function formatTime(date: Date) {
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+export default function AppPage() {
+  const { user, logout } = useAuth();
   const [showVoice, setShowVoice] = React.useState(false);
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [input, setInput] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
-<<<<<<< HEAD
   const [showSubscriptionCards, setShowSubscriptionCards] = React.useState(false);
 
   // Mock usage data for now
@@ -126,25 +151,28 @@ export default function HomePage() {
     ai_chats: { used: 5, limit: 10 },
     resume_parsing: { used: 2, limit: 5 },
     job_matching: { used: 1, limit: 3 }
-=======
+  const [showChat, setShowChat] = React.useState(false);
+  const [isThinking, setIsThinking] = React.useState(false);
+  const [isRecording, setIsRecording] = React.useState(false);
+  const [isPlaying, setIsPlaying] = React.useState(false);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const chatEndRef = React.useRef<HTMLDivElement>(null);
   
   const router = useRouter();
 
   const handleVoiceClick = () => {
     setShowVoice(true);
->>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
   };
 
   const hasVoiceSubscription = subscriptionCanUseFeature('ai_chats');
 
-<<<<<<< HEAD
+
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
 
     const newMessage: Message = {
-=======
+
     const userMessage: Message = {
->>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
       id: Date.now().toString(),
       content,
       role: 'user',
@@ -154,12 +182,11 @@ export default function HomePage() {
     setMessages(prev => [...prev, newMessage]);
     setInput('');
     setIsLoading(true);
+    setShowChat(true);
 
-<<<<<<< HEAD
     // Mock AI response
     setTimeout(() => {
       const aiResponse: Message = {
-=======
     try {
       // Send message to AI
       const response = await fetch('/api/ai/chat', {
@@ -188,7 +215,6 @@ export default function HomePage() {
     } catch (error) {
       console.error('Error sending message:', error);
       const errorMessage: Message = {
->>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
         id: (Date.now() + 1).toString(),
         content: `I understand you said: "${content}". How can I help you with your career goals?`,
         role: 'assistant',
@@ -206,12 +232,10 @@ export default function HomePage() {
     }
   };
 
-<<<<<<< HEAD
   const checkFeatureAccess = (feature: 'ai_chats' | 'resume_parsing' | 'job_matching') => {
     if (!subscriptionCanUseFeature(feature)) {
       setShowSubWarning(true);
       return false;
-=======
   const handleFeatureClick = async (feature: string) => {
     // Handle different features
     switch (feature) {
@@ -226,12 +250,12 @@ export default function HomePage() {
         break;
       default:
         break;
->>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
+
     }
     return true;
   };
 
-<<<<<<< HEAD
+
   const features = [
     {
       id: 'ai_chats',
@@ -279,7 +303,6 @@ export default function HomePage() {
       color: 'text-orange-500'
     }
   ];
-=======
   React.useEffect(() => {
     // Redirect to dashboard after a brief delay
     const timer = setTimeout(() => {
@@ -288,7 +311,43 @@ export default function HomePage() {
 
     return () => clearTimeout(timer);
   }, [router]);
->>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
+
+
+  React.useEffect(() => {
+    if (showChat && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [showChat]);
+
+  React.useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isThinking]);
+
+  const handleVoiceInput = () => {
+    setIsRecording(true);
+    setTimeout(() => {
+      setIsRecording(false);
+      setInput('Hello, how are you today?');
+    }, 2000);
+  };
+
+  // Group consecutive messages from the same sender
+  function groupMessages(msgs: typeof messages) {
+    const groups: { role: 'user' | 'assistant'; messages: { text: string; timestamp: Date }[] }[] = [];
+    for (let i = 0; i < msgs.length; i++) {
+      const msg = msgs[i];
+      if (groups.length === 0 || groups[groups.length - 1].role !== msg.role) {
+        groups.push({ role: msg.role, messages: [{ text: msg.content, timestamp: msg.timestamp }] });
+      } else {
+        groups[groups.length - 1].messages.push({ text: msg.content, timestamp: msg.timestamp });
+      }
+    }
+    return groups;
+  }
+
+  const grouped = groupMessages(messages);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -324,7 +383,6 @@ export default function HomePage() {
         </div>
       </header>
 
-<<<<<<< HEAD
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}
@@ -348,7 +406,6 @@ export default function HomePage() {
               className="px-8 py-3 rounded-lg border border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white transition-colors"
             >
               View Plans
-=======
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-2">
           <a href="/" className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
@@ -384,12 +441,10 @@ export default function HomePage() {
             </div>
             <button className="text-gray-400 hover:text-white">
               <LogOut className="w-4 h-4" />
->>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
             </button>
           </div>
         </div>
 
-<<<<<<< HEAD
         {/* Features Grid */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           {features.map((feature) => (
@@ -409,13 +464,11 @@ export default function HomePage() {
               </div>
             </motion.div>
           ))}
-=======
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-800">
           <h1 className="text-xl font-semibold text-white">CareerForge AI</h1>
->>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
         </div>
 
         {/* Usage Stats */}
@@ -455,6 +508,24 @@ export default function HomePage() {
                   }`}
                 >
                   {message.content}
+            ) : (
+              grouped.map((group, i) => (
+                <div
+                  key={i}
+                  className={`flex ${group.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                      group.role === 'user'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-800 text-gray-100'
+                    }`}
+                  >
+                    {group.messages.map((msg, j) => (
+                      <div key={j}>{msg.text}</div>
+                    ))}
+                    <span className="text-xs text-gray-500 mt-1 ml-1">{formatTime(group.messages[group.messages.length - 1].timestamp)}</span>
+                  </div>
                 </div>
               </div>
             ))}
@@ -470,7 +541,6 @@ export default function HomePage() {
             )}
           </div>
 
-<<<<<<< HEAD
           {/* Input */}
           <div className="flex space-x-4">
             <input
@@ -559,7 +629,6 @@ export default function HomePage() {
                 </div>
               </motion.div>
             </motion.div>
-=======
           {/* Feature Icons */}
           {messages.length > 0 && (
             <div className="flex justify-center space-x-4 p-4 border-t border-gray-800">
@@ -599,7 +668,6 @@ export default function HomePage() {
                 Upload
               </Button>
             </div>
->>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
           )}
         </AnimatePresence>
 
@@ -619,8 +687,23 @@ export default function HomePage() {
                 exit={{ scale: 0.95, opacity: 0 }}
                 className="bg-gray-900 rounded-2xl p-8 max-w-md w-full"
                 onClick={(e) => e.stopPropagation()}
+          {/* Chat Input */}
+          <div className="p-4 border-t border-gray-800">
+            <div className="flex space-x-2">
+              <Input
+                ref={inputRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder={messages.length === 0 ? "Start a conversation..." : "Ask CareerForge AI anything..."}
+                className="flex-1 bg-gray-800 border-gray-700 text-white placeholder-gray-400"
+                disabled={isLoading}
+              />
+              <Button
+                onClick={handleSendMessage}
+                disabled={isLoading || !input.trim()}
+                className="bg-blue-600 hover:bg-blue-700"
               >
-<<<<<<< HEAD
                 <div className="text-center">
                   <AlertCircle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
                   <h3 className="text-2xl font-bold mb-4">Upgrade Required</h3>
@@ -652,14 +735,12 @@ export default function HomePage() {
       </main>
 
       <CommandPalette />
-=======
                 <Send className="w-4 h-4" />
               </Button>
             </div>
           </div>
         </div>
       </div>
->>>>>>> 4741d64a6ee74d56a92784f1a2e3fd96510af089
     </div>
   );
 }

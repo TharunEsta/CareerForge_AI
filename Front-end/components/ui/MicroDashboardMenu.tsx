@@ -12,6 +12,12 @@ import {
 import { useAuth } from '@/components/AuthContext';
 import { User } from '@/types';
 
+interface User {
+  name?: string;
+  avatarUrl?: string;
+  // ...other properties...
+}
+
 export default function MicroDashboardMenu() {
   const { user, logout } = useAuth();
 
@@ -25,6 +31,8 @@ export default function MicroDashboardMenu() {
             <Avatar>
             <AvatarImage src="/placeholder-user.jpg" alt={user.name} />
             <AvatarFallback>{user.name?.[0] || 'U'}</AvatarFallback>
+              <AvatarImage src={user?.avatarUrl ?? "/placeholder-user.jpg"} alt={user?.name ?? ""} />
+              <AvatarFallback>{user.name?.[0] || 'U'}</AvatarFallback>
             </Avatar>
           </button>
         </DropdownMenuTrigger>

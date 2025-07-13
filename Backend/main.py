@@ -48,6 +48,8 @@ from fastapi.responses import JSONResponse
 
 # Local application imports
 from models import RevokedToken, SessionLocal
+from payment_router import router as payment_router
+from subscription_router import router as subscription_router
 from realtime_router import router as realtime_router
 from schemas import User as UserModel
 from skills_jobs_router import router as skills_jobs_router
@@ -105,8 +107,11 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(payment_router, prefix="/api/payment", tags=["payment"])
+app.include_router(subscription_router, prefix="/api/subscription", tags=["subscription"])
 app.include_router(skills_jobs_router, prefix="/api/skills-jobs", tags=["skills-jobs"])
 app.include_router(realtime_router, prefix="/api/realtime", tags=["realtime"])
+app.include_router(subscription_router, prefix="/api/subscription", tags=["subscription"])
 
 # Security & Config
 SECRET_KEY = os.getenv("SECRET_KEY", "secret")
