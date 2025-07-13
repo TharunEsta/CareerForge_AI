@@ -28,7 +28,6 @@ from fastapi import (
     Header,
     HTTPException,
     Path,
-    Query,
     Request,
     UploadFile,
     status,
