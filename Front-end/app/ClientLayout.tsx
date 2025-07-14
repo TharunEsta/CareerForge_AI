@@ -24,17 +24,16 @@ import {
 import Sidebar from '@/components/ui/sidebar';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { CommandPalette } from '@/components/CommandPalette';
-import SplashScreen from '@/components/SplashScreen';
 import { Providers } from '@/components/Providers';
 import Footer from '@/components/Footer';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
-  const [showSplash, setShowSplash] = React.useState(true);
   const { theme, setTheme } = useTheme();
   const router = useRouter();
 
+<<<<<<< HEAD
   React.useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 1500);
     return () => clearTimeout(timer);
@@ -50,10 +49,48 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       document.body.style.overflow = '';
     };
   }, [sidebarOpen]);
+=======
+  // Handler for New Chat
+  const handleNewChat = () => {
+    // Reset chat state by clearing messages and redirecting to dashboard
+    if (typeof window !== 'undefined') {
+      // Clear chat store
+      const chatStore = JSON.parse(localStorage.getItem('chat-storage') || '{}');
+      chatStore.messages = [];
+      localStorage.setItem('chat-storage', JSON.stringify(chatStore));
+    }
+    router.push('/dashboard');
+    setSidebarOpen(false);
+  };
+
+  // Handler for Previous Chats
+  const handlePreviousChats = () => {
+    // Open chat history by navigating to dashboard with history parameter
+    router.push('/dashboard?history=1');
+    setSidebarOpen(false);
+  };
+
+  // Handler for Account
+  const handleAccount = () => {
+    router.push('/account');
+    setSidebarOpen(false);
+  };
+
+  // Handler for Settings
+  const handleSettings = () => {
+    router.push('/settings');
+    setSidebarOpen(false);
+  };
+
+  // Handler for Get Plus
+  const handleGetPlus = () => {
+    router.push('/pricing');
+    setSidebarOpen(false);
+  };
+>>>>>>> 9117cff66fcf78b57107298458fb766e7cdbce31
 
   return (
     <Providers>
-      {showSplash && <SplashScreen />}
       <ErrorBoundary>
         <CommandPalette />
         

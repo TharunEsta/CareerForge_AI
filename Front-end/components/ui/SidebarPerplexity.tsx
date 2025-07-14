@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Home, Globe, Layers, User, ArrowLeftRight, Download, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Dialog, DialogTrigger, DialogContent } from './dialog';
+import SubscriptionUpgradeModal from './SubscriptionUpgradeModal';
 
 const sidebarItems = [
   { icon: <Home size={22} />, label: 'Home' },
@@ -10,7 +12,7 @@ const sidebarItems = [
   { icon: <Download size={22} />, label: 'Install' },
 ];
 
-export default function SidebarPerplexity() {
+export default function SidebarCareerForge() {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
@@ -20,7 +22,7 @@ export default function SidebarPerplexity() {
       <div className="flex items-center justify-between px-4 py-4 border-b border-gray-800">
         <span className="font-bold text-xl tracking-wide flex items-center gap-2">
           <svg width="28" height="28" viewBox="0 0 32 32" fill="none"><path d="M16 2L20.09 11.26L30 12.27L22 19.14L24.18 29.02L16 23.77L7.82 29.02L10 19.14L2 12.27L11.91 11.26L16 2Z" fill="#fff"/></svg>
-          {!collapsed && <span>Perplexity</span>}
+          {!collapsed && <span>CareerForge</span>}
         </span>
         <button onClick={() => setCollapsed(c => !c)} className="ml-2 p-1 rounded hover:bg-gray-700 transition">
           {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
@@ -39,10 +41,24 @@ export default function SidebarPerplexity() {
         </button>
       </nav>
       <div className="mt-auto p-4 border-t border-gray-800">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 mb-4">
           <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="avatar" className="w-8 h-8 rounded-full" />
           {!collapsed && <span className="text-sm">Account</span>}
         </div>
+        <Dialog>
+          <DialogTrigger asChild>
+            <button
+              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-2 px-4 rounded-lg shadow hover:from-blue-600 hover:to-purple-700 transition mb-2"
+              title="Renew Plus"
+            >
+              {!collapsed && <span>Renew Plus</span>}
+              {collapsed && <ArrowLeftRight size={20} />}
+            </button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl w-full p-0 bg-[#18181b] rounded-xl shadow-2xl border border-gray-800 animate-slide-in-right">
+            <SubscriptionUpgradeModal />
+          </DialogContent>
+        </Dialog>
       </div>
     </aside>
   );
