@@ -1,9 +1,5 @@
 "use client";
 
-"use client";
-
-"use client";
-
 import React from 'react';
 
 export const Logo: React.FC<{ size?: 'sm' | 'md' | 'lg' | 'xl' | number; className?: string }> = ({ size = 'md', className = '' }) => {

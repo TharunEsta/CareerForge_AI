@@ -1,0 +1,6 @@
+  21:0  error  Parsing error: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  7:0  error  Parsing error: ')' expected
+  7:0  error  Parsing error: ')' expected
+  7:0  error  Parsing error: ')' expected
+  7:0  error  Parsing error: ')' expected
+  7:0  error  Parsing error: ')' expected

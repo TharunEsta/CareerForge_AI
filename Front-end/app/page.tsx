@@ -1,41 +1,31 @@
+<<<<<<< HEAD
 "use client";
 
 import React, { useState, useEffect } from 'react';
 import { Logo } from '@/components/ui/logo';
+=======
+'use client';
+import * as React from 'react';
+>>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
 import {
   Mic,
-  Plus,
-  User,
   LogOut,
-  Upload,
   MessageSquare,
   Home,
-  Globe,
-  Layers,
-  ArrowUpRight,
-  Download,
-  Star,
-  Settings,
-  Send,
-  FileText,
   Briefcase,
   CreditCard,
+  Settings,
   HelpCircle,
-  Sparkles,
-  Search,
-  Shuffle,
-  Lightbulb,
-  Paperclip,
-  Waveform,
+  Send,
+  FileText,
+  Upload,
+  Menu,
+  X,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
-import VoiceAssistant from '@/components/VoiceAssistant';
-import { useAuth } from '@/components/AuthContext';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
+<<<<<<< HEAD
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Home, 
@@ -73,6 +63,8 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { useAuth } from '@/components/AuthContext';
 import { CommandPalette } from '@/components/CommandPalette';
 import WaveformVisualizer from '@/components/ui/WaveformVisualizer';
+=======
+>>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
 
 
 interface Message {
@@ -82,6 +74,7 @@ interface Message {
   timestamp: Date;
 }
 
+<<<<<<< HEAD
 
 interface SubscriptionPlan {
   id: string;
@@ -132,13 +125,13 @@ function TypingAnimation() {
 const userAvatar = 'https://randomuser.me/api/portraits/men/32.jpg';
 const assistantAvatar = 'https://api.dicebear.com/7.x/bottts/svg?seed=ai';
 
+=======
+>>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
 function formatTime(date: Date) {
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
 export default function AppPage() {
-  const { user, logout } = useAuth();
-  const [showVoice, setShowVoice] = React.useState(false);
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [input, setInput] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
@@ -150,17 +143,11 @@ export default function AppPage() {
     resume_parsing: { used: 2, limit: 5 },
     job_matching: { used: 1, limit: 3 }
   const [showChat, setShowChat] = React.useState(false);
-  const [isThinking, setIsThinking] = React.useState(false);
-  const [isRecording, setIsRecording] = React.useState(false);
-  const [isPlaying, setIsPlaying] = React.useState(false);
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const chatEndRef = React.useRef<HTMLDivElement>(null);
-  
-  const router = useRouter();
 
-  const handleVoiceClick = () => {
-    setShowVoice(true);
-  };
+  const router = useRouter();
 
   const hasVoiceSubscription = subscriptionCanUseFeature('ai_chats');
 
@@ -186,15 +173,12 @@ export default function AppPage() {
     setTimeout(() => {
       const aiResponse: Message = {
     try {
-      // Send message to AI
       const response = await fetch('/api/ai/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: input,
-          userId: 'user123', // Replace with actual user ID
+          message: userMessage.content,
+          userId: 'user123',
         }),
       });
 
@@ -211,6 +195,7 @@ export default function AppPage() {
         throw new Error('Failed to get response');
       }
     } catch (error) {
+<<<<<<< HEAD
       console.error('Error sending message:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -219,6 +204,18 @@ export default function AppPage() {
         timestamp: new Date()
       };
       setMessages(prev => [...prev, aiResponse]);
+=======
+      setMessages(prev => [
+        ...prev,
+        {
+          id: (Date.now() + 2).toString(),
+          content: 'Sorry, I encountered an error. Please try again.',
+          role: 'assistant',
+          timestamp: new Date()
+        }
+      ]);
+    } finally {
+>>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
       setIsLoading(false);
     }, 1000);
   };
@@ -235,16 +232,12 @@ export default function AppPage() {
       setShowSubWarning(true);
       return false;
   const handleFeatureClick = async (feature: string) => {
-    // Handle different features
     switch (feature) {
       case 'resume_parsing':
-        // Handle resume upload
         break;
       case 'job_matching':
-        // Handle job matching
         break;
       case 'voice_assistant':
-        // Handle voice assistant
         break;
       default:
         break;
@@ -302,6 +295,7 @@ export default function AppPage() {
     }
   ];
   React.useEffect(() => {
+<<<<<<< HEAD
     // Redirect to dashboard after a brief delay
     const timer = setTimeout(() => {
       router.push('/dashboard');
@@ -312,6 +306,8 @@ export default function AppPage() {
 
 
   React.useEffect(() => {
+=======
+>>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
     if (showChat && inputRef.current) {
       inputRef.current.focus();
     }
@@ -321,17 +317,8 @@ export default function AppPage() {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isThinking]);
+  }, [messages]);
 
-  const handleVoiceInput = () => {
-    setIsRecording(true);
-    setTimeout(() => {
-      setIsRecording(false);
-      setInput('Hello, how are you today?');
-    }, 2000);
-  };
-
-  // Group consecutive messages from the same sender
   function groupMessages(msgs: typeof messages) {
     const groups: { role: 'user' | 'assistant'; messages: { text: string; timestamp: Date }[] }[] = [];
     for (let i = 0; i < msgs.length; i++) {
@@ -348,6 +335,7 @@ export default function AppPage() {
   const grouped = groupMessages(messages);
 
   return (
+<<<<<<< HEAD
     <div className="min-h-screen bg-gray-900 text-white">
       {/* Header */}
       <header className="border-b border-gray-800 bg-gray-900/95 backdrop-blur-sm">
@@ -376,9 +364,38 @@ export default function AppPage() {
               >
                 Dashboard
               </button>
+=======
+    <div className="flex flex-col lg:flex-row h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-gray-900">
+      {/* Mobile Menu Button */}
+      <button
+        className="lg:hidden fixed top-4 left-4 z-50 flex items-center justify-center w-12 h-12 rounded-xl bg-gray-800/80 hover:bg-gray-700/80 text-white shadow-lg backdrop-blur-sm border border-gray-700"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+      >
+        {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={`fixed lg:static left-0 top-0 z-50 flex flex-col h-screen bg-black/90 border-r border-gray-800 transition-transform duration-300 ${
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      } w-64`}>
+        <div className="p-6 border-b border-gray-800">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">CF</span>
+>>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
             </div>
           </div>
         </div>
+<<<<<<< HEAD
       </header>
 
       {/* Main Content */}
@@ -405,6 +422,8 @@ export default function AppPage() {
             >
               View Plans
         {/* Navigation */}
+=======
+>>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
         <nav className="flex-1 p-4 space-y-2">
           <a href="/" className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
             <Home className="w-5 h-5" />
@@ -427,8 +446,6 @@ export default function AppPage() {
             <span>Help</span>
           </a>
         </nav>
-
-        {/* User Info */}
         <div className="p-4 border-t border-gray-800">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
@@ -463,11 +480,11 @@ export default function AppPage() {
             </motion.div>
           ))}
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
+      <div className="flex-1 flex flex-col w-full">
         <div className="flex items-center justify-between p-4 border-b border-gray-800">
-          <h1 className="text-xl font-semibold text-white">CareerForge AI</h1>
+          <h1 className="text-lg sm:text-xl font-semibold text-white">CareerForge AI</h1>
         </div>
+<<<<<<< HEAD
 
         {/* Usage Stats */}
         <div className="bg-gray-800 rounded-xl p-6 mb-12">
@@ -481,6 +498,34 @@ export default function AppPage() {
                 <div>
                   <p className="text-gray-400 text-sm">{stat.label}</p>
                   <p className="text-white font-semibold">{stat.value}</p>
+=======
+        <div className="flex-1 flex flex-col">
+          <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${messages.length > 0 ? '' : 'flex items-center justify-center'}`}>
+            {messages.length === 0 ? (
+              <div className="text-center text-gray-400 max-w-md px-4">
+                <MessageSquare className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 opacity-50" />
+                <h2 className="text-xl sm:text-2xl font-semibold mb-2">Welcome to CareerForge AI</h2>
+                <p className="text-sm sm:text-base text-gray-500 mb-6">
+                  Your AI-powered career assistant. Ask me anything about resumes, job matching, or career advice.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <button 
+                    onClick={() => handleFeatureClick('resume_parsing')}
+                    className="p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors text-left"
+                  >
+                    <FileText className="w-5 h-5 sm:w-6 sm:h-6 mb-2 text-blue-400" />
+                    <h3 className="font-medium text-white text-sm sm:text-base">Resume Analysis</h3>
+                    <p className="text-xs sm:text-sm text-gray-400">Upload and analyze your resume</p>
+                  </button>
+                  <button 
+                    onClick={() => handleFeatureClick('job_matching')}
+                    className="p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors text-left"
+                  >
+                    <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 mb-2 text-green-400" />
+                    <h3 className="font-medium text-white text-sm sm:text-base">Job Matching</h3>
+                    <p className="text-xs sm:text-sm text-gray-400">Find matching job opportunities</p>
+                  </button>
+>>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
                 </div>
               </div>
             ))}
@@ -513,14 +558,14 @@ export default function AppPage() {
                   className={`flex ${group.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                    className={`max-w-[85vw] sm:max-w-xs lg:max-w-md px-3 sm:px-4 py-2 rounded-lg ${
                       group.role === 'user'
                         ? 'bg-blue-600 text-white'
                         : 'bg-gray-800 text-gray-100'
                     }`}
                   >
                     {group.messages.map((msg, j) => (
-                      <div key={j}>{msg.text}</div>
+                      <div key={j} className="text-sm sm:text-base">{msg.text}</div>
                     ))}
                     <span className="text-xs text-gray-500 mt-1 ml-1">{formatTime(group.messages[group.messages.length - 1].timestamp)}</span>
                   </div>
@@ -529,15 +574,24 @@ export default function AppPage() {
             ))}
             {isLoading && (
               <div className="flex justify-start">
+<<<<<<< HEAD
                 <div className="bg-gray-700 text-gray-200 px-4 py-2 rounded-lg">
                   <div className="flex items-center space-x-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                     <span>AI is thinking...</span>
+=======
+                <div className="bg-gray-800 text-gray-100 px-3 sm:px-4 py-2 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400"></div>
+                    <span className="text-sm sm:text-base">Thinking...</span>
+>>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
                   </div>
                 </div>
               </div>
             )}
+            <div ref={chatEndRef} />
           </div>
+<<<<<<< HEAD
 
           {/* Input */}
           <div className="flex space-x-4">
@@ -627,46 +681,49 @@ export default function AppPage() {
                 </div>
               </motion.div>
             </motion.div>
+=======
+>>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
           {/* Feature Icons */}
           {messages.length > 0 && (
-            <div className="flex justify-center space-x-4 p-4 border-t border-gray-800">
+            <div className="flex justify-center space-x-2 sm:space-x-4 p-4 border-t border-gray-800">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => handleFeatureClick('resume_parsing')}
-                className="text-gray-400 hover:text-white"
+                className="text-gray-400 hover:text-white text-xs sm:text-sm"
               >
-                <FileText className="w-5 h-5 mr-2" />
+                <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
                 Resume
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => handleFeatureClick('job_matching')}
-                className="text-gray-400 hover:text-white"
+                className="text-gray-400 hover:text-white text-xs sm:text-sm"
               >
-                <Briefcase className="w-5 h-5 mr-2" />
+                <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
                 Jobs
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => handleFeatureClick('voice_assistant')}
-                className="text-gray-400 hover:text-white"
+                className="text-gray-400 hover:text-white text-xs sm:text-sm"
               >
-                <Mic className="w-5 h-5 mr-2" />
+                <Mic className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
                 Voice
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-gray-400 hover:text-white"
+                className="text-gray-400 hover:text-white text-xs sm:text-sm"
               >
-                <Upload className="w-5 h-5 mr-2" />
+                <Upload className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
                 Upload
               </Button>
             </div>
           )}
+<<<<<<< HEAD
         </AnimatePresence>
 
         {/* Subscription Warning */}
@@ -685,6 +742,8 @@ export default function AppPage() {
                 exit={{ scale: 0.95, opacity: 0 }}
                 className="bg-gray-900 rounded-2xl p-8 max-w-md w-full"
                 onClick={(e) => e.stopPropagation()}
+=======
+>>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
           {/* Chat Input */}
           <div className="p-4 border-t border-gray-800">
             <div className="flex space-x-2">
@@ -694,13 +753,13 @@ export default function AppPage() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder={messages.length === 0 ? "Start a conversation..." : "Ask CareerForge AI anything..."}
-                className="flex-1 bg-gray-800 border-gray-700 text-white placeholder-gray-400"
+                className="flex-1 bg-gray-800 border-gray-700 text-white placeholder-gray-400 text-sm sm:text-base"
                 disabled={isLoading}
               />
               <Button
                 onClick={handleSendMessage}
                 disabled={isLoading || !input.trim()}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-blue-600 hover:bg-blue-700 px-3 sm:px-4"
               >
                 <div className="text-center">
                   <AlertCircle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />

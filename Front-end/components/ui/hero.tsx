@@ -1,9 +1,5 @@
 "use client";
 
-"use client";
-
-"use client";
-
 import React from 'react';
 import { Button } from './button';
 import { Card, CardContent } from './card';

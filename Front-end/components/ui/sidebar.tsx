@@ -1,10 +1,19 @@
+<<<<<<< HEAD
 'use client';
+=======
+"use client";
+>>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
 
 import * as React from 'react';
 import { motion } from 'framer-motion';
 import { cva, type VariantProps } from 'class-variance-authority';
+<<<<<<< HEAD
+=======
+import { motion, AnimatePresence } from 'framer-motion';
+import { Home, LayoutDashboard, DollarSign, Settings, HelpCircle } from 'lucide-react';
+
+>>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
 import { cn } from '@/lib/utils';
-import { Logo } from './logo';
 
 // Sidebar variants using class-variance-authority
 const sidebarVariants = cva(
@@ -158,7 +167,7 @@ export const SidebarWithLogo: React.FC<SidebarProps> = ({
 }) => (
   <Sidebar className={className} {...props as any}>
     <SidebarHeader>
-      <Logo size="md" className="mx-auto" />
+      <div className="mx-auto">Logo</div>
     </SidebarHeader>
     {children}
   </Sidebar>
@@ -173,42 +182,49 @@ export function SidebarCollapsible({ collapsed, onToggle, open }: SidebarCollaps
   return (
     <AnimatePresence>
       {open && (
-        <motion.aside
-          initial={{ x: -300, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: -300, opacity: 0 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          className={`fixed md:static left-0 top-0 z-50 flex flex-col h-screen bg-[#18181b] text-white border-r border-gray-800 transition-all duration-300 ${collapsed ? 'w-20 p-2' : 'w-64 p-6'}`}
-        >
-          {/* Collapse/Expand button (desktop only) */}
-          <button
-            className="hidden md:block absolute top-4 right-2 z-50 p-1 rounded hover:bg-gray-700 transition"
-            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            onClick={onToggle}
-            type="button"
+        <>
+          {/* Mobile Overlay */}
+          <div
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={() => onToggle()}
+          />
+          <motion.aside
+            initial={{ x: -300, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -300, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className={`fixed lg:static left-0 top-0 z-50 flex flex-col h-screen bg-[#18181b] text-white border-r border-gray-800 transition-all duration-300 ${
+              collapsed ? 'w-16 p-2' : 'w-64 p-6'
+            }`}
           >
-            {collapsed ? <LayoutDashboard size={18} /> : <Home size={18} />}
-          </button>
-          {/* Logo and Brand */}
-          <div className="flex items-center gap-3 mb-8">
-            <Logo size="md" />
-            {!collapsed && <span className="font-bold text-xl">CareerForge</span>}
-          </div>
-          {/* Navigation */}
-          <nav className="flex flex-col gap-2">
-            <SidebarLink icon={<Home />} label="Home" href="/" collapsed={collapsed} />
-            <SidebarLink icon={<LayoutDashboard />} label="Dashboard" href="/dashboard" collapsed={collapsed} />
-            <SidebarLink icon={<DollarSign />} label="Pricing" href="/pricing" collapsed={collapsed} />
-            <SidebarLink icon={<Settings />} label="Settings" href="/settings" collapsed={collapsed} />
-            <SidebarLink icon={<HelpCircle />} label="Help" href="/help" collapsed={collapsed} />
-          </nav>
-          {/* User Section */}
-          <div className="mt-auto flex flex-col items-center gap-2 py-6">
-            <div className="bg-gray-700 rounded-full w-12 h-12 flex items-center justify-center text-lg">U</div>
-            {!collapsed && <span>User</span>}
-            {!collapsed && <span className="bg-blue-700 text-xs px-3 py-1 rounded-full mt-1">FREE Plan</span>}
-          </div>
-        </motion.aside>
+            <button
+              className="hidden lg:block absolute top-4 right-2 z-50 p-1 rounded hover:bg-gray-700 transition"
+              aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              onClick={onToggle}
+              type="button"
+            >
+              {collapsed ? <LayoutDashboard size={18} /> : <Home size={18} />}
+            </button>
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">CF</span>
+              </div>
+              {!collapsed && <span className="font-bold text-xl">CareerForge</span>}
+            </div>
+            <nav className="flex flex-col gap-2">
+              <SidebarLink icon={<Home />} label="Home" href="/" collapsed={collapsed} />
+              <SidebarLink icon={<LayoutDashboard />} label="Dashboard" href="/dashboard" collapsed={collapsed} />
+              <SidebarLink icon={<DollarSign />} label="Pricing" href="/pricing" collapsed={collapsed} />
+              <SidebarLink icon={<Settings />} label="Settings" href="/settings" collapsed={collapsed} />
+              <SidebarLink icon={<HelpCircle />} label="Help" href="/help" collapsed={collapsed} />
+            </nav>
+            <div className="mt-auto flex flex-col items-center gap-2 py-6">
+              <div className="bg-gray-700 rounded-full w-12 h-12 flex items-center justify-center text-lg">U</div>
+              {!collapsed && <span>User</span>}
+              {!collapsed && <span className="bg-blue-700 text-xs px-3 py-1 rounded-full mt-1">FREE Plan</span>}
+            </div>
+          </motion.aside>
+        </>
       )}
     </AnimatePresence>
   );
