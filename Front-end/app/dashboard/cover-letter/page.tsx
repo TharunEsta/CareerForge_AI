@@ -230,3 +230,4 @@ const CoverLetterPage = () => {
 
 // Export with dynamic import to prevent SSR
 export default dynamic(() => Promise.resolve(CoverLetterPage), { ssr: false });
+

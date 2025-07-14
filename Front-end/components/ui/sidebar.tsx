@@ -187,3 +187,4 @@ function SidebarLink({ icon, label, href, collapsed }: SidebarLinkProps) {
   );
 }
 
+

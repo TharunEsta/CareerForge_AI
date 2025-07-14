@@ -238,3 +238,4 @@ const ResumeUploadCard: React.FC<ResumeUploadCardProps> = ({ onAnalysis }) => {
 };
 
 export default ResumeUploadCard;
+

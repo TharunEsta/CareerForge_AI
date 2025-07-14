@@ -37,3 +37,4 @@ export const Logo: React.FC<{ size?: 'sm' | 'md' | 'lg' | 'xl' | number; classNa
 };
 
 export default Logo;
+

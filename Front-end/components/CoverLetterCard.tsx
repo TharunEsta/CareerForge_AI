@@ -165,3 +165,4 @@ Best regards,
 };
 
 export default CoverLetterCard;
+

@@ -182,3 +182,4 @@ if (typeof document !== 'undefined') {
   style.textContent = gridPatternCSS;
   document.head.appendChild(style);
 }
+

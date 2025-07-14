@@ -175,3 +175,4 @@ Passionate about clean code, agile methodologies, and staying current with emerg
 };
 
 export default LinkedInOptimizationCard;
+

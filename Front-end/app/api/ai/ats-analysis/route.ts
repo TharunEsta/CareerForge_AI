@@ -20,3 +20,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to analyze ATS compatibility' }, { status: 500 });
   }
 }
+
