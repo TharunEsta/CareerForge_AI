@@ -5,10 +5,9 @@ Tracks feature usage for subscription management
 
 import logging
 from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Any
+
 from pydantic import BaseModel
-
-
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -26,14 +25,14 @@ class UsageTracker:
     
     def __init__(self):
         # In production, this should be a database
-        self.usage_records: Dict[str, UsageRecord] = {}
+        self.usage_records: dict[str, UsageRecord] = {}
     
     @staticmethod
     def get_usage_key(user_id: str, feature: str) -> str:
         """Generate a unique key for usage tracking"""
         return f"{user_id}:{feature}"
     
-    def increment_usage(self, user_id: str, feature: str, user_plan: str = "free") -> Dict[str, Any]:
+    def increment_usage(self, user_id: str, feature: str, user_plan: str = "free") -> dict[str, Any]:
         """Increment usage count for a user and feature"""
         try:
             key = self.get_usage_key(user_id, feature)
@@ -75,7 +74,7 @@ class UsageTracker:
                 "error": str(e)
             }
     
-    def check_usage_limit(self, user_id: str, feature: str, user_plan: str = "free") -> Dict[str, Any]:
+    def check_usage_limit(self, user_id: str, feature: str, user_plan: str = "free") -> dict[str, Any]:
         """Check if user can use a feature based on their plan"""
         try:
             key = self.get_usage_key(user_id, feature)
@@ -118,7 +117,7 @@ class UsageTracker:
                 "error": str(e)
             }
     
-    def get_user_usage_summary(self, user_id: str, user_plan: str = "free") -> Dict[str, Any]:
+    def get_user_usage_summary(self, user_id: str, user_plan: str = "free") -> dict[str, Any]:
         """Get usage summary for all features for a user"""
         try:
             summary = {
@@ -156,7 +155,7 @@ class UsageTracker:
             logger.error("Error getting usage summary for user %s: %s", user_id, e)
             return {"error": "Failed to get usage summary"}
     
-    def reset_user_usage(self, user_id: str, feature: Optional[str] = None):
+    def reset_user_usage(self, user_id: str, feature: str | None = None):
         """Reset usage for a user (for testing or manual reset)"""
         try:
             if feature:
@@ -220,14 +219,14 @@ class UsageTracker:
 usage_tracker = UsageTracker()
 
 # Helper functions for API endpoints
-def track_feature_usage(user_id: str, feature: str, user_plan: str = "free") -> Dict[str, Any]:
+def track_feature_usage(user_id: str, feature: str, user_plan: str = "free") -> dict[str, Any]:
     """Track usage of a feature for a user"""
     return usage_tracker.increment_usage(user_id, feature, user_plan)
 
-def check_feature_usage(user_id: str, feature: str, user_plan: str = "free") -> Dict[str, Any]:
+def check_feature_usage(user_id: str, feature: str, user_plan: str = "free") -> dict[str, Any]:
     """Check if user can use a feature"""
     return usage_tracker.check_usage_limit(user_id, feature, user_plan)
 
-def get_user_usage_summary(user_id: str, user_plan: str = "free") -> Dict[str, Any]:
+def get_user_usage_summary(user_id: str, user_plan: str = "free") -> dict[str, Any]:
     """Get usage summary for a user"""
     return usage_tracker.get_user_usage_summary(user_id, user_plan) 

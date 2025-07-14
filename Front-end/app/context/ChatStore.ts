@@ -8,7 +8,7 @@ interface Message {
 
 export type ModelType = 'gpt-3.5' | 'gpt-4' | 'dalle';
 
-interface PromptTemplate {
+export interface PromptTemplate {
   name: string;
   prompt: string;
 }

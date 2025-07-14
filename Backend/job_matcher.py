@@ -10,6 +10,7 @@ import os
 import re
 from datetime import datetime
 from typing import Any
+
 import openai
 from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer

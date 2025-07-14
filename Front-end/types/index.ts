@@ -5,9 +5,9 @@ export interface SubscriptionType {
 }
 
 export interface User {
+  avatarUrl?: string;
   id: string;
   name: string;
   email: string;
-  avatarUrl?: string;
   subscription?: SubscriptionType;
 } 

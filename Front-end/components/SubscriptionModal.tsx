@@ -3,8 +3,6 @@ import { useRouter } from 'next/navigation';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -53,9 +51,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
               {getTitle()}
             </DialogTitle>
           </div>
-          <DialogDescription className="text-gray-600 leading-relaxed">
             {getDescription()}
-          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
@@ -86,7 +82,6 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
           </div>
         </div>
 
-        <DialogFooter className="flex gap-3">
           <Button 
             variant="outline" 
             onClick={onClose}
@@ -100,7 +95,6 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
           >
             Get Pro
           </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

@@ -5,12 +5,16 @@ import { motion } from 'framer-motion';
 import { User, Shield, Bell, Palette, Download, Trash2, Save } from 'lucide-react';
 import { useAuth } from '@/components/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useUserStore } from '@/store/useUserStore';
 
 const currentPlan = 'free'; // Placeholder, replace with real value if needed
 
 export default function SettingsPage() {
   const { user, logout } = useAuth();
-  const { currentPlan: subscriptionPlan, userSubscription } = useSubscription();
+   const { user: storeuser } = useUserStore(); 
+  const { subscription, loading, error, cancelSubscription, reactivateSubscription } = useSubscription(user);
+const subscriptionPlan = subscription?.plan ?? 'Free';
+const userSubscription = subscription;
   const [activeTab, setActiveTab] = useState('profile');
   const [saving, setSaving] = useState(false);
 

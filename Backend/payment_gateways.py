@@ -4,12 +4,13 @@ Handles payment processing for CareerForge AI
 Currently supports: Razorpay (domestic payments only)
 """
 
-import os
 import logging
-import razorpay
-from typing import Optional, Dict, Any
-from pydantic import BaseModel
+import os
 from enum import Enum
+from typing import Any
+
+import razorpay
+from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
@@ -41,9 +42,9 @@ class PaymentResponse(BaseModel):
     status: PaymentStatus
     amount: float
     currency: str
-    payment_url: Optional[str] = None
-    transaction_id: Optional[str] = None
-    error_message: Optional[str] = None
+    payment_url: str | None = None
+    transaction_id: str | None = None
+    error_message: str | None = None
 
 class RazorpayGateway:
     """Razorpay payment gateway implementation for domestic payments"""
@@ -167,7 +168,7 @@ class RazorpayGateway:
                 error_message=str(e)
             )
 
-    def get_supported_payment_methods(self) -> Dict[str, Any]:
+    def get_supported_payment_methods(self) -> dict[str, Any]:
         """Get supported payment methods for domestic payments"""
         return {
             "upi": {
@@ -203,6 +204,6 @@ def verify_payment(payment_id: str, signature: str, order_id: str) -> PaymentRes
     """Verify a payment using Razorpay"""
     return razorpay_gateway.verify_payment(payment_id, signature, order_id)
 
-def get_supported_payment_methods() -> Dict[str, Any]:
+def get_supported_payment_methods() -> dict[str, Any]:
     """Get supported payment methods"""
     return razorpay_gateway.get_supported_payment_methods() 

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import { useVoiceAssistantWebSocket, VoiceAssistantMessage } from '@/components/hooks/useVoiceAssistantWebSocket';
 import WaveformVisualizer from '@/components/ui/WaveformVisualizer';

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import { useRealtimeWebSocket, RealtimeMessage } from '@/components/hooks/useRealtimeWebSocket';
 

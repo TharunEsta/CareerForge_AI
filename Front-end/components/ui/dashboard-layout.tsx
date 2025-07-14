@@ -1,3 +1,4 @@
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 "use client";
 
 import React, { useState } from 'react';

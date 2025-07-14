@@ -3,13 +3,13 @@ Subscription Router
 Handles subscription-related endpoints for CareerForge AI
 """
 
-from fastapi import APIRouter, HTTPException, Depends, Request
-from fastapi.responses import JSONResponse
 import logging
-from typing import Dict, Any, List
-from payment_gateways import PaymentRequest, PaymentMethod
-from subscription_plans import get_all_plans, get_plan, get_plan_price, BillingCycle
+
+from fastapi import APIRouter, HTTPException
+
+from payment_gateways import PaymentMethod, PaymentRequest
 from payment_router import create_payment_endpoint
+from subscription_plans import BillingCycle, get_all_plans, get_plan, get_plan_price
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

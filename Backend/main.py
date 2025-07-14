@@ -10,8 +10,8 @@ import os
 import re
 import secrets
 import tempfile
+from contextlib import asynccontextmanager
 from datetime import UTC, datetime, timedelta
-
 
 import docx2txt
 import fitz  # PyMuPDF
@@ -21,10 +21,12 @@ import spacy
 # Third-party imports
 import uvicorn
 from dotenv import load_dotenv
-from fastapi import Depends, Form, File
 from fastapi import (
     Body,
+    Depends,
     FastAPI,
+    File,
+    Form,
     Header,
     HTTPException,
     Path,
@@ -33,33 +35,30 @@ from fastapi import (
     status,
 )
 from fastapi.middleware.cors import CORSMiddleware
-
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import jwt
 from pydantic import BaseModel, EmailStr
 from sentence_transformers import SentenceTransformer
-
-from contextlib import asynccontextmanager
 from slowapi import Limiter
-from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from slowapi.extension import Limiter as rate_limiter
-from fastapi.responses import JSONResponse
+from slowapi.util import get_remote_address
 
 # Local application imports
 from models import RevokedToken, SessionLocal
 from payment_router import router as payment_router
-from subscription_router import router as subscription_router
 from realtime_router import router as realtime_router
 from schemas import User as UserModel
 from skills_jobs_router import router as skills_jobs_router
+from subscription_router import router as subscription_router
+from usage_tracker import usage_tracker
 from utils import (
     allowed_file,
     parse_resume,
     parse_resume_with_job_matching,
     setup_logging,
 )
-from usage_tracker import usage_tracker
 
 # Load environment variables (must come *after* all imports)
 load_dotenv("key.env")

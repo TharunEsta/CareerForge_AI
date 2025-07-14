@@ -21,7 +21,7 @@ import {
   Moon,
   Zap
 } from 'lucide-react';
-import { SidebarWithLogo, SidebarNav, SidebarNavItem, SidebarNavItemIcon, SidebarNavItemText, SidebarFooter } from '@/components/ui/sidebar';
+import Sidebar from '@/components/ui/sidebar';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { CommandPalette } from '@/components/CommandPalette';
 import SplashScreen from '@/components/SplashScreen';
@@ -100,7 +100,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
               className="fixed left-0 top-0 z-40 flex flex-col h-screen w-80 bg-gray-900/95 border-r border-gray-800 backdrop-blur-xl md:translate-x-0 md:static md:flex md:z-30"
               style={{ boxShadow: sidebarOpen ? '0 0 0 9999px rgba(0,0,0,0.5)' : undefined }}
             >
-              <SidebarWithLogo className="flex-1 flex flex-col p-6">
                 {/* Logo Section */}
                 <div className="flex items-center space-x-3 mb-8">
                   <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -111,28 +110,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
                 {/* Navigation */}
                 <div className="flex-1">
-                  <SidebarNav>
-                    <SidebarNavItem onClick={() => { router.push('/'); setSidebarOpen(false); }}>
-                      <SidebarNavItemIcon><Home size={20} /></SidebarNavItemIcon>
-                      <SidebarNavItemText>Home</SidebarNavItemText>
-                    </SidebarNavItem>
-                    <SidebarNavItem onClick={() => { router.push('/dashboard'); setSidebarOpen(false); }}>
-                      <SidebarNavItemIcon><Briefcase size={20} /></SidebarNavItemIcon>
-                      <SidebarNavItemText>Dashboard</SidebarNavItemText>
-                    </SidebarNavItem>
-                    <SidebarNavItem onClick={() => { router.push('/pricing'); setSidebarOpen(false); }}>
-                      <SidebarNavItemIcon><CreditCard size={20} /></SidebarNavItemIcon>
-                      <SidebarNavItemText>Pricing</SidebarNavItemText>
-                    </SidebarNavItem>
-                    <SidebarNavItem onClick={() => { router.push('/settings'); setSidebarOpen(false); }}>
-                      <SidebarNavItemIcon><Settings size={20} /></SidebarNavItemIcon>
-                      <SidebarNavItemText>Settings</SidebarNavItemText>
-                    </SidebarNavItem>
-                    <SidebarNavItem onClick={() => { router.push('/help'); setSidebarOpen(false); }}>
-                      <SidebarNavItemIcon><HelpCircle size={20} /></SidebarNavItemIcon>
-                      <SidebarNavItemText>Help</SidebarNavItemText>
-                    </SidebarNavItem>
-                  </SidebarNav>
                 </div>
 
                 {/* User Section */}
@@ -167,7 +144,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                     <span>Toggle Theme</span>
                   </button>
                 </div>
-              </SidebarWithLogo>
             </motion.div>
           )}
         </AnimatePresence>

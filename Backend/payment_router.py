@@ -4,17 +4,16 @@ Handles payment-related endpoints for CareerForge AI
 Currently supports: Razorpay (domestic payments only)
 """
 
-from fastapi import APIRouter, HTTPException, Depends, Request
-from fastapi.responses import JSONResponse
 import logging
-from typing import Dict, Any
+
+from fastapi import APIRouter, HTTPException, Request
+
 from payment_gateways import (
-    PaymentRequest, 
-    PaymentResponse, 
     PaymentMethod,
+    PaymentRequest,
     create_payment,
+    get_supported_payment_methods,
     verify_payment,
-    get_supported_payment_methods
 )
 
 logger = logging.getLogger(__name__)

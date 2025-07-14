@@ -304,7 +304,7 @@ const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium transition">
-            {modelIcons[model]}<span className="hidden sm:inline">{modelLabels[model]}</span>
+            {modelIcons[model as ModelType]}<span className="hidden sm:inline">{modelLabels[model as ModelType]}</span>
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">

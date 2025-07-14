@@ -3,8 +3,9 @@ Subscription Plans Module
 Defines subscription plans for CareerForge AI (Domestic - INR only)
 """
 
-from typing import Dict, List, Any
 from enum import Enum
+from typing import Any
+
 
 class PlanType(str, Enum):
     FREE = "free"
@@ -24,8 +25,8 @@ class SubscriptionPlan:
         price: float,
         currency: str = "INR",
         billing_cycle: BillingCycle = BillingCycle.MONTHLY,
-        features: List[str] = None,
-        limits: Dict[str, Any] = None,
+        features: list[str] = None,
+        limits: dict[str, Any] = None,
         popular: bool = False
     ):
         self.id = id
@@ -127,16 +128,16 @@ def get_plan(plan_id: str) -> SubscriptionPlan:
     """Get a subscription plan by ID"""
     return SUBSCRIPTION_PLANS.get(plan_id)
 
-def get_all_plans() -> Dict[str, SubscriptionPlan]:
+def get_all_plans() -> dict[str, SubscriptionPlan]:
     """Get all subscription plans"""
     return SUBSCRIPTION_PLANS
 
-def get_plan_features(plan_id: str) -> List[str]:
+def get_plan_features(plan_id: str) -> list[str]:
     """Get features for a specific plan"""
     plan = get_plan(plan_id)
     return plan.features if plan else []
 
-def get_plan_limits(plan_id: str) -> Dict[str, Any]:
+def get_plan_limits(plan_id: str) -> dict[str, Any]:
     """Get limits for a specific plan"""
     plan = get_plan(plan_id)
     return plan.limits if plan else {}

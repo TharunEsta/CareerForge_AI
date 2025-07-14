@@ -10,11 +10,10 @@ import {
   DropdownMenuSeparator,
 } from './dropdown-menu';
 import { useAuth } from '@/components/AuthContext';
-import { User } from '@/types';
+import { User as AppUser } from '@/types';
 
 interface User {
   name?: string;
-  avatarUrl?: string;
   // ...other properties...
 }
 
@@ -31,7 +30,7 @@ export default function MicroDashboardMenu() {
             <Avatar>
             <AvatarImage src="/placeholder-user.jpg" alt={user.name} />
             <AvatarFallback>{user.name?.[0] || 'U'}</AvatarFallback>
-              <AvatarImage src={user?.avatarUrl ?? "/placeholder-user.jpg"} alt={user?.name ?? ""} />
+              <AvatarImage src={"/placeholder-user.jpg"} alt={user?.name ?? ""} />
               <AvatarFallback>{user.name?.[0] || 'U'}</AvatarFallback>
             </Avatar>
           </button>
