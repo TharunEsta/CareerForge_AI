@@ -1,9 +1,10 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sun, Moon, Plus, History, UserCircle, Cog, Zap, Home, DollarSign, Search, X, Briefcase, CreditCard, Settings, HelpCircle } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Command, CommandInput, CommandList, CommandItem } from 'cmdk';
 
 interface CommandItemType {
   id: string;
@@ -146,4 +147,4 @@ export function CommandPalette() {
       )}
     </AnimatePresence>
   );
-}
+} 

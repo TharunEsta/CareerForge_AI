@@ -127,3 +127,4 @@ const ResumeRewriteCard: React.FC<ResumeRewriteCardProps> = ({ onRewrite }) => {
 };
 
 export default ResumeRewriteCard;
+

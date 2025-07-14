@@ -25,3 +25,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to generate cover letter' }, { status: 500 });
   }
 }
+

@@ -5,3 +5,4 @@ declare module 'react-icons/fi' {
   export const FiAlertCircle: FC;
   export const FiCheckCircle: FC;
 }
+

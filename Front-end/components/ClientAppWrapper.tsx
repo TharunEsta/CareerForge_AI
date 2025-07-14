@@ -12,3 +12,4 @@ export default function ClientAppWrapper({ children }: { children: React.ReactNo
     </Providers>
   );
 }
+

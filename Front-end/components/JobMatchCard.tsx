@@ -231,3 +231,4 @@ const JobMatchCard: React.FC<JobMatchCardProps> = ({ onMatch }) => {
 };
 
 export default JobMatchCard;
+

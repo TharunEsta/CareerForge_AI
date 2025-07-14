@@ -39,6 +39,9 @@ export const metadata: Metadata = {
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
       { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
     ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
   },
   manifest: '/manifest.json',
   viewport: 'width=device-width, initial-scale=1',
@@ -58,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={inter.className + " bg-[#18181b] min-h-screen flex flex-col lg:flex-row overflow-x-hidden"}>
         <SplashScreenPerplexity />
         <SidebarPerplexity />
-        <main className="w-full lg:ml-64 min-h-screen flex flex-col items-center justify-center transition-all duration-300">
+        <main className="w-full ml-64 min-h-screen flex flex-col items-center justify-center transition-all duration-300">
           <ClientLayout>
             {children}
           </ClientLayout>
@@ -67,3 +70,5 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
+
+

@@ -10,3 +10,4 @@ interface ClientProvidersProps {
 export default function ClientProviders({ children }: ClientProvidersProps) {
   return <AuthProvider>{children}</AuthProvider>;
 }
+

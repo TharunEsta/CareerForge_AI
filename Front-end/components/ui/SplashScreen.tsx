@@ -77,3 +77,4 @@ export const SplashScreen = ({ show }: SplashScreenProps) => {
 };
 
 export default SplashScreen;
+

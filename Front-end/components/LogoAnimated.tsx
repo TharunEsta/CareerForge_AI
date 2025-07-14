@@ -22,3 +22,4 @@ export const LogoAnimated: React.FC<LogoAnimatedProps> = ({ size = 'md', classNa
     </div>
   );
 };
+
