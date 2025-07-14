@@ -40,9 +40,8 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import jwt
 from pydantic import BaseModel, EmailStr
 from sentence_transformers import SentenceTransformer
-from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
-from slowapi.extension import Limiter as rate_limiter
+from slowapi.extension import Limiter 
 from slowapi.util import get_remote_address
 
 # Local application imports
@@ -59,6 +58,8 @@ from utils import (
     parse_resume_with_job_matching,
     setup_logging,
 )
+
+rate_limiter = Limiter(key_func=get_remote_address)
 
 # Load environment variables (must come *after* all imports)
 load_dotenv("key.env")
