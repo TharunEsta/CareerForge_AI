@@ -24,32 +24,14 @@ import {
 import { SidebarWithLogo, SidebarNav, SidebarNavItem, SidebarNavItemIcon, SidebarNavItemText, SidebarFooter } from '@/components/ui/sidebar';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { CommandPalette } from '@/components/CommandPalette';
-import SplashScreen from '@/components/SplashScreen';
 import { Providers } from '@/components/Providers';
 import Footer from '@/components/Footer';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
-  const [showSplash, setShowSplash] = React.useState(true);
   const { theme, setTheme } = useTheme();
   const router = useRouter();
-
-  React.useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 1500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  React.useEffect(() => {
-    if (sidebarOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [sidebarOpen]);
 
   // Handler for New Chat
   const handleNewChat = () => {
@@ -91,7 +73,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   return (
     <Providers>
-      {showSplash && <SplashScreen />}
       <ErrorBoundary>
         <CommandPalette />
         

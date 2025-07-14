@@ -3,8 +3,8 @@ import { Inter } from 'next/font/google';
 import type { Metadata } from 'next';
 import ClientLayout from './ClientLayout';
 import './globals.css';
-import SidebarPerplexity from '@/components/ui/SidebarPerplexity';
-import SplashScreenPerplexity from '@/components/ui/SplashScreenPerplexity';
+import SidebarCareerForge from '@/components/ui/SidebarPerplexity';
+import { ToasterProvider } from '@/components/ui/toaster';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -59,13 +59,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="msapplication-TileColor" content="#18181b" />
       </head>
       <body className={inter.className + " bg-[#18181b] min-h-screen flex flex-col lg:flex-row overflow-x-hidden"}>
-        <SplashScreenPerplexity />
-        <SidebarPerplexity />
-        <main className="w-full ml-64 min-h-screen flex flex-col items-center justify-center transition-all duration-300">
-          <ClientLayout>
-            {children}
-          </ClientLayout>
-        </main>
+        <ToasterProvider>
+          <SidebarCareerForge />
+          <main className="w-full ml-64 min-h-screen flex flex-col items-center justify-center transition-all duration-300">
+            <ClientLayout>
+              {children}
+            </ClientLayout>
+          </main>
+        </ToasterProvider>
       </body>
     </html>
   );
