@@ -1,18 +1,11 @@
-<<<<<<< HEAD
-'use client';
-=======
 "use client";
->>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
 
 import * as React from 'react';
 import { motion } from 'framer-motion';
 import { cva, type VariantProps } from 'class-variance-authority';
-<<<<<<< HEAD
-=======
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home, LayoutDashboard, DollarSign, Settings, HelpCircle } from 'lucide-react';
 
->>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
 import { cn } from '@/lib/utils';
 
 // Sidebar variants using class-variance-authority
@@ -38,52 +31,6 @@ export interface SidebarProps
 }
 
 export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
-  ({ className, children, variant, ...props }, ref) => {
-    return (
-      <motion.div
-        ref={ref}
-        className={cn(sidebarVariants({ variant }), className)}
-        {...props as any}
-      >
-        {children}
-      </motion.div>
-    );
-  }
-  (
-    { className, children, variant, ...props }: SidebarProps,
-    ref: React.ForwardedRef<HTMLDivElement>
-  ) => (
-    <motion.div
-      ref={ref}
-      className={cn(SidebarVariants({ variant }), className)}
-      {...props}
-    >
-      {children}
-    </motion.div>
-  )
-);
-Sidebar.displayName = 'Sidebar';
-
-// Header
-export const SidebarHeader = ({ children }: { children?: React.ReactNode }) => (
-  <div className="mb-4">{children}</div>
-);
-
-// Footer
-export const SidebarFooter = ({ children }: { children?: React.ReactNode }) => (
-  <div className="mt-auto">{children}</div>
-);
-
-// Navigation wrapper
-export const SidebarNav = ({ children }: { children?: React.ReactNode }) => (
-  <div className="space-y-1">{children}</div>
-);
-
-// Nav item
-export const SidebarNavItem = ({
-  children,
-  onClick,
-}: {
   children?: React.ReactNode;
   onClick?: () => void;
 }) => (
@@ -147,7 +94,6 @@ interface SidebarNavItemBadgeProps extends React.HTMLAttributes<HTMLDivElement> 
   className?: string;
 }
 export const SidebarNavItemBadge = React.forwardRef<HTMLDivElement, SidebarNavItemBadgeProps>(({ className, ...props }, ref) => (
->>>>>>> 3bfe85136697f4c56a9a77a6ce811c8115cff634
   <div
     ref={ref}
     className={cn(

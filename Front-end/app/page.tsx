@@ -1,12 +1,5 @@
-<<<<<<< HEAD
-"use client";
-
-import React, { useState, useEffect } from 'react';
-import { Logo } from '@/components/ui/logo';
-=======
 'use client';
 import * as React from 'react';
->>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -25,46 +18,6 @@ import {
   X,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-<<<<<<< HEAD
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Home, 
-  Briefcase, 
-  CreditCard, 
-  Settings, 
-  HelpCircle, 
-  LogOut, 
-  UserCircle, 
-  Plus, 
-  History, 
-  Cog, 
-  Menu,
-  X,
-  Sun,
-  Moon,
-  Zap,
-  MessageSquare,
-  FileText,
-  Search,
-  Mic,
-  Upload,
-  Sparkles,
-  Shield,
-  Globe,
-  Clock,
-  TrendingUp,
-  Users,
-  Star,
-  CheckCircle,
-  AlertCircle,
-  Info
-} from 'lucide-react';
-import { useSubscription } from '@/hooks/useSubscription';
-import { useAuth } from '@/components/AuthContext';
-import { CommandPalette } from '@/components/CommandPalette';
-import WaveformVisualizer from '@/components/ui/WaveformVisualizer';
-=======
->>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
 
 
 interface Message {
@@ -74,59 +27,6 @@ interface Message {
   timestamp: Date;
 }
 
-<<<<<<< HEAD
-
-interface SubscriptionPlan {
-  id: string;
-  name: string;
-  price: number;
-  features: string[];
-  popular?: boolean;
-}
-
-interface UserSubscription {
-  plan: string;
-  status: string;
-  nextBillingDate: string;
-}
-
-interface UsageSummary {
-  ai_chats: { used: number; limit: number };
-  resume_parsing: { used: number; limit: number };
-  job_matching: { used: number; limit: number };
-}
-
-export default function HomePage() {
-  const router = useRouter();
-  const { user } = useAuth();
-  const {
-    plans,
-    userSubscription,
-    currentPlan,
-    loading,
-    usageSummary,
-    error,
-    canUseFeature: subscriptionCanUseFeature,
-    clearError,
-  } = useSubscription();
-
-
-function TypingAnimation() {
-  return (
-    <div className="flex items-center gap-1 mt-2">
-      <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-      <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '100ms' }}></span>
-      <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></span>
-      <span className="ml-2 text-xs text-gray-400">Thinking...</span>
-    </div>
-  );
-}
-
-const userAvatar = 'https://randomuser.me/api/portraits/men/32.jpg';
-const assistantAvatar = 'https://api.dicebear.com/7.x/bottts/svg?seed=ai';
-
-=======
->>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
 function formatTime(date: Date) {
   return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
@@ -195,16 +95,6 @@ export default function AppPage() {
         throw new Error('Failed to get response');
       }
     } catch (error) {
-<<<<<<< HEAD
-      console.error('Error sending message:', error);
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: `I understand you said: "${content}". How can I help you with your career goals?`,
-        role: 'assistant',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, aiResponse]);
-=======
       setMessages(prev => [
         ...prev,
         {
@@ -215,7 +105,6 @@ export default function AppPage() {
         }
       ]);
     } finally {
->>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
       setIsLoading(false);
     }, 1000);
   };
@@ -295,19 +184,6 @@ export default function AppPage() {
     }
   ];
   React.useEffect(() => {
-<<<<<<< HEAD
-    // Redirect to dashboard after a brief delay
-    const timer = setTimeout(() => {
-      router.push('/dashboard');
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [router]);
-
-
-  React.useEffect(() => {
-=======
->>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
     if (showChat && inputRef.current) {
       inputRef.current.focus();
     }
@@ -335,36 +211,6 @@ export default function AppPage() {
   const grouped = groupMessages(messages);
 
   return (
-<<<<<<< HEAD
-    <div className="min-h-screen bg-gray-900 text-white">
-      {/* Header */}
-      <header className="border-b border-gray-800 bg-gray-900/95 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-lg">CF</span>
-              </div>
-              <h1 className="text-xl font-semibold">CareerForge AI</h1>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setShowVoice(true)}
-                disabled={!hasVoiceSubscription}
-                className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <Mic className="w-4 h-4" />
-                <span>Voice Assistant</span>
-              </button>
-              
-              <button
-                onClick={() => router.push('/dashboard')}
-                className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors"
-              >
-                Dashboard
-              </button>
-=======
     <div className="flex flex-col lg:flex-row h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-gray-900">
       {/* Mobile Menu Button */}
       <button
@@ -391,39 +237,9 @@ export default function AppPage() {
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">CF</span>
->>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
             </div>
           </div>
         </div>
-<<<<<<< HEAD
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
-            Transform Your Career with AI
-          </h1>
-          <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-            Get personalized career advice, optimize your resume, and find the perfect job matches with our AI-powered platform.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="px-8 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
-            >
-              Get Started
-            </button>
-            <button
-              onClick={() => setShowSubscriptionCards(true)}
-              className="px-8 py-3 rounded-lg border border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white transition-colors"
-            >
-              View Plans
-        {/* Navigation */}
-=======
->>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
         <nav className="flex-1 p-4 space-y-2">
           <a href="/" className="flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
             <Home className="w-5 h-5" />
@@ -484,21 +300,6 @@ export default function AppPage() {
         <div className="flex items-center justify-between p-4 border-b border-gray-800">
           <h1 className="text-lg sm:text-xl font-semibold text-white">CareerForge AI</h1>
         </div>
-<<<<<<< HEAD
-
-        {/* Usage Stats */}
-        <div className="bg-gray-800 rounded-xl p-6 mb-12">
-          <h2 className="text-2xl font-semibold mb-6">Your Usage</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {stats.map((stat, index) => (
-              <div key={index} className="flex items-center space-x-3">
-                <div className={`${stat.color}`}>
-                  {stat.icon}
-                </div>
-                <div>
-                  <p className="text-gray-400 text-sm">{stat.label}</p>
-                  <p className="text-white font-semibold">{stat.value}</p>
-=======
         <div className="flex-1 flex flex-col">
           <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${messages.length > 0 ? '' : 'flex items-center justify-center'}`}>
             {messages.length === 0 ? (
@@ -525,7 +326,6 @@ export default function AppPage() {
                     <h3 className="font-medium text-white text-sm sm:text-base">Job Matching</h3>
                     <p className="text-xs sm:text-sm text-gray-400">Find matching job opportunities</p>
                   </button>
->>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
                 </div>
               </div>
             ))}
@@ -574,115 +374,16 @@ export default function AppPage() {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-<<<<<<< HEAD
-                <div className="bg-gray-700 text-gray-200 px-4 py-2 rounded-lg">
-                  <div className="flex items-center space-x-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>AI is thinking...</span>
-=======
                 <div className="bg-gray-800 text-gray-100 px-3 sm:px-4 py-2 rounded-lg">
                   <div className="flex items-center space-x-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400"></div>
                     <span className="text-sm sm:text-base">Thinking...</span>
->>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
                   </div>
                 </div>
               </div>
             )}
             <div ref={chatEndRef} />
           </div>
-<<<<<<< HEAD
-
-          {/* Input */}
-          <div className="flex space-x-4">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Ask me about your career..."
-              className="flex-1 px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              onClick={() => handleSendMessage(input)}
-              disabled={!input.trim() || isLoading}
-              className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              Send
-            </button>
-          </div>
-        </div>
-
-        {/* Subscription Plans */}
-        <AnimatePresence>
-          {showSubscriptionCards && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-              onClick={() => setShowSubscriptionCards(false)}
-            >
-              <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-gray-900 rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="flex justify-between items-center mb-8">
-                  <h2 className="text-3xl font-bold">Choose Your Plan</h2>
-                  <button
-                    onClick={() => setShowSubscriptionCards(false)}
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    <X size={24} />
-                  </button>
-                </div>
-
-                <div className="grid md:grid-cols-3 gap-6">
-                  {plans.map((plan) => (
-                    <div
-                      key={plan.id}
-                      className={`bg-gray-800 rounded-xl p-6 border-2 ${
-                        plan.popular
-                          ? 'border-blue-500 bg-gray-800/50'
-                          : 'border-gray-700'
-                      }`}
-                    >
-                      {plan.popular && (
-                        <div className="bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full inline-block mb-4">
-                          MOST POPULAR
-                        </div>
-                      )}
-                      <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                      <p className="text-4xl font-bold mb-6">
-                        ${plan.price}
-                        <span className="text-lg text-gray-400">/month</span>
-                      </p>
-                      <ul className="space-y-3 mb-8">
-                        {plan.features.map((feature, index) => (
-                          <li key={index} className="flex items-center space-x-3">
-                            <CheckCircle className="w-5 h-5 text-green-500" />
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      <button
-                        onClick={() => {
-                          setShowSubscriptionCards(false);
-                        }}
-                        className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors font-semibold"
-                      >
-                        Get Started
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            </motion.div>
-=======
->>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
           {/* Feature Icons */}
           {messages.length > 0 && (
             <div className="flex justify-center space-x-2 sm:space-x-4 p-4 border-t border-gray-800">
@@ -723,27 +424,6 @@ export default function AppPage() {
               </Button>
             </div>
           )}
-<<<<<<< HEAD
-        </AnimatePresence>
-
-        {/* Subscription Warning */}
-        <AnimatePresence>
-          {showSubWarning && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-              onClick={() => setShowSubWarning(false)}
-            >
-              <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-gray-900 rounded-2xl p-8 max-w-md w-full"
-                onClick={(e) => e.stopPropagation()}
-=======
->>>>>>> db48806bba7dc7d49b870a101db6c2e90a7d7be6
           {/* Chat Input */}
           <div className="p-4 border-t border-gray-800">
             <div className="flex space-x-2">
