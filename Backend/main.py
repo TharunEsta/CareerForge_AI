@@ -33,7 +33,7 @@ from fastapi import (
     status,
 )
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import JSONResponse, FileResponse, HTMLResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import jwt
 from pydantic import BaseModel, EmailStr
@@ -989,6 +989,19 @@ async def root():
 # Mount static files (if needed)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# Serve favicon.ico for both GET and HEAD requests
+@app.api_route("/favicon.ico", methods=["GET", "HEAD"])
+def favicon():
+    return FileResponse("static/favicon.ico")
+
+# Block common sensitive paths targeted by bots
+@app.middleware("http")
+async def block_sensitive_paths(request: Request, call_next):
+    blocked_paths = ["/.env", "/api/.env", "/config.env", "/api/config.env", "/api/src/.env"]
+    if request.url.path in blocked_paths:
+        raise HTTPException(status_code=404, detail="Not Found")
+    return await call_next(request)
+
 # Initialize the rate limiter
 rate_limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = rate_limiter
@@ -1016,16 +1029,9 @@ def create_user(db: Session, email: str, password: str, full_name: str):
     db.refresh(user)
     return user
 
-@app.get("/favicon.ico")
-def favicon():
-    return FileResponse("static/favicon.ico")
-
-@app.middleware("http")
-async def block_sensitive_paths(request: Request, call_next):
-    blocked_paths = ["/.env", "/api/.env", "/config.env", "/api/config.env"]
-    if request.url.path in blocked_paths:
-        raise HTTPException(status_code=404, detail="Not Found")
-    return await call_next(request)
+@app.get("/login", response_class=HTMLResponse)
+def login_page():
+    return "<h1>Login Page Placeholder</h1>"
 
 if __name__ == "__main__":
     uvicorn.run(
