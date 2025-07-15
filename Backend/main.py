@@ -41,6 +41,8 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.extension import Limiter 
 from slowapi.util import get_remote_address
 from typing import Optional, Any
+import uvicorn
+import usage_tracker
 
 # Local application imports
 from models import RevokedToken, SessionLocal
@@ -126,10 +128,6 @@ password_reset_tokens = {}
 def hash_password(password: str) -> str:
     """Simple password hashing using SHA-256"""
     return hashlib.sha256(password.encode()).hexdigest()
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify password against hash"""
-    return hash_password(plain_password) == hashed_password
 
 def generate_reset_token() -> str:
     """Generate a secure random token"""
