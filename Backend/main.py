@@ -33,7 +33,7 @@ from fastapi import (
     status,
 )
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import jwt
 from pydantic import BaseModel, EmailStr
@@ -43,6 +43,7 @@ from slowapi.util import get_remote_address
 from typing import Optional, Any
 import uvicorn
 import usage_tracker
+from fastapi.staticfiles import StaticFiles
 
 # Local application imports
 from models import RevokedToken, SessionLocal
@@ -986,7 +987,7 @@ async def root():
     }
 
 # Mount static files (if needed)
-# app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Initialize the rate limiter
 rate_limiter = Limiter(key_func=get_remote_address)
@@ -1014,6 +1015,17 @@ def create_user(db: Session, email: str, password: str, full_name: str):
     db.commit()
     db.refresh(user)
     return user
+
+@app.get("/favicon.ico")
+def favicon():
+    return FileResponse("static/favicon.ico")
+
+@app.middleware("http")
+async def block_sensitive_paths(request: Request, call_next):
+    blocked_paths = ["/.env", "/api/.env", "/config.env", "/api/config.env"]
+    if request.url.path in blocked_paths:
+        raise HTTPException(status_code=404, detail="Not Found")
+    return await call_next(request)
 
 if __name__ == "__main__":
     uvicorn.run(
