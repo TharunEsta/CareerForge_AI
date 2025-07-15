@@ -5,7 +5,6 @@ Defines subscription plans and pricing for CareerForge AI
 
 from enum import Enum
 from typing import Dict, List, Optional
-from datetime import datetime, timedelta
 
 class BillingCycle(str, Enum):
     MONTHLY = "monthly"

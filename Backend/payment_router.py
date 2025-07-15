@@ -7,10 +7,8 @@ Currently supports: Razorpay (domestic payments only) with enhanced real-time fe
 import logging
 import hashlib
 import hmac
-import json
 import os
 from fastapi import APIRouter, HTTPException, Request, BackgroundTasks
-from fastapi.responses import JSONResponse
 
 from payment_gateways import (
     PaymentMethod,

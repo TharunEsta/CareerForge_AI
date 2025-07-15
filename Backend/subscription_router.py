@@ -42,7 +42,7 @@ async def get_subscription_plans():
         }
         
     except Exception as e:
-        logger.error(f"Failed to get subscription plans: {e}")
+        logger.error("Failed to get subscription plans: %s", e)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/plans/{plan_id}")
@@ -69,7 +69,7 @@ async def get_subscription_plan(plan_id: str):
         }
         
     except Exception as e:
-        logger.error(f"Failed to get subscription plan: {e}")
+        logger.error("Failed to get subscription plan: %s", e)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/upgrade")
@@ -116,7 +116,7 @@ async def upgrade_subscription(
         }
         
     except Exception as e:
-        logger.error(f"Subscription upgrade failed: {e}")
+        logger.error("Subscription upgrade failed: %s", e)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/user/{user_id}")
@@ -147,7 +147,7 @@ async def get_user_subscription(user_id: str):
         }
         
     except Exception as e:
-        logger.error(f"Failed to get user subscription: {e}")
+        logger.error("Failed to get user subscription: %s", e)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/cancel")
@@ -156,7 +156,7 @@ async def cancel_subscription(user_id: str):
     try:
         # Mock cancellation
         # In production, this would update database
-        logger.info(f"Subscription cancelled for user: {user_id}")
+        logger.info("Subscription cancelled for user: %s", user_id)
         
         return {
             "success": True,
@@ -164,7 +164,7 @@ async def cancel_subscription(user_id: str):
         }
         
     except Exception as e:
-        logger.error(f"Failed to cancel subscription: {e}")
+        logger.error("Failed to cancel subscription: %s", e)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/health")
