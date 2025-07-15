@@ -37,8 +37,8 @@ ENVIRONMENT=development
 ### Backend (.env.local)
 ```bash
 # Razorpay Configuration
-RAZORPAY_KEY_ID=rzp_test_your_test_key_id
-RAZORPAY_KEY_SECRET=your_test_key_secret
+RAZORPAY_KEY_ID=rzp_test_0xUo32kCeZ1Nla
+RAZORPAY_KEY_SECRET=pqnnI5vvNQahDE9aqES5X
 RAZORPAY_MODE=test
 
 # Database Configuration
