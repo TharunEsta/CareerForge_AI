@@ -50,6 +50,7 @@ from models import RevokedToken, SessionLocal
 from payment_router import router as payment_router
 from realtime_router import router as realtime_router
 from schemas import User as UserModel
+from schemas import User as DBUser
 from skills_jobs_router import router as skills_jobs_router
 from subscription_router import router as subscription_router
 from utils import (
@@ -58,7 +59,6 @@ from utils import (
     parse_resume_with_job_matching,
     setup_logging,
 )
-from Backend.schemas import User as DBUser
 from Backend.auth import get_password_hash, verify_password
 from sqlalchemy.orm import Session
 from sentence_transformers import SentenceTransformer
