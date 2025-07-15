@@ -7,19 +7,18 @@ FastAPI-based backend for AI-powered career optimization
 import hashlib
 import logging
 import os
-import re
 import secrets
-import tempfile
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime, timedelta
-
-import docx2txt
+from pathlib import Path
 import fitz  # PyMuPDF
 import openai
 import spacy
+import tempfile
+import re
+import docx2txt
 
 # Third-party imports
-import uvicorn
 from dotenv import load_dotenv
 from fastapi import (
     Body,
@@ -29,7 +28,6 @@ from fastapi import (
     Form,
     Header,
     HTTPException,
-    Path,
     Request,
     UploadFile,
     status,
@@ -39,10 +37,10 @@ from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import jwt
 from pydantic import BaseModel, EmailStr
-from sentence_transformers import SentenceTransformer
 from slowapi.errors import RateLimitExceeded
 from slowapi.extension import Limiter 
 from slowapi.util import get_remote_address
+from typing import Optional, Any
 
 # Local application imports
 from models import RevokedToken, SessionLocal
@@ -51,7 +49,6 @@ from realtime_router import router as realtime_router
 from schemas import User as UserModel
 from skills_jobs_router import router as skills_jobs_router
 from subscription_router import router as subscription_router
-from usage_tracker import usage_tracker
 from utils import (
     allowed_file,
     parse_resume,
@@ -61,6 +58,7 @@ from utils import (
 from Backend.schemas import User as DBUser
 from Backend.auth import get_password_hash, verify_password
 from sqlalchemy.orm import Session
+from sentence_transformers import SentenceTransformer
 
 rate_limiter = Limiter(key_func=get_remote_address)
 
@@ -168,8 +166,11 @@ class ParsedResume(BaseModel):
     education: list[str]
 
 # Utilities
-def get_user(username: str):
-    return users_db.get(username)
+def get_user_by_email(db, email: str):
+    return db.query(DBUser).filter(DBUser.email == email).first()
+
+def get_user_by_username(db, username: str):
+    return db.query(DBUser).filter(DBUser.username == username).first()
 
 def create_access_token(data: dict):
     to_encode = data.copy()
@@ -185,9 +186,9 @@ def get_jti_from_token(token: str):
     except Exception:
         return None, None
 
-async def get_current_user(token: str = None):
+async def get_current_user(token: Optional[str] = None) -> Any:
     if token is None:
-        token = Depends(oauth2_scheme)
+        token = await oauth2_scheme()
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -407,11 +408,7 @@ def extract_education(text: str):
 # Routes
 
 @app.post("/api/resume/upload")
-async def upload_resume(request: Request, file: UploadFile = None, current_user: dict = None):
-    if file is None:
-        file = File(...)
-    if current_user is None:
-        current_user = Depends(get_current_user)
+async def upload_resume(request: Request, file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
     allowed_types = [
         "application/pdf",
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -434,7 +431,7 @@ async def upload_resume(request: Request, file: UploadFile = None, current_user:
         parsed_data = parse_resume(text)
         return {
             "message": "Resume uploaded and parsed successfully",
-            "parsed_resume": parsed_data.dict()
+            "parsed_resume": parsed_data.dict() if hasattr(parsed_data, 'dict') else parsed_data
         }
     except Exception as e:
         logger.error("Error processing resume: %s", e)
@@ -494,11 +491,14 @@ async def signup(email: str = Form(...), password: str = Form(...), full_name: s
     return User(username=user.username, email=user.email, full_name=user.full_name)
 
 @app.get("/get_user_info")
-def get_user_info(email: str = Depends(get_current_user)):
-    user = users_db[email]
+def get_user_info(current_user: DBUser = Depends(get_current_user)):
     return {
-        "email": email,
-        "full_name": user["full_name"],
+        "email": current_user.email,
+        "full_name": current_user.full_name,
+        "username": current_user.username,
+        "plan": current_user.plan,
+        "is_active": current_user.is_active,
+        "created_at": current_user.created_at
     }
 
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@example.com")
@@ -511,8 +511,11 @@ def send_email(to_email: str, subject: str, body: str):
 
 @app.post("/forgot-password")
 async def forgot_password(email: str = Form(...)):
-    if email not in users_db:
-        # Don't reveal if email exists or not for security
+    db = SessionLocal()
+    user = get_user_by_email(db, email)
+    db.close()
+    # Don't reveal if email exists or not for security
+    if not user:
         return {"message": "If your email is registered, you will receive a password reset link"}
     token = generate_reset_token()
     password_reset_tokens[token] = {
@@ -537,18 +540,21 @@ async def reset_password(
 ):
     if token not in password_reset_tokens:
         raise HTTPException(status_code=400, detail="Invalid or expired token")
-    
     token_data = password_reset_tokens[token]
     if datetime.utcnow() > token_data["expires"]:
         del password_reset_tokens[token]
         raise HTTPException(status_code=400, detail="Token has expired")
-    
     email = token_data["email"]
-    users_db[email]["hashed_password"] = hash_password(new_password)
-    
+    db = SessionLocal()
+    user = get_user_by_email(db, email)
+    if not user:
+        db.close()
+        raise HTTPException(status_code=400, detail="User not found")
+    user.hashed_password = hash_password(new_password)
+    db.commit()
+    db.close()
     # Remove used token
     del password_reset_tokens[token]
-    
     return {"message": "Password has been reset successfully"}
 
 @app.post("/job_match")

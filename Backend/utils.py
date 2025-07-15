@@ -1,11 +1,11 @@
 import os
 import re
 import tempfile
-
 import docx2txt
 import pdfplumber
 import spacy
 from spacy.matcher import Matcher
+import logging
 
 # Load spaCy model once
 nlp = spacy.load("en_core_web_sm")
@@ -535,7 +535,6 @@ if __name__ == "__main__":
     pprint.pprint(result)
 
 def setup_logging():
-    import logging
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"

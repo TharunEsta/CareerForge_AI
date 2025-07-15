@@ -55,7 +55,7 @@ async def create_payment_endpoint(request: PaymentRequest):
         }
         
     except Exception as e:
-        logger.error(f"Payment creation failed: {e}")
+        logger.error("Payment creation failed: %s", e)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/verify")
@@ -70,7 +70,7 @@ async def verify_payment_endpoint(payment_id: str, signature: str, order_id: str
             raise HTTPException(status_code=400, detail="Invalid payment signature")
             
     except Exception as e:
-        logger.error(f"Payment verification failed: {e}")
+        logger.error("Payment verification failed: %s", e)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/status/{payment_id}")
@@ -88,7 +88,7 @@ async def get_payment_status_endpoint(payment_id: str):
         }
         
     except Exception as e:
-        logger.error(f"Failed to get payment status: {e}")
+        logger.error("Failed to get payment status: %s", e)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/webhook/razorpay")
@@ -117,7 +117,7 @@ async def razorpay_webhook(request: Request, background_tasks: BackgroundTasks):
         event = webhook_data.get("event")
         payment_data = webhook_data.get("payload", {}).get("payment", {})
         
-        logger.info(f"Received Razorpay webhook: {event}")
+        logger.info("Received Razorpay webhook: %s", event)
         
         # Handle different events
         if event == "payment.captured":
@@ -138,7 +138,7 @@ async def razorpay_webhook(request: Request, background_tasks: BackgroundTasks):
         return {"success": True, "message": "Webhook processed"}
         
     except Exception as e:
-        logger.error(f"Error handling Razorpay webhook: {e}")
+        logger.error("Error handling Razorpay webhook: %s", e)
         raise HTTPException(status_code=500, detail="Webhook processing failed")
 
 async def process_successful_payment(payment_data: dict):
@@ -148,13 +148,13 @@ async def process_successful_payment(payment_data: dict):
         order_id = payment_data.get("order_id")
         amount = payment_data.get("amount", 0) / 100  # Convert from paise
         
-        logger.info(f"Processing successful payment: {payment_id}, Amount: {amount}")
+        logger.info("Processing successful payment: %s, Amount: %s", payment_id, amount)
         
         # Update user subscription
         # Add your subscription update logic here
         
     except Exception as e:
-        logger.error(f"Error processing successful payment: {e}")
+        logger.error("Error processing successful payment: %s", e)
 
 async def process_failed_payment(payment_data: dict):
     """Process failed payment"""
@@ -163,26 +163,26 @@ async def process_failed_payment(payment_data: dict):
         error_code = payment_data.get("error_code")
         error_description = payment_data.get("error_description")
         
-        logger.info(f"Processing failed payment: {payment_id}, Error: {error_description}")
+        logger.info("Processing failed payment: %s, Error: %s", payment_id, error_description)
         
         # Handle failed payment
         # Add your failure handling logic here
         
     except Exception as e:
-        logger.error(f"Error processing failed payment: {e}")
+        logger.error("Error processing failed payment: %s", e)
 
 async def process_order_paid(payment_data: dict):
     """Process order paid event"""
     try:
         order_id = payment_data.get("id")
         
-        logger.info(f"Processing order paid: {order_id}")
+        logger.info("Processing order paid: %s", order_id)
         
         # Handle order completion
         # Add your order completion logic here
         
     except Exception as e:
-        logger.error(f"Error processing order paid: {e}")
+        logger.error("Error processing order paid: %s", e)
 
 @router.get("/gateways")
 async def get_payment_gateways():

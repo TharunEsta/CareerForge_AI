@@ -17,14 +17,8 @@ from pydantic import BaseModel, Field
 
 from job_matcher import (
     analyze_job_description as analyze_job_description_logic,
-)
-from job_matcher import (
     analyze_market_trends as analyze_market_trends_logic,
-)
-from job_matcher import (
     get_skill_recommendations as get_skill_recommendations_logic,
-)
-from job_matcher import (
     match_resume_to_job as match_resume_to_job_logic,
 )
 
