@@ -92,7 +92,7 @@ async def get_payment_methods():
         logger.error(f"Failed to get payment methods: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/webhook")
+@router.post("/webhook")
 async def razorpay_webhook(request: Request):
     """Handle Razorpay webhook events"""
     try:

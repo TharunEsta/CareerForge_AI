@@ -58,6 +58,9 @@ from utils import (
     parse_resume_with_job_matching,
     setup_logging,
 )
+from Backend.schemas import User as DBUser
+from Backend.auth import get_password_hash, verify_password
+from sqlalchemy.orm import Session
 
 rate_limiter = Limiter(key_func=get_remote_address)
 
@@ -135,17 +138,6 @@ def generate_reset_token() -> str:
     return secrets.token_urlsafe(32)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-# Databases
-users_db = {
-    "testuser": {
-        "username": "testuser",
-        "email": "test@example.com",
-        "full_name": "Test User",
-        "disabled": False,
-        "hashed_password": hash_password("mysecret123"),
-    }
-}
 
 # Models
 class Token(BaseModel):
@@ -229,17 +221,18 @@ async def get_current_user(token: str = None):
     return user
 
 @app.post("/token")
-async def login(form_data = None):
-    if form_data is None:
-        form_data = Depends(OAuth2PasswordRequestForm)
-    user = get_user(form_data.username)
-    if not user or not verify_password(form_data.password, user["hashed_password"]):
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    db = SessionLocal()
+    user = db.query(DBUser).filter(DBUser.username == form_data.username).first()
+    if not user or not verify_password(form_data.password, user.hashed_password):
+        db.close()
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token = create_access_token(data={"sub": user["username"]})
+    access_token = create_access_token(data={"sub": user.username})
+    db.close()
     return {"access_token": access_token, "token_type": "bearer"}
 
 # NLP Models
@@ -490,23 +483,15 @@ async def get_parsed_resume(current_user: User = Depends(get_current_user)):
 
 
 @app.post("/signup", response_model=User)
-async def signup(email: str = None, password: str = None, full_name: str = None):
-    if email is None:
-        email = Form(...)
-    if password is None:
-        password = Form(...)
-    if full_name is None:
-        full_name = Form(...)
-    if email in users_db:
+async def signup(email: str = Form(...), password: str = Form(...), full_name: str = Form(...)):
+    db = SessionLocal()
+    existing = db.query(DBUser).filter(DBUser.email == email).first()
+    if existing:
+        db.close()
         raise HTTPException(status_code=400, detail="Email already registered")
-    users_db[email] = {
-        "username": email,
-        "email": email,
-        "full_name": full_name,
-        "disabled": False,
-        "hashed_password": hash_password(password),
-    }
-    return User(username=email, email=email, full_name=full_name)
+    user = create_user(db, email, password, full_name)
+    db.close()
+    return User(username=user.username, email=user.email, full_name=user.full_name)
 
 @app.get("/get_user_info")
 def get_user_info(email: str = Depends(get_current_user)):
@@ -1010,6 +995,21 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
         status_code=429,
         content={"detail": "Rate limit exceeded"}
     )
+
+# Update signup endpoint
+def create_user(db: Session, email: str, password: str, full_name: str):
+    hashed_password = get_password_hash(password)
+    user = DBUser(
+        username=email,
+        email=email,
+        full_name=full_name,
+        hashed_password=hashed_password,
+        is_active=True
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
 
 if __name__ == "__main__":
     uvicorn.run(

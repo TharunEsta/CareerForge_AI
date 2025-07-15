@@ -13,6 +13,15 @@ const Index = () => {
   const [showPricing, setShowPricing] = useState(false);
   const [chatInput, setChatInput] = useState("");
 
+  // File upload handler
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // TODO: handle file upload logic here
+      alert(`Selected file: ${file.name}`);
+    }
+  };
+
   // Show login page if not logged in
   if (!isLoggedIn) {
     return <Login onLogin={() => setIsLoggedIn(true)} />;
@@ -75,6 +84,17 @@ const Index = () => {
               <Search className="absolute left-4 top-4 w-6 h-6 text-gray-400" />
               
               <div className="absolute right-3 top-3 flex items-center space-x-2">
+                {/* Upload Button */}
+                <label>
+                  <input
+                    type="file"
+                    style={{ display: "none" }}
+                    onChange={handleFileUpload}
+                  />
+                  <Button size="sm" variant="ghost" className="w-8 h-8 hover:bg-gray-800" asChild>
+                    <span><Plus className="w-4 h-4" /></span>
+                  </Button>
+                </label>
                 <Button size="sm" variant="ghost" className="w-8 h-8 hover:bg-gray-800">
                   <Mic className="w-4 h-4" />
                 </Button>

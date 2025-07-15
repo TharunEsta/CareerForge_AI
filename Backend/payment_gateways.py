@@ -83,35 +83,40 @@ class RazorpayGateway:
             
             order = self.client.order.create(data=order_data)
             
-            # Create payment link
-            payment_data = {
+            # Create payment link with proper parameters
+            payment_link_data = {
                 "amount": amount_in_paise,
                 "currency": request.currency,
-                "order_id": order["id"],
-                "email": request.user_email,
-                "contact": "",  # Add phone if available
-                "name": request.user_name,
+                "accept_partial": False,
+                "first_min_partial_amount": 0,
+                "reference_id": order["id"],
                 "description": request.description,
-                "callback_url": f"{os.getenv('FRONTEND_URL', 'http://localhost:3000')}/payment/success",
-                    "cancel_url": f"{os.getenv('FRONTEND_URL', 'http://localhost:3000')}/payment/cancel",
-                "prefill": {
+                "customer": {
                     "name": request.user_name,
-                    "email": request.user_email
+                    "email": request.user_email,
+                    "contact": ""  # Add phone if available
                 },
+                "notify": {
+                    "sms": False,
+                    "email": True
+                },
+                "reminder_enable": True,
                 "notes": {
                     "user_id": request.user_id,
                     "plan_id": request.plan_id
-                }
+                },
+                "callback_url": f"{os.getenv('FRONTEND_URL', 'http://localhost:3000')}/payment/success",
+                "callback_method": "get"
             }
             
-            payment = self.client.payment_link.create(data=payment_data)
+            payment_link = self.client.payment_link.create(data=payment_link_data)
             
             return PaymentResponse(
                 payment_id=order["id"],
                 status=PaymentStatus.PENDING,
                 amount=request.amount,
                 currency=request.currency,
-                payment_url=payment["short_url"]
+                payment_url=payment_link["short_url"]
             )
             
         except Exception as e:

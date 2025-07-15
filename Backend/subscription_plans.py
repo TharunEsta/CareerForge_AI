@@ -25,8 +25,8 @@ class SubscriptionPlan:
         price: float,
         currency: str = "INR",
         billing_cycle: BillingCycle = BillingCycle.MONTHLY,
-        features: list[str] = None,
-        limits: dict[str, Any] = None,
+        features: list[str] | None = None,
+        limits: dict[str, Any] | None = None,
         popular: bool = False
     ):
         self.id = id
@@ -38,7 +38,7 @@ class SubscriptionPlan:
         self.limits = limits or {}
         self.popular = popular
 
-# Define subscription plans for domestic market (INR)
+# Define subscription plans to match frontend pricing
 SUBSCRIPTION_PLANS = {
     PlanType.FREE: SubscriptionPlan(
         id="free",
@@ -47,10 +47,12 @@ SUBSCRIPTION_PLANS = {
         currency="INR",
         billing_cycle=BillingCycle.MONTHLY,
         features=[
-            "5 AI chats per month",
-            "Basic resume analysis",
-            "Community support",
-            "Basic job matching"
+            "Access to GPT-4o mini and reasoning",
+            "Standard voice mode",
+            "Real-time data from the web with search",
+            "Limited access to GPT-4o and o4-mini",
+            "Limited access to file uploads, advanced data analysis, and image generation",
+            "Use custom GPTs"
         ],
         limits={
             "ai_chats": 5,
@@ -60,61 +62,63 @@ SUBSCRIPTION_PLANS = {
     ),
     
     PlanType.BASIC: SubscriptionPlan(
-        id="basic",
-        name="Basic Plan",
-        price=299.0,
-        currency="INR",
-        billing_cycle=BillingCycle.MONTHLY,
-        features=[
-            "50 AI chats per month",
-            "Advanced resume analysis",
-            "Job matching",
-            "Email support",
-            "Cover letter generation"
-        ],
-        limits={
-            "ai_chats": 50,
-            "resume_parsing": 10,
-            "job_matching": 20
-        }
-    ),
-    
-    PlanType.PREMIUM: SubscriptionPlan(
-        id="premium",
-        name="Premium Plan",
+        id="plus",
+        name="Plus Plan",
         price=599.0,
         currency="INR",
         billing_cycle=BillingCycle.MONTHLY,
         features=[
-            "Unlimited AI chats",
-            "Advanced resume analysis",
-            "Priority job matching",
-            "Voice assistant",
-            "LinkedIn optimization",
-            "Priority support",
-            "All features unlocked"
+            "Everything in Free",
+            "Extended limits on messaging, file uploads, advanced data analysis, and image generation",
+            "Standard and advanced voice mode",
+            "Access to deep research, multiple reasoning models (o4-mini, o4-mini-high, and o3), and a research preview of GPT-4.5",
+            "Create and use tasks, projects, and custom GPTs",
+            "Limited access to Sora video generation",
+            "Opportunities to test new features"
+        ],
+        limits={
+            "ai_chats": 100,
+            "resume_parsing": 20,
+            "job_matching": 50
+        },
+        popular=True
+    ),
+    
+    PlanType.PREMIUM: SubscriptionPlan(
+        id="pro",
+        name="Pro Plan",
+        price=1399.0,
+        currency="INR",
+        billing_cycle=BillingCycle.MONTHLY,
+        features=[
+            "Everything in Plus",
+            "Unlimited access to all reasoning models and GPT-4o",
+            "Unlimited access to advanced voice",
+            "Extended access to deep research, which conducts multi-step online research for complex tasks",
+            "Access to research previews of GPT-4.5 and Operator",
+            "Access to o3 pro mode, which uses more compute for the best answers to the hardest questions",
+            "Extended access to Sora video generation"
         ],
         limits={
             "ai_chats": -1,  # Unlimited
             "resume_parsing": -1,  # Unlimited
             "job_matching": -1  # Unlimited
-        },
-        popular=True
+        }
     ),
     
     PlanType.ENTERPRISE: SubscriptionPlan(
-        id="enterprise",
-        name="Enterprise Plan",
-        price=1499.0,
+        id="business",
+        name="Business Plan",
+        price=1999.0,
         currency="INR",
         billing_cycle=BillingCycle.MONTHLY,
         features=[
-            "All Premium features",
+            "Everything in Pro",
+            "Team management and collaboration tools",
+            "Advanced security and compliance",
+            "Priority support",
             "Custom integrations",
-            "API access",
-            "Dedicated support",
-            "Custom branding",
-            "Team management"
+            "Enterprise-grade analytics"
         ],
         limits={
             "ai_chats": -1,  # Unlimited
@@ -124,13 +128,16 @@ SUBSCRIPTION_PLANS = {
     )
 }
 
-def get_plan(plan_id: str) -> SubscriptionPlan:
+def get_plan(plan_id: str) -> SubscriptionPlan | None:
     """Get a subscription plan by ID"""
-    return SUBSCRIPTION_PLANS.get(plan_id)
+    for plan in SUBSCRIPTION_PLANS.values():
+        if plan.id == plan_id:
+            return plan
+    return None
 
 def get_all_plans() -> dict[str, SubscriptionPlan]:
     """Get all subscription plans"""
-    return SUBSCRIPTION_PLANS
+    return {plan.id: plan for plan in SUBSCRIPTION_PLANS.values()}
 
 def get_plan_features(plan_id: str) -> list[str]:
     """Get features for a specific plan"""
