@@ -16,8 +16,8 @@ NEXT_PUBLIC_API_URL=https://api.careerforge.info
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 # Google OAuth Configuration
-GOOGLE_CLIENT_ID=451537508210-ioomtdkriasc3tgq3t9qcbvlu3ladj67.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=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
+GOOGLE_CLIENT_ID=your-google-client-id-here
+GOOGLE_CLIENT_SECRET=your-google-client-secret-here
 
 # Email Configuration
 SMTP_HOST=smtp.zoho.in
