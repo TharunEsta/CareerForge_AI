@@ -252,7 +252,7 @@ async def text_to_speech(text: str, language: str = "en"):
 
 class SubscribeRequest(BaseModel):
     plan_id: str
-    payment_gateway: str  # 'paypal', 'razorpay', 'stripe'
+    payment_gateway: str  # 'razorpay' only
     auto_renew: bool = True
 
 class SubscribeResponse(BaseModel):

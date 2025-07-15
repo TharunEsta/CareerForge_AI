@@ -247,7 +247,6 @@ srsly==2.5.1
 stack-data==0.6.3
 starlette==0.46.2
 streamlit==1.45.1
-stripe==12.2.0
 sympy==1.14.0
 tenacity==9.1.2
 terminado==0.18.1

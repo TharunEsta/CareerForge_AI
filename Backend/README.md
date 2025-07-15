@@ -1,177 +1,66 @@
 # CareerForge AI Backend
 
-A production-ready FastAPI backend for CareerForge AI - an AI-powered career optimization platform.
+A comprehensive AI-powered career platform backend built with FastAPI, featuring advanced resume parsing, job matching, and real-time payment processing.
 
 ## 🚀 Features
 
-- **AI Chat API**: Real-time AI-powered career assistance
-- **Resume Parsing**: Advanced resume analysis and ATS optimization
-- **Job Matching**: Intelligent job matching based on skills and experience
-- **Subscription Management**: Complete billing and subscription system
-- **Payment Processing**: Stripe and PayPal integration
-- **User Authentication**: JWT-based authentication system
-- **File Upload**: Secure resume file upload and processing
-- **Rate Limiting**: Built-in rate limiting for API protection
-- **Health Monitoring**: Comprehensive health checks and monitoring
-- **Documentation**: Auto-generated API documentation
+- **AI-Powered Resume Parsing**: Advanced resume analysis and optimization
+- **Smart Job Matching**: AI-driven job recommendations based on skills and experience
+- **Real-time Chat**: Interactive AI chat for career guidance
+- **Voice Assistant**: Speech-to-text and text-to-speech capabilities
+- **Payment Processing**: Razorpay integration with UPI, cards, net banking
+- **Subscription Management**: Flexible subscription plans with usage tracking
+- **Real-time Features**: WebSocket support for live updates
+- **File Upload**: Secure file handling for resumes and documents
 
-## 🛠 Tech Stack
+## 🛠️ Tech Stack
 
-- **Framework**: FastAPI with Python 3.11
-- **Database**: SQLite (development) / PostgreSQL (production)
-- **Authentication**: JWT tokens with OAuth2
-- **File Processing**: PyMuPDF, python-docx, docx2txt
-- **AI/ML**: OpenAI API, spaCy, sentence-transformers
-- **Payment**: Stripe, PayPal integration
-- **Monitoring**: Prometheus metrics, structured logging
-- **Deployment**: Docker, Gunicorn, Uvicorn
+- **Framework**: FastAPI
+- **Database**: PostgreSQL with SQLAlchemy
+- **Authentication**: JWT tokens
+- **Payment**: Razorpay integration
+- **AI/ML**: OpenAI GPT models
+- **Real-time**: WebSocket support
+- **Caching**: Redis
+- **Monitoring**: Prometheus metrics
 
-## 📦 Installation
+## 📋 Prerequisites
 
-### Prerequisites
-- Python 3.11+
-- pip
-- git
+- Python 3.8+
+- PostgreSQL
+- Redis
+- Razorpay account
 
-### Local Development
+## 🔧 Installation
 
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd Backend
+   cd CareerForge_AI/Backend
    ```
 
-2. **Create virtual environment**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. **Install dependencies**
+2. **Install dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Set up environment variables**
+3. **Set up environment variables**
    ```bash
-   cp .env.example .env
+   cp env.example .env
+   # Edit .env with your configuration
    ```
-   Edit `.env` with your configuration.
 
-5. **Initialize database**
+4. **Initialize database**
    ```bash
    python init_db.py
    ```
 
-6. **Run the development server**
+5. **Run the application**
    ```bash
-   uvicorn main:app --reload --host 0.0.0.0 --port 8000
+   uvicorn main:app --reload
    ```
 
-7. **Access the API**
-   - API: http://localhost:8000
-   - Documentation: http://localhost:8000/docs
-   - Health Check: http://localhost:8000/health
-
-## 🏗 Building for Production
-
-### Docker Build
-```bash
-# Build the Docker image
-docker build -t careerforge-backend .
-
-# Run the container
-docker run -p 8000:8000 careerforge-backend
-```
-
-### Docker Compose
-```bash
-# Start the entire stack
-docker-compose up -d
-```
-
-### Manual Deployment
-```bash
-# Install production dependencies
-pip install -r requirements.txt
-
-# Run with Gunicorn
-gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
-```
-
-## 🚀 Deployment
-
-### Docker Deployment
-```bash
-# Build and push to registry
-docker build -t your-registry/careerforge-backend:latest .
-docker push your-registry/careerforge-backend:latest
-
-# Deploy to your server
-docker run -d -p 8000:8000 your-registry/careerforge-backend:latest
-```
-
-### Cloud Deployment
-
-#### Heroku
-```bash
-# Install Heroku CLI
-heroku create careerforge-backend
-git push heroku main
-```
-
-#### Railway
-```bash
-# Connect to Railway
-railway login
-railway init
-railway up
-```
-
-#### DigitalOcean App Platform
-1. Connect your GitHub repository
-2. Set environment variables
-3. Deploy automatically
-
-### PM2 Deployment
-```bash
-# Install PM2 globally
-npm install -g pm2
-
-# Start with PM2
-pm2 start "gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000" --name "careerforge-backend"
-pm2 save
-pm2 startup
-```
-
-## 📁 Project Structure
-
-```
-Backend/
-├── main.py                 # FastAPI application entry point
-├── requirements.txt        # Python dependencies
-├── Dockerfile             # Docker configuration
-├── models.py              # Database models
-├── schemas.py             # Pydantic schemas
-├── auth.py                # Authentication logic
-├── utils.py               # Utility functions
-├── subscription_router.py # Subscription endpoints
-├── payment_router.py      # Payment processing
-├── skills_jobs_router.py  # Job matching logic
-├── realtime_router.py     # Real-time features
-├── voice_assistant.py     # Voice assistant
-├── job_matcher.py         # Job matching algorithm
-├── resume_parser_custom.py # Resume parsing
-├── usage_tracker.py       # Usage tracking
-├── paypal_webhook.py      # PayPal webhooks
-├── uploads/               # File upload directory
-├── __init__.py
-└── README.md
-```
-
-## 🔧 Configuration
-
-### Environment Variables
+## 🔐 Environment Variables
 
 Create a `.env` file with the following variables:
 
@@ -187,11 +76,10 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 # OpenAI
 OPENAI_API_KEY=your-openai-api-key-here
 
-# Payment Processing
-STRIPE_SECRET_KEY=your-stripe-secret-key
-STRIPE_PUBLISHABLE_KEY=your-stripe-publishable-key
-PAYPAL_CLIENT_ID=your-paypal-client-id
-PAYPAL_CLIENT_SECRET=your-paypal-client-secret
+# Payment Processing - Razorpay Only
+RAZORPAY_KEY_ID=rzp_test_your_test_key_id
+RAZORPAY_KEY_SECRET=your_test_key_secret
+RAZORPAY_MODE=test
 
 # Email (optional)
 SMTP_HOST=smtp.gmail.com
@@ -206,140 +94,124 @@ REDIS_URL=redis://localhost:6379
 PROMETHEUS_MULTIPROC_DIR=/tmp
 ```
 
-### API Endpoints
+## 📚 API Endpoints
 
-#### Authentication
+### Authentication
 - `POST /token` - Login and get access token
 - `POST /signup` - User registration
 - `POST /logout` - Logout and revoke token
 
-#### Core Features
+### Core Features
 - `POST /api/chat` - AI chat functionality
 - `POST /api/parse-resume` - Resume parsing
 - `POST /api/job-match` - Job matching
 - `GET /api/subscriptions` - Subscription plans
 - `POST /api/subscriptions` - Upgrade subscription
 
-#### Payment
-- `POST /api/payment/create-checkout` - Create Stripe checkout
-- `POST /api/payment/create-paypal-order` - Create PayPal order
-- `POST /api/paypal-webhook` - PayPal webhook handler
+### Payment (Razorpay Only)
+- `POST /api/payment/create` - Create payment order
+- `POST /api/payment/verify` - Verify payment signature
+- `GET /api/payment/status/{payment_id}` - Get payment status
+- `POST /api/payment/webhook/razorpay` - Razorpay webhook handler
+- `GET /api/payment/gateways` - Get available payment gateways
+- `GET /api/payment/methods` - Get supported payment methods
 
-#### Usage Tracking
-- `POST /api/usage/track` - Track feature usage
-- `GET /api/usage/check/{user_id}/{feature}` - Check usage limits
-- `GET /api/usage/summary/{user_id}` - Get usage summary
+### Real-time Features
+- `GET /api/realtime/ws` - WebSocket connection
+- `POST /api/realtime/broadcast` - Broadcast message
 
-## 🧪 Testing
+### Voice Assistant
+- `POST /api/voice-assistant/chat` - Voice chat
+- `POST /api/voice-assistant/subscribe` - Voice assistant subscription
 
-```bash
-# Run tests
-python -m pytest
+## 💳 Payment Features
 
-# Run with coverage
-python -m pytest --cov=.
+### Supported Payment Methods
+- **UPI**: Google Pay, PhonePe, Paytm, BHIM, Amazon Pay
+- **Credit/Debit Cards**: Visa, Mastercard, RuPay, American Express
+- **Net Banking**: HDFC, ICICI, SBI, Axis, Kotak, Yes Bank
+- **Digital Wallets**: Paytm, PhonePe, Amazon Pay, Mobikwik
+- **EMI**: No cost EMI with flexible tenure
 
-# Run specific test file
-python -m pytest test_api.py -v
-```
+### Real-time Features
+- QR code generation for UPI payments
+- Real-time payment status tracking
+- Automatic payment verification
+- Secure webhook processing
+- Payment expiration handling
 
-## 📊 API Documentation
+## 📊 Subscription Plans
 
-The API documentation is automatically generated and available at:
+### Free Plan (₹0/month)
+- 3 Resume Analysis per month
+- Basic AI chat (5 per month)
+- Community support
+- Basic job matching (3 per month)
 
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
-- **OpenAPI JSON**: http://localhost:8000/openapi.json
+### Plus Plan (₹599/month)
+- Resume Analysis + Rewriting (45 times)
+- Cover Letter Generation (45 times)
+- Job Matching (50 times per month)
+- Image Generation (20 times)
+- Voice Assistant (50 times)
+- Advanced AI chat (100 per month)
+- Email support
+
+### Pro Plan (₹1399/month)
+- Everything in Plus
+- Unlimited access to all features
+- Priority support
+- Advanced voice assistant
+
+### Business Plan (₹1999/month)
+- Everything in Pro
+- Team Management
+- Advanced Security & Compliance
+- Priority Support
+- Custom Integrations
+- Enterprise Analytics
 
 ## 🔒 Security
 
-- **CORS**: Configured for production domains
-- **Rate Limiting**: Built-in rate limiting
-- **Input Validation**: Pydantic schema validation
-- **Authentication**: JWT token-based auth
-- **File Upload**: Secure file handling
-- **SQL Injection**: SQLAlchemy ORM protection
-- **XSS Protection**: Input sanitization
+- JWT-based authentication
+- Secure payment processing with Razorpay
+- Webhook signature verification
+- Rate limiting
+- Input validation and sanitization
+- CORS configuration
+
+## 🚀 Deployment
+
+### Docker Deployment
+```bash
+docker-compose up -d
+```
+
+### Manual Deployment
+1. Set up PostgreSQL and Redis
+2. Configure environment variables
+3. Run database migrations
+4. Start the application with uvicorn
 
 ## 📈 Monitoring
 
-### Health Checks
-- `GET /health` - Basic health check
-- `GET /health/detailed` - Detailed health status
-
-### Metrics
-- Prometheus metrics available at `/metrics`
-- Custom business metrics
-- Performance monitoring
-
-### Logging
-- Structured logging with JSON format
-- Log levels: DEBUG, INFO, WARNING, ERROR
-- Log rotation and archiving
-
-## 🔄 Updates
-
-To update dependencies:
-
-```bash
-# Update all packages
-pip install --upgrade -r requirements.txt
-
-# Update specific packages
-pip install --upgrade fastapi uvicorn
-
-# Check for security vulnerabilities
-pip-audit
-```
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-1. **Port already in use**
-   ```bash
-   # Find process using port 8000
-   lsof -i :8000
-   # Kill the process
-   kill -9 <PID>
-   ```
-
-2. **Database connection issues**
-   ```bash
-   # Reinitialize database
-   python init_db.py
-   ```
-
-3. **File upload issues**
-   ```bash
-   # Check uploads directory permissions
-   chmod 755 uploads/
-   ```
-
-4. **Memory issues**
-   ```bash
-   # Increase worker memory
-   gunicorn main:app -w 2 --max-requests 1000 --max-requests-jitter 100
-   ```
+- Prometheus metrics endpoint: `/metrics`
+- Health check endpoint: `/health`
+- Payment status monitoring
+- Usage tracking and analytics
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Add tests if applicable
+4. Add tests
 5. Submit a pull request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License.
 
 ## 🆘 Support
 
-- **Documentation**: Check the `/docs` endpoint
-- **Issues**: Create an issue on GitHub
-- **Email**: support@careerforge.ai
-
----
-
-Built with ❤️ by the CareerForge AI team 
+For support, email support@careerforge.ai or create an issue in the repository. 

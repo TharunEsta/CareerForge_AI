@@ -3,17 +3,24 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Check } from "lucide-react";
+import RazorpayPayment from "./RazorpayPayment";
 
 interface PricingModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  user_id?: string;
+  user_email?: string;
+  user_name?: string;
 }
 
-const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
+const PricingModal = ({ open, onOpenChange, user_id, user_email, user_name }: PricingModalProps) => {
   const [selectedTab, setSelectedTab] = useState<"personal" | "business">("personal");
+  const [showPayment, setShowPayment] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<any>(null);
 
   const personalPlans = [
     {
+      id: "free",
       name: "Free",
       price: 0,
       description: "Basic career tools to get started",
@@ -28,6 +35,7 @@ const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
       isCurrentPlan: true
     },
     {
+      id: "plus",
       name: "Plus",
       price: 599,
       description: "Advanced career optimization tools",
@@ -46,6 +54,7 @@ const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
       isPopular: true
     },
     {
+      id: "pro",
       name: "Pro",
       price: 1399,
       description: "Complete career optimization suite",
@@ -67,6 +76,7 @@ const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
   ];
 
   const businessPlan = {
+    id: "business",
     name: "Business",
     price: 1999,
     description: "Enterprise-grade career optimization for teams",
@@ -82,6 +92,44 @@ const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
     buttonText: "Contact Sales",
     buttonVariant: "default" as const
   };
+
+  const handlePlanSelect = (plan: any) => {
+    if (plan.isCurrentPlan) return;
+    
+    setSelectedPlan(plan);
+    setShowPayment(true);
+  };
+
+  const handlePaymentSuccess = (paymentData: any) => {
+    console.log('Payment successful:', paymentData);
+    setShowPayment(false);
+    onOpenChange(false);
+    // You can add success notification or redirect logic here
+  };
+
+  const handlePaymentFailure = (error: string) => {
+    console.error('Payment failed:', error);
+    setShowPayment(false);
+    // You can add error notification logic here
+  };
+
+  if (showPayment && selectedPlan) {
+    return (
+      <RazorpayPayment
+        amount={selectedPlan.price}
+        currency="INR"
+        user_id={user_id || "anonymous"}
+        user_email={user_email || "user@example.com"}
+        user_name={user_name || "User"}
+        description={`CareerForge AI - ${selectedPlan.name} Plan`}
+        plan_id={selectedPlan.id}
+        billing_cycle="monthly"
+        onSuccess={handlePaymentSuccess}
+        onFailure={handlePaymentFailure}
+        onClose={() => setShowPayment(false)}
+      />
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -119,7 +167,8 @@ const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
                   plan.isPopular
                     ? "bg-gradient-to-b from-green-900/20 to-gray-900 border-green-500"
                     : "bg-gray-900 border-gray-700"
-                } transition-all hover:border-gray-600`}
+                } transition-all hover:border-gray-600 cursor-pointer`}
+                onClick={() => handlePlanSelect(plan)}
               >
                 {plan.isPopular && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
@@ -163,7 +212,10 @@ const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
           </div>
         ) : (
           <div className="flex justify-center">
-            <Card className="bg-gray-900 border-gray-700 max-w-md w-full">
+            <Card 
+              className="bg-gray-900 border-gray-700 max-w-md w-full cursor-pointer"
+              onClick={() => handlePlanSelect(businessPlan)}
+            >
               <CardContent className="p-6">
                 <div className="mb-6">
                   <h3 className="text-xl font-semibold mb-2">{businessPlan.name}</h3>

@@ -1,12 +1,16 @@
 """
 Payment Router
 Handles payment-related endpoints for CareerForge AI
-Currently supports: Razorpay (domestic payments only)
+Currently supports: Razorpay (domestic payments only) with enhanced real-time features
 """
 
 import logging
-
-from fastapi import APIRouter, HTTPException, Request
+import hashlib
+import hmac
+import json
+import os
+from fastapi import APIRouter, HTTPException, Request, BackgroundTasks
+from fastapi.responses import JSONResponse
 
 from payment_gateways import (
     PaymentMethod,
@@ -14,6 +18,7 @@ from payment_gateways import (
     create_payment,
     get_supported_payment_methods,
     verify_payment,
+    get_payment_status
 )
 
 logger = logging.getLogger(__name__)
@@ -21,10 +26,10 @@ router = APIRouter()
 
 @router.post("/create")
 async def create_payment_endpoint(request: PaymentRequest):
-    """Create a new payment order"""
+    """Create a new payment order with enhanced features"""
     try:
         # Validate payment method for domestic payments
-        if request.payment_method not in [PaymentMethod.UPI, PaymentMethod.NET_BANKING, PaymentMethod.CARD, PaymentMethod.WALLET]:
+        if request.payment_method not in [PaymentMethod.UPI, PaymentMethod.NET_BANKING, PaymentMethod.CARD, PaymentMethod.WALLET, PaymentMethod.EMI]:
             raise HTTPException(status_code=400, detail="Invalid payment method for domestic payments")
         
         # Validate currency (only INR for domestic)
@@ -41,9 +46,12 @@ async def create_payment_endpoint(request: PaymentRequest):
             "success": True,
             "payment_id": payment_response.payment_id,
             "payment_url": payment_response.payment_url,
+            "qr_code_url": payment_response.qr_code_url,
             "amount": payment_response.amount,
             "currency": payment_response.currency,
-            "status": payment_response.status
+            "status": payment_response.status,
+            "payment_methods": payment_response.payment_methods,
+            "expires_at": payment_response.expires_at.isoformat() if payment_response.expires_at else None
         }
         
     except Exception as e:
@@ -51,91 +59,159 @@ async def create_payment_endpoint(request: PaymentRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/verify")
-async def verify_payment_endpoint(
-    payment_id: str,
-    signature: str,
-    order_id: str
-):
-    """Verify a payment signature"""
+async def verify_payment_endpoint(payment_id: str, signature: str, order_id: str):
+    """Verify payment signature"""
     try:
-        payment_response = verify_payment(payment_id, signature, order_id)
+        is_valid = verify_payment(payment_id, signature, order_id)
         
-        if payment_response.status == "failed":
-            raise HTTPException(status_code=400, detail=payment_response.error_message)
-        
-        return {
-            "success": True,
-            "payment_id": payment_response.payment_id,
-            "status": payment_response.status,
-            "amount": payment_response.amount,
-            "currency": payment_response.currency,
-            "transaction_id": payment_response.transaction_id
-        }
-        
+        if is_valid:
+            return {"success": True, "message": "Payment verified successfully"}
+        else:
+            raise HTTPException(status_code=400, detail="Invalid payment signature")
+            
     except Exception as e:
         logger.error(f"Payment verification failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/methods")
-async def get_payment_methods():
-    """Get supported payment methods for domestic payments"""
+@router.get("/status/{payment_id}")
+async def get_payment_status_endpoint(payment_id: str):
+    """Get real-time payment status"""
     try:
-        methods = get_supported_payment_methods()
+        status = get_payment_status(payment_id)
+        
+        if "error" in status:
+            raise HTTPException(status_code=400, detail=status["error"])
+        
         return {
             "success": True,
-            "methods": methods,
-            "currency": "INR",
-            "region": "India"
+            "payment_status": status
         }
         
     except Exception as e:
-        logger.error(f"Failed to get payment methods: {e}")
+        logger.error(f"Failed to get payment status: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/webhook")
-async def razorpay_webhook(request: Request):
-    """Handle Razorpay webhook events"""
+@router.post("/webhook/razorpay")
+async def razorpay_webhook(request: Request, background_tasks: BackgroundTasks):
+    """Handle Razorpay webhook events with enhanced processing"""
     try:
         # Get webhook data
         webhook_data = await request.json()
+        webhook_signature = request.headers.get("X-Razorpay-Signature")
         
-        # Log webhook event
-        logger.info(f"Received Razorpay webhook: {webhook_data.get('event', 'unknown')}")
+        # Verify webhook signature
+        if not webhook_signature:
+            raise HTTPException(status_code=400, detail="Missing signature")
         
-        # Handle different webhook events
-        event = webhook_data.get('event')
+        # Verify webhook signature
+        expected_signature = hmac.new(
+            os.getenv("RAZORPAY_KEY_SECRET").encode(),
+            await request.body(),
+            hashlib.sha256
+        ).hexdigest()
         
-        if event == 'payment.captured':
+        if not hmac.compare_digest(webhook_signature, expected_signature):
+            raise HTTPException(status_code=400, detail="Invalid signature")
+        
+        # Process webhook event
+        event = webhook_data.get("event")
+        payment_data = webhook_data.get("payload", {}).get("payment", {})
+        
+        logger.info(f"Received Razorpay webhook: {event}")
+        
+        # Handle different events
+        if event == "payment.captured":
             # Payment successful
-            payment_id = webhook_data['payload']['payment']['entity']['id']
-            order_id = webhook_data['payload']['payment']['entity']['order_id']
+            background_tasks.add_task(process_successful_payment, payment_data)
+            return {"success": True, "message": "Payment processed successfully"}
             
-            logger.info(f"Payment captured: {payment_id} for order: {order_id}")
-            
-            # Here you can update user subscription, send emails, etc.
-            
-        elif event == 'payment.failed':
+        elif event == "payment.failed":
             # Payment failed
-            payment_id = webhook_data['payload']['payment']['entity']['id']
-            logger.warning(f"Payment failed: {payment_id}")
+            background_tasks.add_task(process_failed_payment, payment_data)
+            return {"success": True, "message": "Payment failure processed"}
             
-        elif event == 'refund.processed':
-            # Refund processed
-            refund_id = webhook_data['payload']['refund']['entity']['id']
-            logger.info(f"Refund processed: {refund_id}")
+        elif event == "order.paid":
+            # Order paid
+            background_tasks.add_task(process_order_paid, payment_data)
+            return {"success": True, "message": "Order paid successfully"}
         
         return {"success": True, "message": "Webhook processed"}
         
     except Exception as e:
-        logger.error(f"Webhook processing failed: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Error handling Razorpay webhook: {e}")
+        raise HTTPException(status_code=500, detail="Webhook processing failed")
 
-@router.get("/health")
-async def payment_health_check():
-    """Health check for payment service"""
+async def process_successful_payment(payment_data: dict):
+    """Process successful payment"""
+    try:
+        payment_id = payment_data.get("id")
+        order_id = payment_data.get("order_id")
+        amount = payment_data.get("amount", 0) / 100  # Convert from paise
+        
+        logger.info(f"Processing successful payment: {payment_id}, Amount: {amount}")
+        
+        # Update user subscription
+        # Add your subscription update logic here
+        
+    except Exception as e:
+        logger.error(f"Error processing successful payment: {e}")
+
+async def process_failed_payment(payment_data: dict):
+    """Process failed payment"""
+    try:
+        payment_id = payment_data.get("id")
+        error_code = payment_data.get("error_code")
+        error_description = payment_data.get("error_description")
+        
+        logger.info(f"Processing failed payment: {payment_id}, Error: {error_description}")
+        
+        # Handle failed payment
+        # Add your failure handling logic here
+        
+    except Exception as e:
+        logger.error(f"Error processing failed payment: {e}")
+
+async def process_order_paid(payment_data: dict):
+    """Process order paid event"""
+    try:
+        order_id = payment_data.get("id")
+        
+        logger.info(f"Processing order paid: {order_id}")
+        
+        # Handle order completion
+        # Add your order completion logic here
+        
+    except Exception as e:
+        logger.error(f"Error processing order paid: {e}")
+
+@router.get("/gateways")
+async def get_payment_gateways():
+    """Get available payment gateways"""
     return {
-        "status": "healthy",
-        "gateway": "razorpay",
-        "currency": "INR",
-        "region": "India"
+        "gateways": [
+            {
+                "id": "razorpay",
+                "name": "Razorpay",
+                "description": "Indian payment gateway with UPI, cards, net banking",
+                "supported_countries": ["IN"],
+                "supported_currencies": ["INR"],
+                "features": [
+                    "UPI payments",
+                    "Credit/Debit cards",
+                    "Net banking",
+                    "Digital wallets",
+                    "EMI options",
+                    "QR code payments",
+                    "Real-time status",
+                    "Instant settlements"
+                ]
+            }
+        ]
+    }
+
+@router.get("/methods")
+async def get_payment_methods():
+    """Get supported payment methods"""
+    return {
+        "methods": get_supported_payment_methods()
     } 
