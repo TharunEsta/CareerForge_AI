@@ -47,17 +47,20 @@ SUBSCRIPTION_PLANS = {
         currency="INR",
         billing_cycle=BillingCycle.MONTHLY,
         features=[
-            "Access to GPT-4o mini and reasoning",
-            "Standard voice mode",
-            "Real-time data from the web with search",
-            "Limited access to GPT-4o and o4-mini",
-            "Limited access to file uploads, advanced data analysis, and image generation",
-            "Use custom GPTs"
+            "3 Resume Analysis per month",
+            "Basic AI chat (5 per month)",
+            "Community support",
+            "Basic job matching (3 per month)"
         ],
         limits={
+            "resume_analysis": 3,
             "ai_chats": 5,
-            "resume_parsing": 2,
-            "job_matching": 3
+            "job_matching": 3,
+            "resume_rewriting": 0,
+            "cover_letter_generation": 0,
+            "image_generation": 0,
+            "voice_assistant": False,
+            "daily_news": False
         }
     ),
     
@@ -68,18 +71,24 @@ SUBSCRIPTION_PLANS = {
         currency="INR",
         billing_cycle=BillingCycle.MONTHLY,
         features=[
-            "Everything in Free",
-            "Extended limits on messaging, file uploads, advanced data analysis, and image generation",
-            "Standard and advanced voice mode",
-            "Access to deep research, multiple reasoning models (o4-mini, o4-mini-high, and o3), and a research preview of GPT-4.5",
-            "Create and use tasks, projects, and custom GPTs",
-            "Limited access to Sora video generation",
-            "Opportunities to test new features"
+            "Resume Analysis + Rewriting (45 times)",
+            "Cover Letter Generation with Job Description (45 times)",
+            "Job Matching (50 times per month)",
+            "Image Generation",
+            "Daily News Updates",
+            "Voice Assistant",
+            "Advanced AI chat (100 per month)",
+            "Email support"
         ],
         limits={
+            "resume_analysis": -1,  # Unlimited
+            "resume_rewriting": 45,
+            "cover_letter_generation": 45,
+            "job_matching": 50,
+            "image_generation": 20,
             "ai_chats": 100,
-            "resume_parsing": 20,
-            "job_matching": 50
+            "voice_assistant": True,
+            "daily_news": True
         },
         popular=True
     ),
@@ -92,17 +101,25 @@ SUBSCRIPTION_PLANS = {
         billing_cycle=BillingCycle.MONTHLY,
         features=[
             "Everything in Plus",
-            "Unlimited access to all reasoning models and GPT-4o",
-            "Unlimited access to advanced voice",
-            "Extended access to deep research, which conducts multi-step online research for complex tasks",
-            "Access to research previews of GPT-4.5 and Operator",
-            "Access to o3 pro mode, which uses more compute for the best answers to the hardest questions",
-            "Extended access to Sora video generation"
+            "Unlimited Resume Analysis",
+            "Unlimited Resume Rewriting",
+            "Unlimited Cover Letter Generation",
+            "Unlimited Job Matching",
+            "Unlimited Image Generation",
+            "Unlimited AI Chats",
+            "Advanced Voice Assistant",
+            "Priority support",
+            "All features unlocked"
         ],
         limits={
+            "resume_analysis": -1,  # Unlimited
+            "resume_rewriting": -1,  # Unlimited
+            "cover_letter_generation": -1,  # Unlimited
+            "job_matching": -1,  # Unlimited
+            "image_generation": -1,  # Unlimited
             "ai_chats": -1,  # Unlimited
-            "resume_parsing": -1,  # Unlimited
-            "job_matching": -1  # Unlimited
+            "voice_assistant": True,
+            "daily_news": True
         }
     ),
     
@@ -114,16 +131,22 @@ SUBSCRIPTION_PLANS = {
         billing_cycle=BillingCycle.MONTHLY,
         features=[
             "Everything in Pro",
-            "Team management and collaboration tools",
-            "Advanced security and compliance",
-            "Priority support",
-            "Custom integrations",
-            "Enterprise-grade analytics"
+            "Team Management",
+            "Advanced Security & Compliance",
+            "Priority Support",
+            "Custom Integrations",
+            "Enterprise Analytics",
+            "All features unlimited"
         ],
         limits={
+            "resume_analysis": -1,  # Unlimited
+            "resume_rewriting": -1,  # Unlimited
+            "cover_letter_generation": -1,  # Unlimited
+            "job_matching": -1,  # Unlimited
+            "image_generation": -1,  # Unlimited
             "ai_chats": -1,  # Unlimited
-            "resume_parsing": -1,  # Unlimited
-            "job_matching": -1  # Unlimited
+            "voice_assistant": True,
+            "daily_news": True
         }
     )
 }

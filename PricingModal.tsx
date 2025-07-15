@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -17,14 +16,12 @@ const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
     {
       name: "Free",
       price: 0,
-      description: "Explore how AI can help you with everyday tasks",
+      description: "Basic career tools to get started",
       features: [
-        "Access to GPT-4o mini and reasoning",
-        "Standard voice mode",
-        "Real-time data from the web with search",
-        "Limited access to GPT-4o and o4-mini",
-        "Limited access to file uploads, advanced data analysis, and image generation",
-        "Use custom GPTs"
+        "3 Resume Analysis per month",
+        "Basic AI chat (5 per month)",
+        "Community support",
+        "Basic job matching (3 per month)"
       ],
       buttonText: "Your current plan",
       buttonVariant: "secondary" as const,
@@ -33,15 +30,16 @@ const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
     {
       name: "Plus",
       price: 599,
-      description: "Level up productivity and creativity with expanded access",
+      description: "Advanced career optimization tools",
       features: [
-        "Everything in Free",
-        "Extended limits on messaging, file uploads, advanced data analysis, and image generation",
-        "Standard and advanced voice mode",
-        "Access to deep research, multiple reasoning models (o4-mini, o4-mini-high, and o3), and a research preview of GPT-4.5",
-        "Create and use tasks, projects, and custom GPTs",
-        "Limited access to Sora video generation",
-        "Opportunities to test new features"
+        "Resume Analysis + Rewriting (45 times)",
+        "Cover Letter Generation with Job Description (45 times)",
+        "Job Matching (50 times per month)",
+        "Image Generation",
+        "Daily News Updates",
+        "Voice Assistant",
+        "Advanced AI chat (100 per month)",
+        "Email support"
       ],
       buttonText: "Get Plus",
       buttonVariant: "default" as const,
@@ -50,15 +48,18 @@ const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
     {
       name: "Pro",
       price: 1399,
-      description: "Get the best of OpenAI with the highest level of access",
+      description: "Complete career optimization suite",
       features: [
         "Everything in Plus",
-        "Unlimited access to all reasoning models and GPT-4o",
-        "Unlimited access to advanced voice",
-        "Extended access to deep research, which conducts multi-step online research for complex tasks",
-        "Access to research previews of GPT-4.5 and Operator",
-        "Access to o3 pro mode, which uses more compute for the best answers to the hardest questions",
-        "Extended access to Sora video generation"
+        "Unlimited Resume Analysis",
+        "Unlimited Resume Rewriting",
+        "Unlimited Cover Letter Generation",
+        "Unlimited Job Matching",
+        "Unlimited Image Generation",
+        "Unlimited AI Chats",
+        "Advanced Voice Assistant",
+        "Priority support",
+        "All features unlocked"
       ],
       buttonText: "Get Pro",
       buttonVariant: "outline" as const
@@ -68,14 +69,15 @@ const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
   const businessPlan = {
     name: "Business",
     price: 1999,
-    description: "Advanced AI capabilities for teams and organizations",
+    description: "Enterprise-grade career optimization for teams",
     features: [
       "Everything in Pro",
-      "Team management and collaboration tools",
-      "Advanced security and compliance",
-      "Priority support",
-      "Custom integrations",
-      "Enterprise-grade analytics"
+      "Team Management",
+      "Advanced Security & Compliance",
+      "Priority Support",
+      "Custom Integrations",
+      "Enterprise Analytics",
+      "All features unlimited"
     ],
     buttonText: "Contact Sales",
     buttonVariant: "default" as const

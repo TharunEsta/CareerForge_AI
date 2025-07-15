@@ -1,10 +1,11 @@
-
 import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 interface LoginProps {
   onLogin: () => void;
@@ -15,11 +16,58 @@ const Login = ({ onLogin }: LoginProps) => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && password) {
-      onLogin();
+    setLoading(true);
+    try {
+      if (isSignUp) {
+        // Signup
+        const res = await fetch(`${API_BASE}/signup`, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            email,
+            password,
+            full_name: fullName || email.split("@")[0],
+          }).toString(),
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          alert(data.detail || "Signup failed");
+          setLoading(false);
+          return;
+        }
+        alert("Signup successful! Please sign in.");
+        setIsSignUp(false);
+        setLoading(false);
+        return;
+      } else {
+        // Login
+        const res = await fetch(`${API_BASE}/token`, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            username: email,
+            password,
+          }).toString(),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.detail || "Login failed");
+          setLoading(false);
+          return;
+        }
+        // Store JWT token
+        localStorage.setItem("token", data.access_token);
+        onLogin();
+      }
+    } catch (err) {
+      alert("Network error. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -48,7 +96,6 @@ const Login = ({ onLogin }: LoginProps) => {
               {isSignUp ? "Sign up to get started" : "Sign in to your account"}
             </p>
           </CardHeader>
-          
           <CardContent className="space-y-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email Field */}
@@ -66,7 +113,22 @@ const Login = ({ onLogin }: LoginProps) => {
                   />
                 </div>
               </div>
-
+              {/* Full Name Field (Sign Up Only) */}
+              {isSignUp && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-300">Full Name</Label>
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      placeholder="Enter your full name"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="bg-gray-800 border-gray-700 pl-4 text-white placeholder:text-gray-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                </div>
+              )}
               {/* Password Field */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-300">Password</Label>
@@ -95,16 +157,15 @@ const Login = ({ onLogin }: LoginProps) => {
                   </Button>
                 </div>
               </div>
-
               {/* Submit Button */}
               <Button
                 type="submit"
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                disabled={loading}
               >
-                {isSignUp ? "Create Account" : "Sign In"}
+                {loading ? (isSignUp ? "Creating..." : "Signing in...") : isSignUp ? "Create Account" : "Sign In"}
               </Button>
             </form>
-
             {/* Google Login */}
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -114,7 +175,6 @@ const Login = ({ onLogin }: LoginProps) => {
                 <span className="bg-gray-900 px-2 text-gray-400">Or continue with</span>
               </div>
             </div>
-
             <Button
               type="button"
               variant="outline"
@@ -141,7 +201,6 @@ const Login = ({ onLogin }: LoginProps) => {
               </svg>
               Continue with Google
             </Button>
-
             {/* Toggle Sign Up/Sign In */}
             <div className="text-center">
               <p className="text-gray-400">
