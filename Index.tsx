@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Mic, MessageSquare, BarChart3, Search, Library, Plus, User, Sparkles } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Mic, MessageSquare, BarChart3, Search, Library, Plus, User, Sparkles, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -12,6 +12,34 @@ const Index = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showPricing, setShowPricing] = useState(false);
   const [chatInput, setChatInput] = useState("");
+  const [userPlan, setUserPlan] = useState("free"); // free, plus, pro, business
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Check user subscription on component mount
+  useEffect(() => {
+    const checkUserSubscription = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (token) {
+          // TODO: Replace with actual API call to get user subscription
+          // For now, using localStorage or default to free
+          const storedPlan = localStorage.getItem("userPlan") || "free";
+          setUserPlan(storedPlan);
+        }
+      } catch (error) {
+        console.error("Error checking subscription:", error);
+        setUserPlan("free");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (isLoggedIn) {
+      checkUserSubscription();
+    } else {
+      setIsLoading(false);
+    }
+  }, [isLoggedIn]);
 
   // File upload handler
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,6 +49,9 @@ const Index = () => {
       alert(`Selected file: ${file.name}`);
     }
   };
+
+  // Check if user is on free tier
+  const isFreeTier = userPlan === "free";
 
   // Show login page if not logged in
   if (!isLoggedIn) {
@@ -50,7 +81,7 @@ const Index = () => {
           className="w-12 h-8 bg-blue-600 hover:bg-blue-700 text-xs font-medium transition-colors"
           size="sm"
         >
-          Renew Plus
+          {isFreeTier ? "Upgrade" : "Manage"}
         </Button>
       </div>
 
@@ -60,6 +91,11 @@ const Index = () => {
         <header className="flex justify-between items-center p-6 border-b border-gray-800">
           <div className="flex items-center space-x-4">
             <h1 className="text-4xl font-bold tracking-tight">careerforge</h1>
+            {!isFreeTier && (
+              <span className="px-2 py-1 bg-green-600 text-xs font-medium rounded-full">
+                {userPlan.charAt(0).toUpperCase() + userPlan.slice(1)}
+              </span>
+            )}
           </div>
           
           <Avatar className="w-10 h-10 ring-2 ring-gray-700">
@@ -108,39 +144,86 @@ const Index = () => {
             </div>
           </div>
 
-          {/* CareerForge Pro Banner */}
-          <Card className="w-full max-w-3xl bg-gradient-to-r from-purple-900/50 to-blue-900/50 border-purple-700/50 shadow-xl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Sparkles className="w-5 h-5 text-purple-400" />
-                    <h3 className="text-xl font-semibold">Introducing CareerForge Pro</h3>
+          {/* Free Tier Warnings - Only show for free users */}
+          {isFreeTier && !isLoading && (
+            <>
+              {/* CareerForge Pro Banner */}
+              <Card className="w-full max-w-3xl bg-gradient-to-r from-purple-900/50 to-blue-900/50 border-purple-700/50 shadow-xl">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <Sparkles className="w-5 h-5 text-purple-400" />
+                        <h3 className="text-xl font-semibold">Introducing CareerForge Pro</h3>
+                      </div>
+                      <p className="text-gray-300">Early access to resume AI & unlimited uploads</p>
+                    </div>
+                    <Button 
+                      onClick={() => setShowPricing(true)}
+                      className="bg-purple-600 hover:bg-purple-700 transition-colors"
+                    >
+                      Upgrade
+                    </Button>
                   </div>
-                  <p className="text-gray-300">Early access to resume AI & unlimited uploads</p>
-                </div>
-                <Button className="bg-purple-600 hover:bg-purple-700 transition-colors">
-                  Upgrade
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
 
-          {/* Usage Meter */}
-          <Card className="w-full max-w-3xl bg-gray-900 border-gray-700 shadow-lg">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <h4 className="text-lg font-medium text-cyan-400">Free</h4>
-                  <div className="w-16 h-1 bg-cyan-400 rounded-full" />
+              {/* Usage Meter */}
+              <Card className="w-full max-w-3xl bg-gray-900 border-gray-700 shadow-lg">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <h4 className="text-lg font-medium text-cyan-400">Free</h4>
+                      <div className="w-16 h-1 bg-cyan-400 rounded-full" />
+                    </div>
+                    <div className="text-right space-y-1">
+                      <p className="text-gray-300">You've reached your free tier limits</p>
+                      <LoadingDots />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Free Tier Limits Warning */}
+              <Card className="w-full max-w-3xl bg-yellow-900/20 border-yellow-700/50 shadow-lg">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3">
+                    <AlertTriangle className="w-5 h-5 text-yellow-400" />
+                    <div className="space-y-1">
+                      <h4 className="text-lg font-medium text-yellow-400">Free Tier Limits</h4>
+                      <p className="text-gray-300 text-sm">
+                        You're on the free plan. Upgrade to unlock unlimited resume analysis, cover letter generation, and more features.
+                      </p>
+                    </div>
+                    <Button 
+                      onClick={() => setShowPricing(true)}
+                      className="bg-yellow-600 hover:bg-yellow-700 transition-colors ml-auto"
+                      size="sm"
+                    >
+                      Upgrade Now
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
+
+          {/* Subscribed User Welcome Message */}
+          {!isFreeTier && !isLoading && (
+            <Card className="w-full max-w-3xl bg-green-900/20 border-green-700/50 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-3">
+                  <Sparkles className="w-5 h-5 text-green-400" />
+                  <div className="space-y-1">
+                    <h4 className="text-lg font-medium text-green-400">Welcome to CareerForge {userPlan.charAt(0).toUpperCase() + userPlan.slice(1)}!</h4>
+                    <p className="text-gray-300 text-sm">
+                      You have access to all {userPlan} features. Enjoy unlimited resume analysis, cover letter generation, and more!
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right space-y-1">
-                  <p className="text-gray-300">You've reached your free tier limits</p>
-                  <LoadingDots />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
 
