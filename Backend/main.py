@@ -514,7 +514,7 @@ async def forgot_password(email: str = Form(...)):
     db = SessionLocal()
     user = get_user_by_email(db, email)
     db.close()
-    # Don't reveal if email exists or not for security
+        # Don't reveal if email exists or not for security
     if not user:
         return {"message": "If your email is registered, you will receive a password reset link"}
     token = generate_reset_token()
