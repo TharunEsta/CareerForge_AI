@@ -159,7 +159,7 @@ class RazorpayGateway:
             )
             
         except Exception as e:
-            logger.error(f"Razorpay payment creation failed: {e}")
+            logger.error("Razorpay payment creation failed: %s", e)
             return PaymentResponse(
                 payment_id="",
                 status=PaymentStatus.FAILED,
@@ -188,7 +188,7 @@ class RazorpayGateway:
             return f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={qr_data}"
             
         except Exception as e:
-            logger.error(f"QR code generation failed: {e}")
+            logger.error("QR code generation failed: %s", e)
             return ""
     
     def verify_payment(self, payment_id: str, signature: str, order_id: str) -> bool:
@@ -208,7 +208,7 @@ class RazorpayGateway:
             return True
             
         except Exception as e:
-            logger.error(f"Razorpay payment verification failed: {e}")
+            logger.error("Razorpay payment verification failed: %s", e)
             return False
     
     def get_payment_status(self, payment_id: str) -> dict[str, Any]:
@@ -230,10 +230,11 @@ class RazorpayGateway:
             }
             
         except Exception as e:
-            logger.error(f"Failed to get payment status: {e}")
+            logger.error("Failed to get payment status: %s", e)
             return {"error": str(e)}
     
-    def get_supported_payment_methods(self) -> dict[str, Any]:
+    @staticmethod
+    def get_supported_payment_methods() -> dict[str, Any]:
         """Get enhanced supported payment methods with real-time features"""
         return {
             "upi": {
