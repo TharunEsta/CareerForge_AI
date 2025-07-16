@@ -55,7 +55,6 @@ from models import RevokedToken, SessionLocal
 from payment_router import router as payment_router
 from realtime_router import router as realtime_router
 from schemas import User as DBUser
-from schemas import User as UserModel
 from skills_jobs_router import router as skills_jobs_router
 from subscription_router import router as subscription_router
 from utils import (
@@ -216,7 +215,7 @@ async def get_current_user(token: str | None = None) -> Any:
             status_code=401, 
             detail="Token has been revoked. Please log in again."
         )
-    user = db.query(UserModel).filter(UserModel.username == username).first()
+    user = db.query(DBUser).filter(DBUser.username == username).first()
     db.close()
     if user is None:
         raise credentials_exception
@@ -763,7 +762,7 @@ async def admin_analytics(x_api_key: str = None):
         return {"error": "Unauthorized"}
     db = SessionLocal()
     try:
-        user_count = db.query(UserModel).count()
+        user_count = db.query(DBUser).count()
     except Exception as e:
         logger.error("User count error: %s", e)
         user_count = 0
@@ -795,7 +794,7 @@ async def admin_list_users(x_api_key: str = None):
     if x_api_key != ADMIN_API_KEY:
         return {"error": "Unauthorized"}
     db = SessionLocal()
-    users = db.query(UserModel).all()
+    users = db.query(DBUser).all()
     user_list = [
         {
             "id": u.id,
@@ -820,7 +819,7 @@ async def admin_get_user(user_id: int = None, x_api_key: str = None):
         return {"error": "Unauthorized"}
     
     db = SessionLocal()
-    user = db.query(UserModel).filter(UserModel.id == user_id).first()
+    user = db.query(DBUser).filter(DBUser.id == user_id).first()
     
     if not user:
         db.close()
@@ -849,7 +848,7 @@ async def admin_deactivate_user(user_id: int = None, x_api_key: str = None):
     if x_api_key != ADMIN_API_KEY:
         return {"error": "Unauthorized"}
     db = SessionLocal()
-    user = db.query(UserModel).filter(UserModel.id == user_id).first()
+    user = db.query(DBUser).filter(DBUser.id == user_id).first()
     if not user:
         db.close()
         return {"error": "User not found"}
@@ -867,7 +866,7 @@ async def admin_activate_user(user_id: int = None, x_api_key: str = None):
     if x_api_key != ADMIN_API_KEY:
         return {"error": "Unauthorized"}
     db = SessionLocal()
-    user = db.query(UserModel).filter(UserModel.id == user_id).first()
+    user = db.query(DBUser).filter(DBUser.id == user_id).first()
     if not user:
         db.close()
         return {"error": "User not found"}
@@ -885,7 +884,7 @@ async def admin_delete_user(user_id: int = None, x_api_key: str = None):
     if x_api_key != ADMIN_API_KEY:
         return {"error": "Unauthorized"}
     db = SessionLocal()
-    user = db.query(UserModel).filter(UserModel.id == user_id).first()
+    user = db.query(DBUser).filter(DBUser.id == user_id).first()
     if not user:
         db.close()
         return {"error": "User not found"}
