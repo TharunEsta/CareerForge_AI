@@ -7,16 +7,20 @@ FastAPI-based backend for AI-powered career optimization
 import hashlib
 import logging
 import os
+import re
 import secrets
+import tempfile
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import Any
+
+import docx2txt
 import fitz  # PyMuPDF
 import openai
 import spacy
-import tempfile
-import re
-import docx2txt
+import uvicorn
+from Backend.auth import get_password_hash, verify_password
 
 # Third-party imports
 from dotenv import load_dotenv
@@ -33,24 +37,25 @@ from fastapi import (
     status,
 )
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.staticfiles import StaticFiles
 from jose import jwt
 from pydantic import BaseModel, EmailStr
+from sentence_transformers import SentenceTransformer
 from slowapi.errors import RateLimitExceeded
-from slowapi.extension import Limiter 
+from slowapi.extension import Limiter
 from slowapi.util import get_remote_address
-from typing import Optional, Any
-import uvicorn
+from sqlalchemy.orm import Session
+
 import usage_tracker
-from fastapi.staticfiles import StaticFiles
 
 # Local application imports
 from models import RevokedToken, SessionLocal
 from payment_router import router as payment_router
 from realtime_router import router as realtime_router
-from schemas import User as UserModel
 from schemas import User as DBUser
+from schemas import User as UserModel
 from skills_jobs_router import router as skills_jobs_router
 from subscription_router import router as subscription_router
 from utils import (
@@ -59,9 +64,6 @@ from utils import (
     parse_resume_with_job_matching,
     setup_logging,
 )
-from Backend.auth import get_password_hash, verify_password
-from sqlalchemy.orm import Session
-from sentence_transformers import SentenceTransformer
 
 rate_limiter = Limiter(key_func=get_remote_address)
 
@@ -185,7 +187,7 @@ def get_jti_from_token(token: str):
     except Exception:
         return None, None
 
-async def get_current_user(token: Optional[str] = None) -> Any:
+async def get_current_user(token: str | None = None) -> Any:
     if token is None:
         token = await oauth2_scheme()
     credentials_exception = HTTPException(

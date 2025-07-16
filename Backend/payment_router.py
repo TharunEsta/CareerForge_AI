@@ -4,19 +4,20 @@ Handles payment-related endpoints for CareerForge AI
 Currently supports: Razorpay (domestic payments only) with enhanced real-time features
 """
 
-import logging
 import hashlib
 import hmac
+import logging
 import os
-from fastapi import APIRouter, HTTPException, Request, BackgroundTasks
+
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 
 from payment_gateways import (
     PaymentMethod,
     PaymentRequest,
     create_payment,
+    get_payment_status,
     get_supported_payment_methods,
     verify_payment,
-    get_payment_status
 )
 
 logger = logging.getLogger(__name__)
@@ -143,7 +144,6 @@ async def process_successful_payment(payment_data: dict):
     """Process successful payment"""
     try:
         payment_id = payment_data.get("id")
-        order_id = payment_data.get("order_id")
         amount = payment_data.get("amount", 0) / 100  # Convert from paise
         
         logger.info("Processing successful payment: %s, Amount: %s", payment_id, amount)
@@ -158,7 +158,6 @@ async def process_failed_payment(payment_data: dict):
     """Process failed payment"""
     try:
         payment_id = payment_data.get("id")
-        error_code = payment_data.get("error_code")
         error_description = payment_data.get("error_description")
         
         logger.info("Processing failed payment: %s, Error: %s", payment_id, error_description)

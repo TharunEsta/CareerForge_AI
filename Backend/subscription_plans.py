@@ -4,7 +4,7 @@ Defines subscription plans and pricing for CareerForge AI
 """
 
 from enum import Enum
-from typing import Dict, List, Optional
+
 
 class BillingCycle(str, Enum):
     MONTHLY = "monthly"
@@ -23,9 +23,9 @@ class SubscriptionPlan:
         name: str,
         price: float,
         description: str,
-        features: List[str],
-        limits: Dict[str, int],
-        billing_cycles: List[BillingCycle] = None
+        features: list[str],
+        limits: dict[str, int],
+        billing_cycles: list[BillingCycle] = None
     ):
         self.id = id
         self.name = name
@@ -139,9 +139,9 @@ SUBSCRIPTION_PLANS = {
     )
 }
 
-def get_plan(plan_id: str) -> Optional[SubscriptionPlan]:
+def get_plan(plan_id: str) -> SubscriptionPlan | None:
     """Get subscription plan by ID"""
-    for plan_type, plan in SUBSCRIPTION_PLANS.items():
+    for _plan_type, plan in SUBSCRIPTION_PLANS.items():
         if plan.id == plan_id:
             return plan
     return None
@@ -171,18 +171,18 @@ def is_feature_unlimited(plan_id: str, feature: str) -> bool:
     limit = get_plan_limit(plan_id, feature)
     return limit == -1
 
-def get_all_plans() -> Dict[str, SubscriptionPlan]:
+def get_all_plans() -> dict[str, SubscriptionPlan]:
     """Get all subscription plans"""
     return SUBSCRIPTION_PLANS
 
-def get_plan_features(plan_id: str) -> List[str]:
+def get_plan_features(plan_id: str) -> list[str]:
     """Get features for plan"""
     plan = get_plan(plan_id)
     if not plan:
         return []
     return plan.features
 
-def get_plan_limits(plan_id: str) -> Dict[str, int]:
+def get_plan_limits(plan_id: str) -> dict[str, int]:
     """Get all limits for plan"""
     plan = get_plan(plan_id)
     if not plan:

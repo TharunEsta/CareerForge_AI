@@ -71,6 +71,7 @@ const RazorpayPayment: React.FC<RazorpayPaymentProps> = ({
   const [showQRCode, setShowQRCode] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [paymentUrl, setPaymentUrl] = useState<string>('');
+  const [isRegenerating, setIsRegenerating] = useState(false);
 
   const paymentMethods: PaymentMethod[] = [
     {
@@ -115,8 +116,9 @@ const RazorpayPayment: React.FC<RazorpayPaymentProps> = ({
     }
   ];
 
-  const createPayment = async () => {
-    setIsLoading(true);
+  const createPayment = async (regenerating = false) => {
+    if (regenerating) setIsRegenerating(true);
+    else setIsLoading(true);
     setPaymentStatus(null);
 
     try {
@@ -174,7 +176,8 @@ const RazorpayPayment: React.FC<RazorpayPaymentProps> = ({
       });
       onFailure?.(error instanceof Error ? error.message : 'Payment creation failed');
     } finally {
-      setIsLoading(false);
+      if (regenerating) setIsRegenerating(false);
+      else setIsLoading(false);
     }
   };
 
@@ -218,6 +221,9 @@ const RazorpayPayment: React.FC<RazorpayPaymentProps> = ({
     if (timeLeft > 0) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
       return () => clearTimeout(timer);
+    } else if (paymentStatus && paymentStatus.status === 'pending') {
+      // QR code expired, auto-regenerate
+      createPayment(true);
     }
   }, [timeLeft]);
 
@@ -344,7 +350,7 @@ const RazorpayPayment: React.FC<RazorpayPaymentProps> = ({
                     </Alert>
                     
                     <Button 
-                      onClick={createPayment} 
+                      onClick={() => createPayment()} 
                       disabled={isLoading}
                       className="w-full bg-green-600 hover:bg-green-700"
                     >
@@ -402,6 +408,15 @@ const RazorpayPayment: React.FC<RazorpayPaymentProps> = ({
                               alt="Payment QR Code"
                               className="mx-auto w-48 h-48 border border-gray-600 rounded-lg"
                             />
+                            <div className="mt-2 flex flex-col gap-2 items-center">
+                              <Button 
+                                variant="outline" 
+                                onClick={() => createPayment(true)}
+                                disabled={isRegenerating}
+                              >
+                                {isRegenerating ? 'Regenerating...' : 'Regenerate QR Code'}
+                              </Button>
+                            </div>
                           </div>
                         )}
 
@@ -411,14 +426,6 @@ const RazorpayPayment: React.FC<RazorpayPaymentProps> = ({
                             className="w-full"
                           >
                             Open Payment Page
-                          </Button>
-                          
-                          <Button 
-                            variant="outline" 
-                            onClick={() => setShowQRCode(!showQRCode)}
-                            className="w-full"
-                          >
-                            {showQRCode ? 'Hide' : 'Show'} QR Code
                           </Button>
                         </div>
                       </>

@@ -6,9 +6,9 @@ Currently supports: Razorpay (domestic payments only) with enhanced features
 
 import logging
 import os
-from enum import Enum
-from typing import Any, Dict, List
 from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any
 
 import razorpay
 from pydantic import BaseModel
@@ -50,7 +50,7 @@ class PaymentResponse(BaseModel):
     currency: str
     payment_url: str = ""
     qr_code_url: str = ""
-    payment_methods: Dict[str, Any] = {}
+    payment_methods: dict[str, Any] = {}
     expires_at: datetime = None
     error_message: str = ""
 
@@ -211,7 +211,7 @@ class RazorpayGateway:
             logger.error(f"Razorpay payment verification failed: {e}")
             return False
     
-    def get_payment_status(self, payment_id: str) -> Dict[str, Any]:
+    def get_payment_status(self, payment_id: str) -> dict[str, Any]:
         """Get real-time payment status"""
         try:
             if not self.client:
@@ -233,7 +233,7 @@ class RazorpayGateway:
             logger.error(f"Failed to get payment status: {e}")
             return {"error": str(e)}
     
-    def get_supported_payment_methods(self) -> Dict[str, Any]:
+    def get_supported_payment_methods(self) -> dict[str, Any]:
         """Get enhanced supported payment methods with real-time features"""
         return {
             "upi": {
@@ -284,10 +284,10 @@ def verify_payment(payment_id: str, signature: str, order_id: str) -> bool:
     """Verify a payment using Razorpay"""
     return razorpay_gateway.verify_payment(payment_id, signature, order_id)
 
-def get_supported_payment_methods() -> Dict[str, Any]:
+def get_supported_payment_methods() -> dict[str, Any]:
     """Get supported payment methods"""
     return razorpay_gateway.get_supported_payment_methods()
 
-def get_payment_status(payment_id: str) -> Dict[str, Any]:
+def get_payment_status(payment_id: str) -> dict[str, Any]:
     """Get real-time payment status"""
     return razorpay_gateway.get_payment_status(payment_id) 

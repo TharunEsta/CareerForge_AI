@@ -21,7 +21,7 @@ async def get_subscription_plans():
         plans = get_all_plans()
         plans_data = []
         
-        for plan_id, plan in plans.items():
+        for _plan_id, plan in plans.items():
             plans_data.append({
                 "id": plan.id,
                 "name": plan.name,
