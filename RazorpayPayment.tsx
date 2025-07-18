@@ -11,7 +11,6 @@ import {
   Smartphone, 
   Building2, 
   Wallet, 
-  QrCode, 
   Clock, 
   CheckCircle, 
   XCircle,
