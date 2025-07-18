@@ -1,0 +1,113 @@
+[
+  {
+    "title": "AI Engineer",
+    "company": "TechCorp",
+    "skills_required": [
+      "Python",
+      "TensorFlow",
+      "Computer Vision",
+      "YOLO",
+      "Git",
+      "OpenCV"
+    ],
+    "description": "Develop AI models for image recognition tasks."
+  },
+  {
+    "title": "Full Stack Developer",
+    "company": "DevStack",
+    "skills_required": [
+      "JavaScript",
+      "React",
+      "Node.js",
+      "MongoDB",
+      "Git"
+    ],
+    "description": "Work on frontend/backend systems."
+  },
+  {
+    "title": "Office Clerk",
+    "company": "GovDept",
+    "skills_required": [
+      "MS Office",
+      "Typing",
+      "Record Keeping",
+      "Data Entry"
+    ],
+    "description": "Manage office files, type documents, and assist in clerical tasks."
+  },
+  {
+    "title": "Warehouse Associate",
+    "company": "LogiPack",
+    "skills_required": [
+      "Physical Fitness",
+      "Inventory Management",
+      "Forklift Operation"
+    ],
+    "description": "Handle goods loading, unloading, and inventory checks."
+  },
+  {
+    "title": "Customer Support Executive",
+    "company": "HelpFast",
+    "skills_required": [
+      "Communication",
+      "CRM Tools",
+      "Problem Solving"
+    ],
+    "description": "Provide phone and chat support to customers."
+  },
+  {
+    "title": "Electrician",
+    "company": "ElectroHome",
+    "skills_required": [
+      "Electrical Wiring",
+      "Circuit Diagrams",
+      "Safety Procedures"
+    ],
+    "description": "Install and maintain electrical systems in residential and commercial settings."
+  },
+  {
+    "title": "Junior Graphic Designer",
+    "company": "BrandPix",
+    "skills_required": [
+      "Photoshop",
+      "Illustrator",
+      "Creativity",
+      "Typography"
+    ],
+    "description": "Design social media creatives and assist in brand campaigns."
+  },
+  {
+    "title": "Construction Laborer",
+    "company": "BuildMax",
+    "skills_required": [
+      "Lifting",
+      "Concrete Mixing",
+      "Site Cleanup"
+    ],
+    "description": "Assist with building construction and material movement."
+  },
+  {
+    "title": "Data Analyst",
+    "company": "DataSense",
+    "skills_required": [
+      "Excel",
+      "SQL",
+      "Power BI",
+      "Python",
+      "Data Visualization"
+    ],
+    "description": "Analyze and report business trends from datasets."
+  },
+  {
+    "title": "Chief Executive Officer (CEO)",
+    "company": "InnovateX",
+    "skills_required": [
+      "Leadership",
+      "Strategic Planning",
+      "Finance",
+      "Stakeholder Management",
+      "Business Development"
+    ],
+    "description": "Drive overall company growth and vision execution."
+  }
+]

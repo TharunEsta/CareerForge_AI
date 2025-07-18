@@ -1,0 +1,59 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# Environment variables
+.key.env
+key.env
+.env
+.env.*
+
+# Pytest
+.pytest_cache/
+
+# MyPy
+.mypy_cache/
+
+# Pylint
+.pylint.d/
+
+# VS Code workspace settings
+.vscode/
+
+# macOS and Linux system files
+.DS_Store
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Coverage reports
+htmlcov/
+coverage.xml
+*.cover
+.cache
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# FastAPI static files (if generated)
+staticfiles/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# SQLite and test databases
+*.sqlite3
+*.db
+
+# Others
+*.bak
