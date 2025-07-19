@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  # Frontend Service
+  frontend:
+    build:
+      context: ./Front-end
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=https://careerforge.info/api
+      - NEXT_PUBLIC_APP_URL=https://careerforge.info
+    networks:
+      - careerforge-network
+    restart: unless-stopped
+
+  # Backend Service
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/careerforge
+      - SECRET_KEY=${SECRET_KEY}
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET}
+      - RAZORPAY_MODE=${RAZORPAY_MODE:-live}
+      - REDIS_URL=redis://redis:6379
+      - CORS_ORIGINS=https://careerforge.info,https://www.careerforge.info
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - careerforge-network
+    restart: unless-stopped
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=careerforge
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - careerforge-network
+    restart: unless-stopped
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    networks:
+      - careerforge-network
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy - Single Domain
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - careerforge-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  uploads:
+
+networks:
+  careerforge-network:
+    driver: bridge 
