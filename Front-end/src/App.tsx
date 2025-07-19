@@ -41,6 +41,8 @@ const AuthPage: React.FC = () => {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showOtp, setShowOtp] = useState(false);
+  const [otp, setOtp] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,9 +65,13 @@ const AuthPage: React.FC = () => {
       
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem('token', data.access_token || data.token);
-        // Simulate successful login/signup
-        window.location.reload();
+        if (isLogin) {
+          localStorage.setItem('token', data.access_token || data.token);
+          window.location.reload();
+        } else {
+          // For signup, show OTP input
+          setShowOtp(true);
+        }
       } else {
         const errorData = await response.json();
         setError(errorData.detail || "Login failed. Please check your credentials.");
@@ -77,9 +83,86 @@ const AuthPage: React.FC = () => {
     }
   };
 
-  const handleGoogle = () => {
-    alert("Google sign-in coming soon!");
+  const handleOtpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    
+    try {
+      const response = await fetch('https://careerforge.info/api/auth/verify-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          otp: otp
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('token', data.access_token || data.token);
+        window.location.reload();
+      } else {
+        const errorData = await response.json();
+        setError(errorData.detail || "Invalid OTP. Please try again.");
+      }
+    } catch (err) {
+      setError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleGoogle = async () => {
+    try {
+      window.location.href = 'https://careerforge.info/api/auth/google';
+    } catch (err) {
+      setError("Google sign-in failed. Please try again.");
+    }
+  };
+
+  if (showOtp) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#10121A] px-2">
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-extrabold text-white mb-2">careerforge</h1>
+          <p className="text-gray-400 text-lg">AI-driven career tools for professionals</p>
+        </div>
+        <div className="w-full max-w-md bg-[#181B23] rounded-2xl shadow-xl p-8">
+          <h2 className="text-2xl font-bold text-white mb-2 text-center">Verify OTP</h2>
+          <p className="text-gray-400 text-center mb-6">Enter the OTP sent to your email</p>
+          <form onSubmit={handleOtpSubmit} className="space-y-4">
+            <div>
+              <label className="block text-gray-300 mb-1">OTP</label>
+              <input
+                type="text"
+                className="w-full px-4 py-2 rounded bg-[#23263A] text-white border border-[#23263A] focus:border-blue-500 focus:outline-none"
+                placeholder="Enter 6-digit OTP"
+                value={otp}
+                onChange={e => setOtp(e.target.value)}
+                maxLength={6}
+              />
+            </div>
+            {error && <div className="text-red-400 text-sm text-center">{error}</div>}
+            <button
+              type="submit"
+              className="w-full py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg transition-colors"
+              disabled={loading}
+            >
+              {loading ? "Verifying..." : "Verify OTP"}
+            </button>
+          </form>
+          <div className="text-center mt-4 text-gray-400">
+            <button className="text-blue-400 hover:underline" onClick={() => setShowOtp(false)}>
+              Back to Sign Up
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#10121A] px-2">
@@ -184,12 +267,116 @@ const Dashboard: React.FC = () => {
   const [showPricing, setShowPricing] = useState(false);
   const [pricingTab, setPricingTab] = useState<'personal' | 'business'>('personal');
   const [chatInput, setChatInput] = useState("");
+  const [chatHistory, setChatHistory] = useState<Array<{role: string, content: string}>>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleChatSubmit = () => {
-    if (chatInput.trim()) {
-      console.log("Chat message:", chatInput);
-      setChatInput("");
+  const handleChatSubmit = async () => {
+    if (!chatInput.trim()) return;
+    
+    const userMessage = { role: 'user', content: chatInput };
+    setChatHistory(prev => [...prev, userMessage]);
+    const currentInput = chatInput;
+    setChatInput("");
+    setLoading(true);
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('https://careerforge.info/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          message: currentInput
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setChatHistory(prev => [...prev, { role: 'assistant', content: data.response || data.message }]);
+      } else {
+        setError("Chat failed. Please try again.");
+      }
+    } catch (err) {
+      setError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleFileUpload = async (file: File) => {
+    setLoading(true);
+    setError("");
+    
+    try {
+      const token = localStorage.getItem('token');
+      const formData = new FormData();
+      formData.append('resume', file);
+      
+      const response = await fetch('https://careerforge.info/api/resume/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        alert('Resume uploaded successfully!');
+      } else {
+        setError("File upload failed. Please try again.");
+      }
+    } catch (err) {
+      setError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpgrade = async (planId: string) => {
+    setLoading(true);
+    setError("");
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('https://careerforge.info/api/subscription/upgrade', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          plan_id: planId
+        })
+      });
+      
+      if (response.ok) {
+        alert('Subscription upgraded successfully!');
+        setShowPricing(false);
+      } else {
+        setError("Upgrade failed. Please try again.");
+      }
+    } catch (err) {
+      setError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const triggerFileUpload = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.pdf,.doc,.docx';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        handleFileUpload(file);
+      }
+    };
+    input.click();
   };
 
   return (
@@ -203,12 +390,16 @@ const Dashboard: React.FC = () => {
             <line x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
         </div>
-        <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center cursor-pointer hover:bg-white/30 transition-colors">
+        <button
+          onClick={triggerFileUpload}
+          className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center cursor-pointer hover:bg-white/30 transition-colors"
+          title="Upload Resume"
+        >
           <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
           </svg>
-        </div>
+        </button>
         <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center cursor-pointer hover:bg-white/30 transition-colors">
           <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
             <circle cx="11" cy="11" r="8"></circle>
@@ -257,13 +448,18 @@ const Dashboard: React.FC = () => {
                 onKeyPress={(e) => e.key === 'Enter' && handleChatSubmit()}
                 placeholder="Ask anything or @mention a Skill"
                 className="w-full h-14 bg-gray-800 border border-gray-700 rounded-2xl pl-12 pr-32 text-lg placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-lg"
+                disabled={loading}
               />
               <svg className="absolute left-4 top-4 w-6 h-6 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <circle cx="11" cy="11" r="8"></circle>
                 <path d="m21 21-4.35-4.35"></path>
               </svg>
               <div className="absolute right-3 top-3 flex items-center space-x-2">
-                <button className="w-8 h-8 bg-transparent hover:bg-gray-700 rounded flex items-center justify-center transition-colors">
+                <button 
+                  onClick={triggerFileUpload}
+                  className="w-8 h-8 bg-transparent hover:bg-gray-700 rounded flex items-center justify-center transition-colors"
+                  title="Upload Resume"
+                >
                   <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path d="M12 19v3"></path>
                     <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
@@ -275,7 +471,12 @@ const Dashboard: React.FC = () => {
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                   </svg>
                 </button>
-                <button className="w-8 h-8 bg-transparent hover:bg-gray-700 rounded flex items-center justify-center transition-colors">
+                <button 
+                  onClick={handleChatSubmit}
+                  disabled={loading || !chatInput.trim()}
+                  className="w-8 h-8 bg-blue-600 hover:bg-blue-700 rounded flex items-center justify-center transition-colors disabled:opacity-50"
+                  title="Send Message"
+                >
                   <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <line x1="18" y1="20" x2="18" y2="10"></line>
                     <line x1="12" y1="20" x2="12" y2="4"></line>
@@ -285,6 +486,29 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* Chat History */}
+          {chatHistory.length > 0 && (
+            <div className="w-full max-w-3xl space-y-4">
+              {chatHistory.map((msg, index) => (
+                <div key={index} className={`p-4 rounded-lg ${
+                  msg.role === 'user' ? 'bg-blue-900/20 ml-8' : 'bg-gray-800 mr-8'
+                }`}>
+                  <p className="text-sm text-gray-400 mb-1">
+                    {msg.role === 'user' ? 'You' : 'AI Assistant'}
+                  </p>
+                  <p className="text-white">{msg.content}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Error Display */}
+          {error && (
+            <div className="w-full max-w-3xl p-4 bg-red-900/20 border border-red-700 rounded-lg text-red-300">
+              {error}
+            </div>
+          )}
 
           {/* Promotional Banner */}
           <div className="w-full max-w-3xl bg-gradient-to-r from-purple-900/50 to-blue-900/50 border border-purple-700/50 rounded-2xl p-6">
@@ -302,7 +526,10 @@ const Dashboard: React.FC = () => {
                 </div>
                 <p className="text-gray-300">Early access to resume AI & unlimited uploads</p>
               </div>
-              <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors">
+              <button 
+                onClick={() => setShowPricing(true)}
+                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+              >
                 Upgrade
               </button>
             </div>
@@ -411,8 +638,12 @@ const Dashboard: React.FC = () => {
                     <span className="text-sm text-gray-400">/month</span>
                   </div>
                   <p className="text-gray-400 mb-6">Level up productivity and creativity with expanded access</p>
-                  <button className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg mb-4">
-                    Get Plus
+                  <button 
+                    onClick={() => handleUpgrade('plus')}
+                    disabled={loading}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg mb-4 disabled:opacity-50"
+                  >
+                    {loading ? "Processing..." : "Get Plus"}
                   </button>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-center space-x-2">
@@ -443,8 +674,12 @@ const Dashboard: React.FC = () => {
                     <span className="text-sm text-gray-400">/month</span>
                   </div>
                   <p className="text-gray-400 mb-6">Get the best of OpenAI with the highest level of access</p>
-                  <button className="w-full bg-white hover:bg-gray-100 text-black py-2 rounded-lg mb-4">
-                    Get Pro
+                  <button 
+                    onClick={() => handleUpgrade('pro')}
+                    disabled={loading}
+                    className="w-full bg-white hover:bg-gray-100 text-black py-2 rounded-lg mb-4 disabled:opacity-50"
+                  >
+                    {loading ? "Processing..." : "Get Pro"}
                   </button>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-center space-x-2">
@@ -480,7 +715,13 @@ const Dashboard: React.FC = () => {
                 </div>
                 <p className="text-gray-400 mb-6">Advanced AI capabilities for teams and organizations</p>
                 <div className="text-center mb-6">
-                  <button className="text-blue-400 hover:underline">Contact Sales</button>
+                  <button 
+                    onClick={() => handleUpgrade('business')}
+                    disabled={loading}
+                    className="text-blue-400 hover:underline disabled:opacity-50"
+                  >
+                    {loading ? "Processing..." : "Contact Sales"}
+                  </button>
                 </div>
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-center space-x-2">
@@ -532,13 +773,18 @@ const Dashboard: React.FC = () => {
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Simulate checking if user is logged in
+  // Check if user is logged in
   React.useEffect(() => {
-    // For demo purposes, show dashboard after a brief delay
-    const timer = setTimeout(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
       setIsLoggedIn(true);
-    }, 1000);
-    return () => clearTimeout(timer);
+    } else {
+      // For demo purposes, show dashboard after a brief delay
+      const timer = setTimeout(() => {
+        setIsLoggedIn(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   if (!isLoggedIn) {
