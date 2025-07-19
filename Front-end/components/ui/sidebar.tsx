@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-"use client";
+'use client';
 
-"use client";
+'use client';
 
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
@@ -33,11 +33,7 @@ export interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
   ({ className, children, variant, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(SidebarVariants({ variant }), className)}
-      {...props}
-    >
+    <div ref={ref} className={cn(SidebarVariants({ variant }), className)} {...props}>
       {children}
     </div>
   )
@@ -56,8 +52,17 @@ export const SidebarNav = ({ children }: { children?: React.ReactNode }) => (
   <div className="space-y-1">{children}</div>
 );
 
-export const SidebarNavItem = ({ children }: { children?: React.ReactNode }) => (
-  <div className="flex items-center space-x-2 px-2 py-1 hover:bg-accent rounded-md cursor-pointer">
+export const SidebarNavItem = ({
+  children,
+  onClick,
+}: {
+  children?: React.ReactNode;
+  onClick?: () => void;
+}) => (
+  <div
+    className="flex items-center space-x-2 px-2 py-1 hover:bg-accent rounded-md cursor-pointer"
+    onClick={onClick}
+  >
     {children}
   </div>
 );
@@ -85,11 +90,7 @@ export const SidebarNavItemBadge = React.forwardRef<
 ));
 SidebarNavItemBadge.displayName = 'SidebarNavItemBadge';
 
-export const SidebarWithLogo: React.FC<SidebarProps> = ({
-  className,
-  children,
-  ...props
-}) => (
+export const SidebarWithLogo: React.FC<SidebarProps> = ({ className, children, ...props }) => (
   <Sidebar className={className} {...props}>
     <SidebarHeader>
       <Logo size="md" className="mx-auto" />
@@ -97,4 +98,3 @@ export const SidebarWithLogo: React.FC<SidebarProps> = ({
     {children}
   </Sidebar>
 );
-
