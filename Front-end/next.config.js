@@ -67,12 +67,8 @@ const nextConfig = {
     }
     return config;
   },
-  // Development server configuration
-  ...(process.env.NODE_ENV === 'development' && {
-    experimental: {
-      forceSwcTransforms: true,
-    },
-  }),
+  // Development server configuration - clean config for stability
+  output: 'standalone',
 };
 
 module.exports = nextConfig;
