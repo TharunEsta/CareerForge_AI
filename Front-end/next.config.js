@@ -33,6 +33,21 @@ const nextConfig = {
       },
     ];
   },
+  // Configure redirects
+  async redirects() {
+    return [
+      {
+        source: '/home',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/chat',
+        destination: '/',
+        permanent: false,
+      },
+    ];
+  },
   // Configure webpack for better hot reloading and preview compatibility
   webpack: (config, { dev, isServer }) => {
     if (dev && !isServer) {
