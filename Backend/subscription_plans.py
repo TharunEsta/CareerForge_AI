@@ -25,7 +25,8 @@ class SubscriptionPlan:
         description: str,
         features: list[str],
         limits: dict[str, int],
-        billing_cycles: list[BillingCycle] = None
+        billing_cycles: list[BillingCycle] | None = None,
+        currency: str = "INR"
     ):
         self.id = id
         self.name = name
@@ -34,6 +35,7 @@ class SubscriptionPlan:
         self.features = features
         self.limits = limits
         self.billing_cycles = billing_cycles or [BillingCycle.MONTHLY]
+        self.currency = currency
 
 # Define subscription plans
 SUBSCRIPTION_PLANS = {
@@ -173,7 +175,7 @@ def is_feature_unlimited(plan_id: str, feature: str) -> bool:
 
 def get_all_plans() -> dict[str, SubscriptionPlan]:
     """Get all subscription plans"""
-    return SUBSCRIPTION_PLANS
+    return {plan_type.value: plan for plan_type, plan in SUBSCRIPTION_PLANS.items()}
 
 def get_plan_features(plan_id: str) -> list[str]:
     """Get features for plan"""
